@@ -44,4 +44,9 @@ class Transaction extends Model
     {
         return $this->morphTo();
     }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'transaction_tag');
+    }
 }
