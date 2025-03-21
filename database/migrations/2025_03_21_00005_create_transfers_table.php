@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Transaction;
+use App\Models\Transfer;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -8,14 +8,13 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create((new Transaction())->getTable(), function (Blueprint $table) {
+        Schema::create((new Transfer())->getTable(), function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('account_id')->constrained()->onDelete('cascade');
-            $table->foreignId('transaction_category_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('from_account_id')->constrained('accounts')->onDelete('cascade');
+            $table->foreignId('to_account_id')->constrained('accounts')->onDelete('cascade');
 
-            $table->enum('type', ['income', 'expense']);
             $table->decimal('amount', 16, 2);
             $table->date('date');
             $table->text('note')->nullable();
@@ -26,6 +25,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists((new Transaction())->getTable());
+        Schema::dropIfExists((new Transfer())->getTable());
     }
 };

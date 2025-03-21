@@ -19,6 +19,9 @@ class Transaction extends Model
         'amount',
         'date',
         'note',
+        'source_type',
+        'source_id',
+        'flag',
     ];
 
     public function user()
@@ -34,5 +37,11 @@ class Transaction extends Model
     public function category()
     {
         return $this->belongsTo(TransactionCategory::class, 'transaction_category_id');
+    }
+
+    // Polymorphic source
+    public function source()
+    {
+        return $this->morphTo();
     }
 }
