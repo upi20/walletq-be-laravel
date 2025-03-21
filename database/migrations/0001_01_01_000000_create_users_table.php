@@ -13,10 +13,22 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+
+            // Informasi user utama
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+
+            // Tambahan untuk fitur SAAS
+            $table->string('currency')->default('IDR'); // preferensi mata uang
+            $table->string('locale')->default('id');    // preferensi bahasa
+            $table->string('avatar')->nullable();       // URL profil
+            $table->string('plan')->default('free');    // free / premium / dsb
+
+            $table->decimal('balance', 16, 2)->default(0);
+
+            // Fitur Laravel standar
             $table->rememberToken();
             $table->timestamps();
         });
