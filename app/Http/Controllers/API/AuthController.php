@@ -1,9 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\Controller;
+use App\Models\AccountCategory;
+use App\Models\TransactionCategory;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -22,14 +26,32 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+        DB::beginTransaction();
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        $token = JWTAuth::fromUser($user);
+        // Buat master data default untuk user
+        $defaultAccountCategory = AccountCategory::select(
+            ['name', DB::raw("{$user->id} as user_id")]
+        )->where('is_default', true)
+            ->whereNull('user_id')
+            ->get()
+            ->toArray();
+        AccountCategory::insert($defaultAccountCategory);
 
+        $defaultTransactionCategory = TransactionCategory::select(
+            ['name', DB::raw("{$user->id} as user_id"), 'type']
+        )->where('is_default', true)
+            ->whereNull('user_id')
+            ->get()
+            ->toArray();
+        TransactionCategory::insert($defaultTransactionCategory);
+
+        $token = JWTAuth::fromUser($user);
+        DB::commit();
         return response()->json([
             'status' => 200,
             'message' => 'User registered successfully',
