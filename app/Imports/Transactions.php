@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Models\Account;
 use App\Models\Transaction;
 use App\Models\TransactionCategory;
+use App\Models\Transfer;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -24,19 +25,18 @@ class Transactions implements ToCollection
         if (is_null($user)) return true;
         $user_id = $user->id;
 
-        $timeNow = Carbon::now();
         $startFrom = 2;
-        $curentTransaction = null;
         $isDebt = false;
         $debt_payment = 'Tagih Hutang';
         $debt_collect = ['Beri Pinjaman', 'Tambah Pinjaman'];
         $debits = array_merge($debt_collect, [$debt_payment]);
 
         $isTransfer = false;
-        $transfer_in = 'Kirim Saldo';
-        $transfer_out = 'Terima Saldo';
+        $transfer_in = 'Terima Saldo';
+        $transfer_out = 'Kirim Saldo';
         $transfers = [$transfer_in, $transfer_out];
         $initial_balance = 'Saldo Awal';
+        $transfer = (object)[];
 
         foreach ($rows as $k => $r) {
             if ($k < $startFrom - 1) continue;
@@ -80,10 +80,28 @@ class Transactions implements ToCollection
 
             // Transfer
             if ($isTransfer) {
+                if ($kategori == $transfer_out) {
+                    $transfer = new Transfer();
+                    $transfer->user_id = $user_id;
+                    $transfer->from_account_id = $account->id;
+                    $transfer->to_account_id = $account->id;
+                    $transfer->amount = $transaction->amount;
+                    $transfer->date = $transaction->date;
+                    $transfer->save();
+                } else {
+                    $transfer->to_account_id = $account->id;
+                    $transfer->save();
+                }
 
                 // Flag Check
+                $transaction->source_id = $transfer->id;
                 $transaction->flag = $kategori == $transfer_in ? 'transfer_in' : 'transfer_out';
                 $transaction->save();
+
+                if ($transaction_category->is_hide == false) {
+                    $transaction_category->is_hide = true;
+                    $transaction_category->save();
+                }
             }
 
             // Debt
@@ -92,6 +110,11 @@ class Transactions implements ToCollection
                 // Flag Check
                 $transaction->flag = in_array($kategori, $debt_collect) ? 'debt_collect' : 'debt_payment';
                 $transaction->save();
+
+                if ($transaction_category->is_hide == false) {
+                    $transaction_category->is_hide = true;
+                    $transaction_category->save();
+                }
             }
 
             // Initial Balance
@@ -102,9 +125,12 @@ class Transactions implements ToCollection
 
                 $account->initial_balance = $transaction->amount;
                 $account->save();
-            }
 
-            $curentTransaction = $transaction;
+                if ($transaction_category->is_hide == false) {
+                    $transaction_category->is_hide = true;
+                    $transaction_category->save();
+                }
+            }
         }
     }
 }
