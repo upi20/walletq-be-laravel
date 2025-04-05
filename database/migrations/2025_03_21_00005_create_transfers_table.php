@@ -11,9 +11,9 @@ return new class extends Migration {
         Schema::create((new Transfer())->getTable(), function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('from_account_id')->constrained('accounts')->onDelete('cascade');
-            $table->foreignId('to_account_id')->constrained('accounts')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->nullOnDelete();
+            $table->foreignId('from_account_id')->constrained('accounts')->nullOnDelete();
+            $table->foreignId('to_account_id')->constrained('accounts')->nullOnDelete();
 
             $table->decimal('amount', 16, 2);
             $table->date('date');

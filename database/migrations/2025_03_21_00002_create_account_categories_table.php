@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->id();
 
             // Jika null → default global
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
 
             $table->string('name');         // Nama kategori: Cash, Bank, dll
             $table->boolean('is_default')->default(false); // Penanda default dari sistem

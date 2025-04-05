@@ -12,10 +12,10 @@ return new class extends Migration {
             $table->id();
 
             // Relasi ke user
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
 
             // Kategori akun
-            $table->foreignId('account_category_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('account_category_id')->nullable()->constrained()->nullOnDelete();
 
             $table->string('name'); // contoh: BCA, Dompet, OVO
             $table->string('type')->nullable(); // misal: 'tabungan', 'utama'

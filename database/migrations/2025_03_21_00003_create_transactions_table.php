@@ -11,13 +11,13 @@ return new class extends Migration {
         Schema::create((new Transaction())->getTable(), function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('account_id')->constrained()->onDelete('cascade');
-            $table->foreignId('transaction_category_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('user_id')->constrained()->nullOnDelete();
+            $table->foreignId('account_id')->constrained()->nullOnDelete();
+            $table->foreignId('transaction_category_id')->nullable()->constrained()->nullOnDelete();
 
             $table->enum('type', ['income', 'expense']);
             $table->decimal('amount', 16, 2);
-            $table->date('date');
+            $table->dateTime('date');
             $table->text('note')->nullable();
 
             $table->string('source_type')->nullable();
@@ -29,6 +29,7 @@ return new class extends Migration {
                 'transfer_out',
                 'debt_payment',
                 'debt_collect',
+                'initial_balance',
             ])->default('normal');
 
             $table->timestamps();

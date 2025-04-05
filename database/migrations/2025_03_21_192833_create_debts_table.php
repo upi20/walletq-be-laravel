@@ -11,7 +11,7 @@ return new class extends Migration {
         Schema::create((new Debt())->getTable(), function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->nullOnDelete();
 
             $table->string('contact_name'); // nama orang / lembaga
             $table->enum('type', ['debt', 'receivable']); // debt = kita utang, receivable = orang lain utang ke kita

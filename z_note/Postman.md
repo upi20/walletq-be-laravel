@@ -1,3 +1,56 @@
+# Feature Concept
+## User Auth
+  - Register
+  - Login
+  - Forgot Password
+  - Refresh JWT token
+
+## User Profile
+  - Get Profile
+  - Edit Password
+  - Edit Profile
+    - Name
+    - Email
+    - Profile Picture
+
+## Master Data
+### Account Category
+  - Create
+  - Read
+  - Update
+  - Delete
+
+### Transaction Category
+  - Create
+  - Read
+    - Filter [type]
+  - Update
+  - Delete
+
+### Account
+  - Create
+  - Read
+  - Update
+  - Delete
+
+## Transaction
+  - Create
+  - Import Data
+  - Template Import
+  - Read
+    - Filter
+  - Delete
+
+## Page
+### Home
+### Report
+### Debt
+
+
+
+
+
+
 # UangKu API
 ## 👤 Administrator
 ### 📦 Master Data 
