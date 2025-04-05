@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
@@ -81,5 +82,33 @@ class User extends Authenticatable implements JWTSubject
     public function settings()
     {
         return $this->hasMany(Setting::class, 'user_id', 'id');
+    }
+
+    public static function refreshBalance($user_id)
+    {
+        try {
+            $user = self::find($user_id);
+            $amount = 0;
+            $allAccount = Account::where('user_id', $user_id)->get();
+            foreach ($allAccount as $account) {
+                $income = Transaction::where('user_id', $user_id)
+                    ->where('account_id', $account->id)
+                    ->where('type', 'income')->sum('amount');
+                $expense = Transaction::where('user_id', $user_id)
+                    ->where('account_id', $account->id)
+                    ->where('type', 'expense')->sum('amount');
+
+                $account->current_balance = $income - $expense;
+                $account->save();
+
+                $amount += $account->current_balance;
+            }
+
+            $user->balance = $amount;
+            $user->save();
+            return $amount;
+        } catch (\Throwable $th) {
+            Log::info($th);
+        }
     }
 }
