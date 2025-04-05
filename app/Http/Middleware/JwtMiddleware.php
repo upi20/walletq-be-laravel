@@ -12,6 +12,9 @@ class JwtMiddleware
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
+            if ($user == false) {
+                return response()->json(['error' => 'Token not valid'], 401);
+            }
         } catch (JWTException $e) {
             return response()->json(['error' => 'Token not valid'], 401);
         }

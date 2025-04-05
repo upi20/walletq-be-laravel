@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ImportTransaction;
 use App\Models\Transaction;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,8 +12,9 @@ return new class extends Migration {
         Schema::create((new Transaction())->getTable(), function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('user_id')->constrained()->nullOnDelete();
-            $table->foreignId('account_id')->constrained()->nullOnDelete();
+            $table->foreignId('import_id')->nullable()->constrained((new ImportTransaction())->getTable(), 'id')->nullOnDelete()->default(null);
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('account_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('transaction_category_id')->nullable()->constrained()->nullOnDelete();
 
             $table->enum('type', ['income', 'expense']);
