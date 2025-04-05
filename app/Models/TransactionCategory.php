@@ -14,8 +14,9 @@ class TransactionCategory extends Model
     protected $fillable = [
         'user_id',
         'name',
-        'type',
+        'type', // 'income', 'expense'
         'is_default',
+        'is_hide',
     ];
 
     public function user()

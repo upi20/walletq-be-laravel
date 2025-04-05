@@ -12,6 +12,7 @@ class Transaction extends Model
     protected $table = 'transactions';
 
     protected $fillable = [
+        'import_id',
         'user_id',
         'account_id',
         'transaction_category_id',
@@ -21,12 +22,17 @@ class Transaction extends Model
         'note',
         'source_type',
         'source_id',
-        'flag',
+        'flag', // ['normal', 'transfer_in', 'transfer_out', 'debt_payment', 'debt_collect', 'initial_balance']
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function import()
+    {
+        return $this->belongsTo(ImportTransaction::class);
     }
 
     public function account()

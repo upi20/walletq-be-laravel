@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\Admin\AccountCategoryController;
+use App\Http\Controllers\API\User\Transaction\ImportTransactionController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -33,7 +34,10 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-    Route::prefix('user')->group(function () {
+    Route::prefix('user')->middleware('jwt')->group(function () {
+        Route::prefix('transaction')->group(function(){
+            Route::post('import', [ImportTransactionController::class, 'handleImport']);
 
+        });
     });
 });
