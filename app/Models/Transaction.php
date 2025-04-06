@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 
 class Transaction extends Model
 {
@@ -22,8 +23,30 @@ class Transaction extends Model
         'note',
         'source_type',
         'source_id',
-        'flag', // ['normal', 'transfer_in', 'transfer_out', 'debt_payment', 'debt_collect', 'initial_balance']
+        'flag',
     ];
+
+    const CATEGORY_INITIAL_BALANCE = 'Saldo Awal';
+    const TYPE_INCOME = 'income';
+    const TYPE_EXPENSE = 'expense';
+
+    // Flag ==========================================
+    const FLAG_NORMAL = 'normal';
+    const FLAG_TRANSFER_IN = 'transfer_in';
+    const FLAG_TRANSFER_OUT = 'transfer_out';
+    const FLAG_DEBT_PAYMENT = 'debt_payment';
+    const FLAG_DEBT_COLLECT = 'debt_collect';
+    const FLAG_INITIAL_BALANCE = 'initial_balance';
+
+    const FLAGS = [
+        self::FLAG_NORMAL,
+        self::FLAG_TRANSFER_IN,
+        self::FLAG_TRANSFER_OUT,
+        self::FLAG_DEBT_PAYMENT,
+        self::FLAG_DEBT_COLLECT,
+        self::FLAG_INITIAL_BALANCE,
+    ];
+    // Flag ==========================================
 
     public function user()
     {

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\Admin\AccountCategoryController;
+use App\Http\Controllers\API\User\MasterData\AccountController;
 use App\Http\Controllers\API\User\Transaction\ImportTransactionController;
 
 Route::get('/user', function (Request $request) {
@@ -22,7 +23,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/refresh', [AuthController::class, 'refresh']);
         });
     });
-    
+
     // Admin
     Route::prefix('admin')->group(function () {
         Route::prefix('master-data')->group(function () {
@@ -35,9 +36,17 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::prefix('user')->middleware('jwt')->group(function () {
-        Route::prefix('transaction')->group(function(){
+        Route::prefix('transaction')->group(function () {
             Route::post('import', [ImportTransactionController::class, 'handleImport']);
-
+        });
+        Route::prefix('master-data')->group(function () {
+            Route::prefix('account')->group(function () {
+                Route::get('/', [AccountController::class, 'index']);
+                Route::post('/', [AccountController::class, 'store']);
+                Route::get('/{id}', [AccountController::class, 'show']);
+                Route::put('/{id}', [AccountController::class, 'update']);
+                Route::delete('/{id}', [AccountController::class, 'destroy']);
+            });
         });
     });
 });

@@ -35,7 +35,7 @@ class Transactions implements ToCollection
         $transfer_in = 'Terima Saldo';
         $transfer_out = 'Kirim Saldo';
         $transfers = [$transfer_in, $transfer_out];
-        $initial_balance = 'Saldo Awal';
+        $initial_balance = Transaction::CATEGORY_INITIAL_BALANCE;
         $transfer = (object)[];
 
         foreach ($rows as $k => $r) {
@@ -45,7 +45,7 @@ class Transactions implements ToCollection
             $jumlah = $r[charIndex('C')];
             $tanggal = $r[charIndex('D')];
             $catatan = $r[charIndex('E')];
-            $type = $r[charIndex('F')] == '+' ? 'income' : 'expense';
+            $type = $r[charIndex('F')] == '+' ? Transaction::TYPE_INCOME : Transaction::TYPE_EXPENSE;
             $isDebt = in_array($kategori, $debits);
             $isTransfer = in_array($kategori, $transfers);
 
@@ -95,7 +95,7 @@ class Transactions implements ToCollection
 
                 // Flag Check
                 $transaction->source_id = $transfer->id;
-                $transaction->flag = $kategori == $transfer_in ? 'transfer_in' : 'transfer_out';
+                $transaction->flag = $kategori == $transfer_in ? Transaction::FLAG_TRANSFER_IN : Transaction::FLAG_TRANSFER_OUT;
                 $transaction->save();
 
                 if ($transaction_category->is_hide == false) {
@@ -108,7 +108,7 @@ class Transactions implements ToCollection
             if ($isDebt) {
 
                 // Flag Check
-                $transaction->flag = in_array($kategori, $debt_collect) ? 'debt_collect' : 'debt_payment';
+                $transaction->flag = in_array($kategori, $debt_collect) ? Transaction::FLAG_DEBT_COLLECT : Transaction::FLAG_DEBT_PAYMENT;
                 $transaction->save();
 
                 if ($transaction_category->is_hide == false) {
@@ -120,11 +120,13 @@ class Transactions implements ToCollection
             // Initial Balance
             if ($kategori == $initial_balance) {
                 // Flag Check
-                $transaction->flag = 'initial_balance';
+                $transaction->flag = Transaction::FLAG_INITIAL_BALANCE;
                 $transaction->save();
 
                 $account->initial_balance = $transaction->amount;
                 $account->save();
+                $transaction->source_id = $account->id;
+                $transaction->save();
 
                 if ($transaction_category->is_hide == false) {
                     $transaction_category->is_hide = true;

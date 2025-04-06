@@ -7,6 +7,7 @@ use App\Imports\Transactions;
 use App\Models\Account;
 use App\Models\ImportTransaction;
 use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -43,8 +44,7 @@ class ImportTransactionController extends Controller
 
             Excel::import(new Transactions($import->id), $file);
 
-            $user->balance = $this->refreshBalance($user->id);
-            $user->save();
+            User::refreshBalance($user->id);
             DB::commit();
         } catch (\Exception $ex) {
             $error_message = $ex->getMessage();
@@ -73,26 +73,5 @@ class ImportTransactionController extends Controller
         $cleanFile = $cleanName . '.' . $info['extension'];
 
         return strtolower($cleanFile);
-    }
-
-    private function refreshBalance($user_id)
-    {
-        $amount = 0;
-        $allAccount = Account::where('user_id', $user_id)->get();
-        foreach ($allAccount as $account) {
-            $income = Transaction::where('user_id', $user_id)
-                ->where('account_id', $account->id)
-                ->where('type', 'income')->sum('amount');
-            $expense = Transaction::where('user_id', $user_id)
-                ->where('account_id', $account->id)
-                ->where('type', 'expense')->sum('amount');
-
-            $account->current_balance = $income - $expense;
-            $account->save();
-
-            $amount+=$account->current_balance;
-        }
-
-        return $amount;
     }
 }
