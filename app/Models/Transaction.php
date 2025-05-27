@@ -26,6 +26,11 @@ class Transaction extends Model
         'flag',
     ];
 
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'date' => 'datetime',
+    ];
+
     const CATEGORY_INITIAL_BALANCE = 'Saldo Awal';
     const TYPE_INCOME = 'income';
     const TYPE_EXPENSE = 'expense';

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\User\Transaction;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -10,13 +11,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
-{
-    public function index(Request $request)
+{    public function index(Request $request)
     {
         $query = $request->user()->transactions()
-            ->with(['category', 'account', 'tags'])
-            ->orderBy('date', 'desc')
-            ->orderBy('created_at', 'desc');
+            ->with(['category', 'account', 'tags']);        // Exclude initial balance transactions
+        $query->where('flag', Transaction::FLAG_NORMAL);
 
         // Apply filters if any
         if ($request->has('account_id')) {
@@ -28,12 +27,17 @@ class TransactionController extends Controller
         if ($request->has('type')) {
             $query->where('type', $request->type);
         }
+        
+        // Date range filtering
         if ($request->has('start_date')) {
-            $query->whereDate('date', '>=', $request->start_date);
+            $query->whereDate('date', '>=', date('Y-m-d', strtotime($request->start_date)));
+        }        if ($request->has('end_date')) {
+            $query->whereDate('date', '<=', date('Y-m-d', strtotime($request->end_date)));
         }
-        if ($request->has('end_date')) {
-            $query->whereDate('date', '<=', $request->end_date);
-        }
+
+        // Apply sorting
+        $query->orderBy('date', 'desc')
+              ->orderBy('created_at', 'desc');
 
         $transactions = $query->get();
 
@@ -42,9 +46,7 @@ class TransactionController extends Controller
             'message' => 'Transactions fetched successfully',
             'data' => $transactions
         ]);
-    }
-
-    public function store(Request $request)
+    }    public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'account_id' => 'required|exists:accounts,id',
@@ -64,43 +66,75 @@ class TransactionController extends Controller
         try {
             DB::beginTransaction();
 
-            $transaction = new Transaction();
-            $transaction->user_id = $request->user()->id;
-            $transaction->account_id = $request->account_id;
-            $transaction->transaction_category_id = $request->transaction_category_id;
-            $transaction->type = $request->type;
-            $transaction->amount = $request->amount;
-            $transaction->date = $request->date;
-            $transaction->note = $request->note;
-            $transaction->flag = Transaction::FLAG_NORMAL;
+            \Log::debug('Creating transaction', [
+                'user_id' => $request->user()->id,
+                'account_id' => $request->account_id,
+                'amount' => $request->amount,
+                'type' => $request->type
+            ]);
+
+            // Lock account for update to prevent race conditions
+            $account = $request->user()->accounts()
+                ->where('id', $request->account_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            // Check for sufficient balance if this is an expense
+            if ($request->type === 'expense' && !$account->hasSufficientBalance($request->amount)) {
+                DB::rollback();
+                return response()->json([
+                    'status' => 422,
+                    'message' => 'Insufficient balance for this transaction'
+                ], 422);
+            }
+
+            // Create and save the transaction first
+            $transaction = new Transaction([
+                'user_id' => $request->user()->id,
+                'account_id' => $account->id,
+                'transaction_category_id' => $request->transaction_category_id,
+                'type' => $request->type,
+                'amount' => $request->amount,
+                'date' => $request->date,
+                'note' => $request->note,
+                'flag' => Transaction::FLAG_NORMAL
+            ]);
+
             $transaction->save();
+
+            // Update account balance
+            $account->updateBalance($transaction->amount, $transaction->type);
+            
+            // Update user's total balance
+            User::refreshBalance($request->user()->id);
 
             // Attach tags if any
             if ($request->has('tags')) {
                 $transaction->tags()->attach($request->tags);
             }
-
-            User::refreshBalance($request->user()->id);
             
             DB::commit();
+
+            // Load relationships for response
+            $transaction->load(['category', 'account', 'tags']);
 
             return response()->json([
                 'status' => 201,
                 'message' => 'Transaction created successfully',
-                'data' => $transaction->load(['category', 'account', 'tags'])
-            ]);
-
-        } catch (\Exception $e) {
+                'data' => $transaction
+            ], 201);} catch (\Exception $e) {
             DB::rollback();
+            \Log::error('Error creating transaction', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'status' => 500,
                 'message' => 'Error creating transaction',
                 'error' => $e->getMessage()
             ], 500);
         }
-    }
-
-    public function storeBulk(Request $request)
+    }    public function storeBulk(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'transactions' => 'required|array|min:1',
@@ -122,17 +156,46 @@ class TransactionController extends Controller
             DB::beginTransaction();
 
             $createdTransactions = [];
+            $accounts = collect();
+
+            // First verify balances for all transactions
             foreach ($request->transactions as $transactionData) {
-                $transaction = new Transaction();
-                $transaction->user_id = $request->user()->id;
-                $transaction->account_id = $transactionData['account_id'];
-                $transaction->transaction_category_id = $transactionData['transaction_category_id'];
-                $transaction->type = $transactionData['type'];
-                $transaction->amount = $transactionData['amount'];
-                $transaction->date = $transactionData['date'];
-                $transaction->note = $transactionData['note'] ?? null;
-                $transaction->flag = Transaction::FLAG_NORMAL;
+                $account = $accounts->get($transactionData['account_id']) ?? 
+                    $request->user()->accounts()
+                        ->where('id', $transactionData['account_id'])
+                        ->lockForUpdate()
+                        ->firstOrFail();
+                
+                $accounts->put($transactionData['account_id'], $account);
+
+                if ($transactionData['type'] === 'expense' && !$account->hasSufficientBalance($transactionData['amount'])) {
+                    DB::rollback();
+                    return response()->json([
+                        'status' => 422,
+                        'message' => "Insufficient balance in account {$account->name} for transaction of {$transactionData['amount']}"
+                    ], 422);
+                }
+            }
+
+            // Create all transactions and update balances
+            foreach ($request->transactions as $transactionData) {
+                $account = $accounts->get($transactionData['account_id']);
+                
+                $transaction = new Transaction([
+                    'user_id' => $request->user()->id,
+                    'account_id' => $account->id,
+                    'transaction_category_id' => $transactionData['transaction_category_id'],
+                    'type' => $transactionData['type'],
+                    'amount' => $transactionData['amount'],
+                    'date' => $transactionData['date'],
+                    'note' => $transactionData['note'] ?? null,
+                    'flag' => Transaction::FLAG_NORMAL
+                ]);
+
                 $transaction->save();
+
+                // Update account balance
+                $account->updateBalance($transaction->amount, $transaction->type);
 
                 // Attach tags if any
                 if (isset($transactionData['tags']) && is_array($transactionData['tags'])) {
@@ -142,6 +205,7 @@ class TransactionController extends Controller
                 $createdTransactions[] = $transaction;
             }
 
+            // Update user's total balance after all transactions
             User::refreshBalance($request->user()->id);
             
             DB::commit();

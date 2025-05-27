@@ -19,6 +19,56 @@ class Account extends Model
         'current_balance',
     ];
 
+    protected $casts = [
+        'initial_balance' => 'decimal:2',
+        'current_balance' => 'decimal:2',
+    ];
+
+    /**
+     * Update account balance based on a new transaction
+     */
+    public function updateBalance($amount, $type)
+    {
+        $this->current_balance += ($type === 'income' ? $amount : -$amount);
+        $this->save();
+
+        // Update user's total balance
+        User::refreshBalance($this->user_id);
+
+        return $this->current_balance;
+    }
+
+    /**
+     * Check if account has sufficient balance for an expense
+     */
+    public function hasSufficientBalance($amount)
+    {
+        return $this->current_balance >= $amount;
+    }
+
+    /**
+     * Recalculate current balance from all transactions
+     */
+    public function recalculateBalance()
+    {
+        $balance = $this->initial_balance;
+
+        $this->transactions()
+            ->where('flag', '!=', Transaction::FLAG_INITIAL_BALANCE)
+            ->orderBy('date', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->chunk(100, function ($transactions) use (&$balance) {
+                foreach ($transactions as $transaction) {
+                    $balance += ($transaction->type === 'income' ? $transaction->amount : -$transaction->amount);
+                }
+            });
+
+        $this->current_balance = $balance;
+        $this->save();
+
+        return $balance;
+    }
+
     // Relasi ke User
     public function user()
     {

@@ -18,14 +18,21 @@ class AccountController extends Controller
     {
         $user = $request->user();
         $accounts = $user->accounts()->orderBy('name', 'asc')->with(['category'])->get();
-        $data = [
-            'balance' => (float)$user->balance,
-            'accounts' => $accounts,
-        ];
+        
+        // Calculate total balance
+        $totalBalance = $accounts->sum('current_balance');
+        
+        // Update user's balance
+        $user->balance = $totalBalance;
+        $user->save();
+
         return response()->json([
             'status' => 200,
             'message' => 'Accounts fetched successfully',
-            'data' => $data
+            'data' => [
+                'balance' => $totalBalance,
+                'accounts' => $accounts
+            ]
         ], 200);
     }
 
@@ -44,15 +51,16 @@ class AccountController extends Controller
 
         DB::beginTransaction();
 
-        // Menyimpan akun baru untuk user
+        // Create account first
         $account = $request->user()->accounts()->create([
             'name' => $request->name,
             'account_category_id' => $request->account_category_id,
             'initial_balance' => $request->initial_balance,
-            'current_balance' => $request->initial_balance,  // Initial balance is also the current balance initially
+            'current_balance' => $request->initial_balance,
         ]);
 
-        if ($request->initial_balance > 0) {
+        // Always create initial balance transaction if initial balance is not 0
+        if ($request->initial_balance != 0) {
             $type = Transaction::TYPE_INCOME;
             $kategori = Transaction::CATEGORY_INITIAL_BALANCE;
             $transaction_category = TransactionCategory::where('name', $kategori)->where('user_id', $account->user_id)->where('type', $type)->first();

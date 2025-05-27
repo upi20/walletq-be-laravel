@@ -48,7 +48,41 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
-    // implement method wajib
+    /**
+     * Calculate and update user's total balance
+     */
+    public static function refreshBalance($userId)
+    {
+        $user = static::findOrFail($userId);
+        $totalBalance = $user->accounts()
+            ->sum('current_balance');
+            
+        $user->balance = $totalBalance;
+        $user->save();
+        
+        return $totalBalance;
+    }
+
+    public function accounts()
+    {
+        return $this->hasMany(Account::class);
+    }
+
+    public function accountCategories()
+    {
+        return $this->hasMany(AccountCategory::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function transactionCategories()
+    {
+        return $this->hasMany(TransactionCategory::class);
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -57,63 +91,5 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
-    }
-
-    public function accountCategories()
-    {
-        return $this->hasMany(AccountCategory::class, 'user_id', 'id');
-    }
-
-    public function transactionCategories()
-    {
-        return $this->hasMany(TransactionCategory::class, 'user_id', 'id');
-    }
-
-    public function accounts()
-    {
-        return $this->hasMany(Account::class, 'user_id', 'id');
-    }
-
-    public function transactions()
-    {
-        return $this->hasMany(Transaction::class, 'user_id', 'id');
-    }
-
-    public function transfers()
-    {
-        return $this->hasMany(Transfer::class, 'user_id', 'id');
-    }
-
-    public function settings()
-    {
-        return $this->hasMany(Setting::class, 'user_id', 'id');
-    }
-
-    public static function refreshBalance($user_id)
-    {
-        try {
-            $user = self::find($user_id);
-            $amount = 0;
-            $allAccount = Account::where('user_id', $user_id)->get();
-            foreach ($allAccount as $account) {
-                $income = Transaction::where('user_id', $user_id)
-                    ->where('account_id', $account->id)
-                    ->where('type', 'income')->sum('amount');
-                $expense = Transaction::where('user_id', $user_id)
-                    ->where('account_id', $account->id)
-                    ->where('type', 'expense')->sum('amount');
-
-                $account->current_balance = $income - $expense;
-                $account->save();
-
-                $amount += $account->current_balance;
-            }
-
-            $user->balance = $amount;
-            $user->save();
-            return $amount;
-        } catch (\Throwable $th) {
-            Log::info($th);
-        }
     }
 }
