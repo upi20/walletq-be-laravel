@@ -15,13 +15,8 @@ class AccountFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'account_category_id' => AccountCategory::factory(),            'name' => $this->faker->unique()->words(2, true),
-            'initial_balance' => function (array $attributes) {
-                return $attributes['current_balance'] ?? $this->faker->numberBetween(0, 10000000);
-            },
-            'current_balance' => function (array $attributes) {
-                return $attributes['initial_balance'] ?? $this->faker->numberBetween(0, 10000000);
-            }
+            'account_category_id' => AccountCategory::factory(),            'name' => $this->faker->unique()->words(2, true),            'initial_balance' => $this->faker->numberBetween(0, 10000000),
+            'current_balance' => $this->faker->numberBetween(0, 10000000)
         ];
     }
 
