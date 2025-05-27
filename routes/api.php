@@ -6,6 +6,8 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\Admin\AccountCategoryController;
 use App\Http\Controllers\API\User\MasterData\AccountController;
 use App\Http\Controllers\API\User\Transaction\ImportTransactionController;
+use App\Http\Controllers\API\User\Transaction\TransactionController;
+use App\Http\Controllers\API\User\MasterData\TransactionCategoryController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -36,16 +38,38 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::prefix('user')->middleware('jwt')->group(function () {
+        // Transactions
+        Route::prefix('transactions')->group(function () {
+            Route::get('/', [TransactionController::class, 'index']);
+            Route::post('/', [TransactionController::class, 'store']);
+            Route::post('/bulk', [TransactionController::class, 'storeBulk']);
+            Route::get('/{id}', [TransactionController::class, 'show']);
+            Route::put('/{id}', [TransactionController::class, 'update']);
+            Route::delete('/{id}', [TransactionController::class, 'destroy']);
+        });
+
+        // Import transactions
         Route::prefix('transaction')->group(function () {
             Route::post('import', [ImportTransactionController::class, 'handleImport']);
         });
+        // Master Data
         Route::prefix('master-data')->group(function () {
+            // Account routes
             Route::prefix('account')->group(function () {
                 Route::get('/', [AccountController::class, 'index']);
                 Route::post('/', [AccountController::class, 'store']);
                 Route::get('/{id}', [AccountController::class, 'show']);
                 Route::put('/{id}', [AccountController::class, 'update']);
                 Route::delete('/{id}', [AccountController::class, 'destroy']);
+            });
+
+            // Transaction Category routes
+            Route::prefix('transaction-category')->group(function () {
+                Route::get('/', [TransactionCategoryController::class, 'index']);
+                Route::post('/', [TransactionCategoryController::class, 'store']);
+                Route::get('/{id}', [TransactionCategoryController::class, 'show']);
+                Route::put('/{id}', [TransactionCategoryController::class, 'update']);
+                Route::delete('/{id}', [TransactionCategoryController::class, 'destroy']);
             });
         });
     });

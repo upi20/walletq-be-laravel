@@ -86,6 +86,7 @@
 ### 💰 Transactions
 [ ] - **GET**   `/user/transactions`               - List transactions
 [ ] - **POST**  `/user/transactions`               - Create transaction
+[ ] - **POST**  `/user/transactions/bulk`          - Create multiple transactions at once
 [ ] - **GET**   `/user/transactions/{id}`          - View transaction
 [ ] - **PUT**   `/user/transactions/{id}`          - Update transaction
 [ ] - **DELETE** `/user/transactions/{id}`         - Delete transaction
@@ -116,3 +117,134 @@
 
 
 ### Environment
+
+# API Documentation with Examples
+
+## Transactions API
+
+### Create Single Transaction
+**Endpoint:** POST `/user/transactions`
+
+**Request Body:**
+```json
+{
+    "account_id": 1,
+    "transaction_category_id": 2,
+    "type": "expense",  // income or expense
+    "amount": 50000,
+    "date": "2025-05-28",
+    "note": "Lunch at restaurant",
+    "tags": ["food", "lunch"]  // optional
+}
+```
+
+### Create Bulk Transactions
+**Endpoint:** POST `/user/transactions/bulk`
+
+**Request Body:**
+```json
+{
+    "transactions": [
+        {
+            "account_id": 1,
+            "transaction_category_id": 2,
+            "type": "expense",
+            "amount": 50000,
+            "date": "2025-05-28",
+            "note": "Lunch",
+            "tags": ["food"]
+        },
+        {
+            "account_id": 1,
+            "transaction_category_id": 3,
+            "type": "expense",
+            "amount": 25000,
+            "date": "2025-05-28",
+            "note": "Transport",
+            "tags": ["transport"]
+        }
+    ]
+}
+```
+
+### Create Transfer
+**Endpoint:** POST `/user/transfers`
+
+**Request Body:**
+```json
+{
+    "from_account_id": 1,
+    "to_account_id": 2,
+    "amount": 100000,
+    "date": "2025-05-28",
+    "note": "Transfer to savings"
+}
+```
+
+### Create Debt
+**Endpoint:** POST `/user/debts`
+
+**Request Body:**
+```json
+{
+    "type": "debt",  // debt or receivable
+    "amount": 500000,
+    "date": "2025-05-28",
+    "due_date": "2025-06-28",
+    "note": "Borrowed money from John",
+    "contact_name": "John Doe"
+}
+```
+
+### Pay Debt
+**Endpoint:** POST `/user/debts/{id}/pay`
+
+**Request Body:**
+```json
+{
+    "amount": 100000,
+    "date": "2025-05-28",
+    "note": "First payment"
+}
+```
+
+## Transaction Categories API
+
+### List Transaction Categories
+**Endpoint:** GET `/user/master-data/transaction-category`
+
+Query Parameters:
+- type (optional) - Filter by type: 'income' or 'expense'
+
+### Create Transaction Category
+**Endpoint:** POST `/user/master-data/transaction-category`
+
+**Request Body:**
+```json
+{
+    "name": "Food & Beverages",
+    "type": "expense"  // income or expense
+}
+```
+
+### View Transaction Category
+**Endpoint:** GET `/user/master-data/transaction-category/{id}`
+
+### Update Transaction Category
+**Endpoint:** PUT `/user/master-data/transaction-category/{id}`
+
+**Request Body:**
+```json
+{
+    "name": "Updated Category Name",
+    "type": "expense"  // income or expense
+}
+```
+
+### Delete Transaction Category
+**Endpoint:** DELETE `/user/master-data/transaction-category/{id}`
+
+Notes:
+- Default categories cannot be updated or deleted
+- Categories that are being used in transactions cannot be deleted
+- The type field must be either 'income' or 'expense'
