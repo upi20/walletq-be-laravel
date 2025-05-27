@@ -64,6 +64,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(AccountCategory::class, 'user_id', 'id');
     }
 
+    public function transactionCategories()
+    {
+        return $this->hasMany(TransactionCategory::class, 'user_id', 'id');
+    }
+
     public function accounts()
     {
         return $this->hasMany(Account::class, 'user_id', 'id');

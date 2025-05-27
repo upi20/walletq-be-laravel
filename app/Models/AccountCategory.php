@@ -14,6 +14,7 @@ class AccountCategory extends Model
     protected $fillable = [
         'user_id',
         'name',
+        'type',
         'is_default',
     ];
 

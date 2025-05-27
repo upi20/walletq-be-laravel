@@ -18,7 +18,7 @@ class AccountCategoryController extends Controller
             'status' => 200,
             'message' => 'Account categories fetched successfully',
             'data' => $accountCategories
-        ]);
+        ], 200);
     }
 
     // Menambahkan kategori akun baru
@@ -43,7 +43,7 @@ class AccountCategoryController extends Controller
             'status' => 201,
             'message' => 'Account category created successfully',
             'data' => $accountCategory
-        ]);
+        ], 201);
     }
 
     // Menampilkan kategori akun tertentu
@@ -62,7 +62,7 @@ class AccountCategoryController extends Controller
             'status' => 200,
             'message' => 'Account category fetched successfully',
             'data' => $accountCategory
-        ]);
+        ], 200);
     }
 
     // Mengupdate kategori akun
@@ -96,7 +96,7 @@ class AccountCategoryController extends Controller
             'status' => 200,
             'message' => 'Account category updated successfully',
             'data' => $accountCategory
-        ]);
+        ], 200);
     }
 
     // Menghapus kategori akun
@@ -117,6 +117,6 @@ class AccountCategoryController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'Account category deleted successfully'
-        ]);
+        ], 200);
     }
 }

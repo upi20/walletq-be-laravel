@@ -27,7 +27,7 @@ Route::prefix('v1')->group(function () {
     });
 
     // Admin
-    Route::prefix('admin')->group(function () {
+    Route::prefix('admin')->middleware('jwt')->group(function () {
         Route::prefix('master-data')->group(function () {
             Route::get('/account-categories', [AccountCategoryController::class, 'index']);  // List all categories
             Route::post('/account-categories', [AccountCategoryController::class, 'store']);  // Create new category

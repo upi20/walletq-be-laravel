@@ -51,13 +51,11 @@ class TransactionCategoryController extends Controller
                 'is_hide' => false
             ]);
 
-            DB::commit();
-
-            return response()->json([
+            DB::commit();            return response()->json([
                 'status' => 201,
                 'message' => 'Transaction category created successfully',
                 'data' => $category
-            ]);
+            ], 201);
 
         } catch (\Exception $e) {
             DB::rollback();

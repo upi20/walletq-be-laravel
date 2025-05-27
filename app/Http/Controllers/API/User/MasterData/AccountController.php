@@ -26,7 +26,7 @@ class AccountController extends Controller
             'status' => 200,
             'message' => 'Accounts fetched successfully',
             'data' => $data
-        ]);
+        ], 200);
     }
 
     // Menambahkan akun baru
@@ -81,27 +81,26 @@ class AccountController extends Controller
             'status' => 201,
             'message' => 'Account created successfully',
             'data' => $account
-        ]);
+        ], 201);
     }
 
     // Menampilkan akun tertentu
     public function show(Request $request, $id)
     {
-        try {
-            $account = $request->user()->accounts()->with(['category'])->find($id);
-            return response()->json([
-                'status' => 200,
-                'message' => 'Account fetched successfully',
-                'data' => $account
-            ]);
-        } catch (\Throwable $th) {
-            Log::info('Error Account Controller Show');
-            Log::info($th);
+        $account = $request->user()->accounts()->with(['category'])->find($id);
+
+        if (!$account) {
             return response()->json([
                 'status' => 404,
                 'message' => 'Account not found'
             ], 404);
         }
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Account fetched successfully',
+            'data' => $account
+        ], 200);
     }
 
     // Mengupdate akun
@@ -109,8 +108,8 @@ class AccountController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'account_category_id' => 'required|exists:account_categories,id',
-            'initial_balance' => 'required|numeric',
+            'account_category_id' => 'nullable|exists:account_categories,id',
+            'initial_balance' => 'nullable|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -127,18 +126,26 @@ class AccountController extends Controller
         }
 
         // Mengupdate akun
-        $account->update([
-            'name' => $request->name,
-            'account_category_id' => $request->account_category_id,
-            'initial_balance' => $request->initial_balance,
-            'current_balance' => $request->initial_balance,  // update current balance if needed
-        ]);
+        $updateData = [
+            'name' => $request->name
+        ];
+
+        if ($request->has('account_category_id')) {
+            $updateData['account_category_id'] = $request->account_category_id;
+        }
+
+        if ($request->has('initial_balance')) {
+            $updateData['initial_balance'] = $request->initial_balance;
+            $updateData['current_balance'] = $request->initial_balance;
+        }
+
+        $account->update($updateData);
 
         return response()->json([
             'status' => 200,
             'message' => 'Account updated successfully',
             'data' => $account
-        ]);
+        ], 200);
     }
 
     // Menghapus akun
@@ -153,12 +160,20 @@ class AccountController extends Controller
             ], 404);
         }
 
+        // Check if account has any transactions
+        if ($account->transactions()->exists()) {
+            return response()->json([
+                'status' => 422,
+                'message' => 'Cannot delete account with transactions'
+            ], 422);
+        }
+
         // Menghapus akun
         $account->delete();
 
         return response()->json([
             'status' => 200,
             'message' => 'Account deleted successfully'
-        ]);
+        ], 200);
     }
 }
