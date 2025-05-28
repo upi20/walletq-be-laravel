@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\Transaction;
 use App\Models\TransactionCategory;
 use App\Models\Transfer;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -50,7 +51,6 @@ class Transactions implements ToCollection
             $transfer = (object)[];
 
             // First validate all transactions
-            $accountBalances = collect();
             foreach ($rows as $k => $r) {
                 if ($k < $startFrom - 1) continue;
                 $type = $r[charIndex('F')] == '+' ? Transaction::TYPE_INCOME : Transaction::TYPE_EXPENSE;
@@ -84,7 +84,7 @@ class Transactions implements ToCollection
                 $account = Account::where('name', $rekening)
                     ->where('user_id', $user_id)
                     ->first();
-                    
+
                 if (is_null($account)) {
                     $account = new Account();
                     $account->name = $rekening;
@@ -168,6 +168,13 @@ class Transactions implements ToCollection
                     }
                 }
             }
+
+            $user = Auth::user();
+            // account
+            foreach ($user->accounts as $account) {
+                $account->recalculateBalance();
+            }
+            User::refreshBalance($user->id);
             DB::commit();
             return true;
         } catch (\Exception $e) {

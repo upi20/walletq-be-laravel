@@ -100,10 +100,14 @@ class AuthController extends Controller
 
     public function me()
     {
+        $user = auth()->user();
+        $user->load(['accounts'=>function($query) {
+            $query->orderBy('created_at');
+        }]);
         return response()->json([
             'status' => 200,
             'message' => 'Authenticated user',
-            'data' => auth()->user()
+            'data' => $user
         ]);
     }
 }
