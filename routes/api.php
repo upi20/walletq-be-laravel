@@ -8,6 +8,7 @@ use App\Http\Controllers\API\User\MasterData\AccountController;
 use App\Http\Controllers\API\User\Transaction\ImportTransactionController;
 use App\Http\Controllers\API\User\Transaction\TransactionController;
 use App\Http\Controllers\API\User\MasterData\TransactionCategoryController;
+use App\Http\Controllers\API\User\MasterData\AccountCategoryController as UserAccountCategoryController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -61,6 +62,15 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{id}', [AccountController::class, 'show']);
                 Route::put('/{id}', [AccountController::class, 'update']);
                 Route::delete('/{id}', [AccountController::class, 'destroy']);
+            });
+
+            // Account Category routes
+            Route::prefix('account-category')->group(function () {
+                Route::get('/', [UserAccountCategoryController::class, 'index']);
+                Route::post('/', [UserAccountCategoryController::class, 'store']);
+                Route::get('/{id}', [UserAccountCategoryController::class, 'show']);
+                Route::put('/{id}', [UserAccountCategoryController::class, 'update']);
+                Route::delete('/{id}', [UserAccountCategoryController::class, 'destroy']);
             });
 
             // Transaction Category routes

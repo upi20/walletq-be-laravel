@@ -1,0 +1,379 @@
+{
+    "title": "Account Category API Documentation",
+    "version": "1.0.0",
+    "baseUrl": "/api/v1/user/master-data/account-category",
+    "authentication": {
+        "type": "Bearer Token",
+        "description": "All endpoints require JWT token in Authorization header"
+    },
+    "endpoints": [
+        {
+            "method": "GET",
+            "path": "/",
+            "description": "Get list of account categories with pagination",
+            "queryParameters": {
+                "search": {
+                    "type": "string",
+                    "description": "Optional. Filter categories by name",
+                    "example": "bank"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Optional. Filter categories by type",
+                    "enum": ["cash", "bank", "e-wallet"]
+                },
+                "per_page": {
+                    "type": "integer",
+                    "description": "Optional. Number of items per page",
+                    "default": 10
+                },
+                "page": {
+                    "type": "integer",
+                    "description": "Optional. Page number",
+                    "default": 1
+                }
+            },
+            "response": {
+                "200": {
+                    "description": "Success",
+                    "data": {
+                        "status": 200,
+                        "message": "Account categories fetched successfully",
+                        "data": {
+                            "categories": [
+                                {
+                                    "id": 1,
+                                    "name": "Personal Bank",
+                                    "type": "bank",
+                                    "is_default": false,
+                                    "created_at": "2025-05-29T10:00:00.000000Z",
+                                    "updated_at": "2025-05-29T10:00:00.000000Z"
+                                }
+                            ],
+                            "pagination": {
+                                "current_page": 1,
+                                "per_page": 10,
+                                "total": 1,
+                                "last_page": 1
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "method": "POST",
+            "path": "/",
+            "description": "Create new account category",
+            "requestBody": {
+                "content": {
+                    "application/json": {
+                        "required": true,
+                        "schema": {
+                            "name": {
+                                "type": "string",
+                                "required": true,
+                                "maxLength": 255,
+                                "description": "Category name"
+                            },
+                            "type": {
+                                "type": "string",
+                                "required": true,
+                                "enum": ["cash", "bank", "e-wallet"],
+                                "description": "Category type"
+                            }
+                        }
+                    }
+                }
+            },
+            "response": {
+                "201": {
+                    "description": "Created successfully",
+                    "data": {
+                        "status": 201,
+                        "message": "Account category created successfully",
+                        "data": {
+                            "id": 1,
+                            "name": "Personal Bank",
+                            "type": "bank",
+                            "is_default": false,
+                            "created_at": "2025-05-29T10:00:00.000000Z",
+                            "updated_at": "2025-05-29T10:00:00.000000Z"
+                        }
+                    }
+                },
+                "422": {
+                    "description": "Validation error",
+                    "data": {
+                        "name": ["The category name is required."],
+                        "type": ["The category type must be one of: cash, bank, e-wallet."]
+                    }
+                }
+            }
+        },
+        {
+            "method": "GET",
+            "path": "/{id}",
+            "description": "Get specific account category details",
+            "parameters": {
+                "id": {
+                    "type": "integer",
+                    "required": true,
+                    "description": "Category ID"
+                }
+            },
+            "response": {
+                "200": {
+                    "description": "Success",
+                    "data": {
+                        "status": 200,
+                        "message": "Account category fetched successfully",
+                        "data": {
+                            "id": 1,
+                            "name": "Personal Bank",
+                            "type": "bank",
+                            "is_default": false,
+                            "created_at": "2025-05-29T10:00:00.000000Z",
+                            "updated_at": "2025-05-29T10:00:00.000000Z"
+                        }
+                    }
+                },
+                "404": {
+                    "description": "Not found",
+                    "data": {
+                        "status": 404,
+                        "message": "Account category not found"
+                    }
+                }
+            }
+        },
+        {
+            "method": "PUT",
+            "path": "/{id}",
+            "description": "Update existing account category",
+            "parameters": {
+                "id": {
+                    "type": "integer",
+                    "required": true,
+                    "description": "Category ID"
+                }
+            },
+            "requestBody": {
+                "content": {
+                    "application/json": {
+                        "required": true,
+                        "schema": {
+                            "name": {
+                                "type": "string",
+                                "required": true,
+                                "maxLength": 255,
+                                "description": "Category name"
+                            },
+                            "type": {
+                                "type": "string",
+                                "required": true,
+                                "enum": ["cash", "bank", "e-wallet"],
+                                "description": "Category type"
+                            }
+                        }
+                    }
+                }
+            },
+            "response": {
+                "200": {
+                    "description": "Success",
+                    "data": {
+                        "status": 200,
+                        "message": "Account category updated successfully",
+                        "data": {
+                            "id": 1,
+                            "name": "Personal Bank Updated",
+                            "type": "bank",
+                            "is_default": false,
+                            "created_at": "2025-05-29T10:00:00.000000Z",
+                            "updated_at": "2025-05-29T10:00:00.000000Z"
+                        }
+                    }
+                },
+                "404": {
+                    "description": "Not found",
+                    "data": {
+                        "status": 404,
+                        "message": "Account category not found"
+                    }
+                },
+                "422": {
+                    "description": "Validation error or Cannot modify default category",
+                    "data": {
+                        "status": 422,
+                        "message": "Cannot modify default category"
+                    }
+                }
+            }
+        },
+        {
+            "method": "DELETE",
+            "path": "/{id}",
+            "description": "Delete an account category",
+            "parameters": {
+                "id": {
+                    "type": "integer",
+                    "required": true,
+                    "description": "Category ID"
+                }
+            },
+            "response": {
+                "200": {
+                    "description": "Success",
+                    "data": {
+                        "status": 200,
+                        "message": "Account category deleted successfully"
+                    }
+                },
+                "404": {
+                    "description": "Not found",
+                    "data": {
+                        "status": 404,
+                        "message": "Account category not found"
+                    }
+                },
+                "422": {
+                    "description": "Cannot delete category",
+                    "examples": [
+                        {
+                            "status": 422,
+                            "message": "Cannot delete default category"
+                        },
+                        {
+                            "status": 422,
+                            "message": "Cannot delete category with associated accounts"
+                        }
+                    ]
+                }
+            }
+        }
+    ],    "notes": [
+        "All endpoints require authentication using JWT token",
+        "Default categories cannot be modified or deleted",
+        "Categories with associated accounts cannot be deleted",
+        "Category names must be unique per user",
+        "Responses include HTTP status codes that match the status in the response body"
+    ],
+    "testScenarios": [
+        {
+            "name": "List with complex filters",
+            "description": "Get categories with multiple filters and sorting",
+            "request": {
+                "method": "GET",
+                "path": "/?search=bank&type=bank&per_page=15&page=2&sort=name&direction=desc"
+            },
+            "expectedResponse": {
+                "status": 200,
+                "data": {
+                    "categories": [
+                        {
+                            "id": 5,
+                            "name": "Secondary Bank",
+                            "type": "bank"
+                        }
+                    ],
+                    "pagination": {
+                        "current_page": 2,
+                        "total": 16
+                    }
+                }
+            }
+        },
+        {
+            "name": "Create duplicate category",
+            "description": "Attempt to create a category with name that already exists for user",
+            "request": {
+                "method": "POST",
+                "path": "/",
+                "body": {
+                    "name": "Existing Bank",
+                    "type": "bank"
+                }
+            },
+            "expectedResponse": {
+                "status": 422,
+                "message": "Validation error",
+                "errors": {
+                    "name": ["You already have a category with this name."]
+                }
+            }
+        },
+        {
+            "name": "Update category with accounts",
+            "description": "Update a category that has associated accounts",
+            "request": {
+                "method": "PUT",
+                "path": "/1",
+                "body": {
+                    "name": "Updated Bank Name",
+                    "type": "bank"
+                }
+            },
+            "expectedResponse": {
+                "status": 200,
+                "data": {
+                    "id": 1,
+                    "name": "Updated Bank Name",
+                    "type": "bank",
+                    "accounts_count": 2
+                }
+            }
+        },
+        {
+            "name": "Delete default category",
+            "description": "Attempt to delete a default category",
+            "request": {
+                "method": "DELETE",
+                "path": "/1"
+            },
+            "expectedResponse": {
+                "status": 422,
+                "message": "Cannot delete default category"
+            }
+        },
+        {
+            "name": "Delete category with accounts",
+            "description": "Attempt to delete a category that has associated accounts",
+            "request": {
+                "method": "DELETE",
+                "path": "/2"
+            },
+            "expectedResponse": {
+                "status": 422,
+                "message": "Cannot delete category with associated accounts"
+            }
+        },
+        {
+            "name": "Invalid token scenarios",
+            "description": "Various authentication failure scenarios",
+            "cases": [
+                {
+                    "description": "No token provided",
+                    "expectedResponse": {
+                        "status": 401,
+                        "message": "Unauthorized"
+                    }
+                },
+                {
+                    "description": "Expired token",
+                    "expectedResponse": {
+                        "status": 401,
+                        "message": "Token has expired"
+                    }
+                },
+                {
+                    "description": "Invalid token format",
+                    "expectedResponse": {
+                        "status": 401,
+                        "message": "Invalid token format"
+                    }
+                }
+            ]
+        }
+    ]
+}
