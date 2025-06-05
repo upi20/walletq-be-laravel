@@ -5,24 +5,30 @@ import { resolve } from 'path'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src'),
-    },
-  },
-  server: {
-    port: 5173,
-    proxy: {
-      // Proxy API requests to Laravel backend
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-        secure: false,
-      },
-      '/v1': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-        secure: false,
+  // base: '/frontend/', // Base path untuk assets
+  // build: {
+  //   outDir: 'dist',
+  //   assetsDir: 'assets',
+  //   emptyOutDir: true,
+  // },
+  // resolve: {
+  //   alias: {
+  //     '@': resolve(__dirname, 'src'),
+  //   },
+  // },
+  // server: {
+  //   port: 5173,
+  //   proxy: {
+  //     // Proxy API requests to Laravel backend
+  //     '/api': {
+  //       target: 'http://localhost:8000',
+  //       changeOrigin: true,
+  //       secure: false,
+  //     },
+  //     '/v1': {
+  //       target: 'http://localhost:8000',
+  //       changeOrigin: true,
+  //       secure: false,
   //     },
   //   },
   // },
