@@ -1,11 +1,12 @@
 /**
  * Format a number as Indonesian currency (IDR)
  * @param {number} amount - The amount to format
+ * @param {boolean} showSymbol - Whether to show the currency symbol
  * @returns {string} Formatted currency string
  */
-export function formatCurrency(amount) {
+export function formatCurrency(amount, showSymbol = true) {
   return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
+    style: showSymbol ? 'currency' : 'decimal',
     currency: 'IDR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
@@ -15,10 +16,13 @@ export function formatCurrency(amount) {
 /**
  * Format a date string to Indonesian format
  * @param {string} dateString - Date string in YYYY-MM-DD format
+ * @param {string} format - Optional format type: 'short', 'medium', 'long', 'full'
  * @returns {string} Formatted date string
  */
-export function formatDate(dateString) {
-  const options = { 
+export function formatDate(dateString, format = 'short') {
+  if (!dateString) return '-';
+  
+  const options = {
     day: '2-digit', 
     month: 'long', 
     year: 'numeric' 
