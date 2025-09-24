@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, computed, onBeforeUnmount } from 'vue';
 import { 
   CreditCard, 
   Plus, 
@@ -9,7 +9,9 @@ import {
   Eye, 
   Trash2,
   MoreVertical,
-  ArrowLeft
+  ArrowLeft,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-vue-next';
 
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
@@ -52,11 +54,67 @@ const toggleMenu = (accountId: number) => {
 
 const searchQuery = ref(props.filters.search || '');
 
+// debounce timer for search (keyup)
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const onKeyupSearch = (event: KeyboardEvent) => {
+  // if the user pressed Enter, search immediately
+  if (event.key === 'Enter') {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+      searchTimeout = null;
+    }
+    search();
+    return;
+  }
+
+  // otherwise debounce
+  if (searchTimeout) clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    search();
+    searchTimeout = null;
+  }, 500);
+};
+
+onBeforeUnmount(() => {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+    searchTimeout = null;
+  }
+});
+
+// client-side sorting & filtering (no backend request)
+const sortField = ref<'name' | 'current_balance'>('name');
+const sortOrder = ref<'asc' | 'desc'>('asc');
+
+const filteredAndSortedAccounts = computed(() => {
+  // Server returns filtered & sorted list. Return a shallow copy for reactivity.
+  return Array.isArray(props.accounts) ? props.accounts.slice() : [];
+});
+
+// perform a backend request with search param (updates URL)
 const search = () => {
-  router.get('/settings/accounts', { search: searchQuery.value }, { 
+  router.get('/settings/accounts', { 
+    search: searchQuery.value,
+    sortField: sortField.value,
+    sortOrder: sortOrder.value,
+  }, { 
     preserveState: true,
-    replace: true 
+    preserveScroll: true,
+    only: ['accounts'],
   });
+};
+
+const toggleSort = (field: 'name' | 'current_balance') => {
+  if (sortField.value === field) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortField.value = field;
+    sortOrder.value = 'asc';
+  }
+
+  // trigger server-side sorting/filtering
+  search();
 };
 
 const deleteAccount = (account: Account) => {
@@ -117,22 +175,42 @@ document.addEventListener('click', (event) => {
     <!-- Search -->
     <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
       <div class="flex flex-col sm:flex-row gap-4">
-        <div class="relative flex-1">
+        <form class="relative flex-1" @submit.prevent="search">
           <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             v-model="searchQuery"
-            type="text"
+            type="search"
             placeholder="Search accounts..."
             class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-            @keyup.enter="search"
+            @keyup="onKeyupSearch"
           />
+        </form>
+        <div class="flex items-center gap-2">
+          <div class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button
+              @click.prevent="toggleSort('name')"
+              class="px-3 py-2 text-sm flex items-center gap-2"
+            >
+              Name
+              <ChevronUp v-if="sortField === 'name' && sortOrder === 'asc'" class="w-4 h-4" />
+              <ChevronDown v-else-if="sortField === 'name' && sortOrder === 'desc'" class="w-4 h-4" />
+            </button>
+            <button
+              @click.prevent="toggleSort('current_balance')"
+              class="px-3 py-2 text-sm flex items-center gap-2 border-l border-gray-200 dark:border-gray-700"
+            >
+              Balance
+              <ChevronUp v-if="sortField === 'current_balance' && sortOrder === 'asc'" class="w-4 h-4" />
+              <ChevronDown v-else-if="sortField === 'current_balance' && sortOrder === 'desc'" class="w-4 h-4" />
+            </button>
+          </div>
         </div>
-        <button
+        <!-- <button
           @click="search"
           class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
         >
           Search
-        </button>
+        </button> -->
       </div>
     </div>
 
@@ -152,9 +230,14 @@ document.addEventListener('click', (event) => {
       </Link>
     </div>
 
+    <div v-else-if="filteredAndSortedAccounts.length === 0" class="text-center py-12">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No results</h3>
+      <p class="text-gray-600 dark:text-gray-400">No accounts match your search or filter.</p>
+    </div>
+
     <div v-else class="grid grid-cols-1 gap-4">
       <div
-        v-for="(account, index) in accounts"
+        v-for="(account, index) in filteredAndSortedAccounts"
         :key="account.id"
         :class="[
           'group rounded-xl p-6 shadow-sm border transition-all duration-300',

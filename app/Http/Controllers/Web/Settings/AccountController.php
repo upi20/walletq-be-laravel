@@ -18,15 +18,24 @@ class AccountController extends Controller
         $accounts = Account::with('category')
             ->where('user_id', Auth::id())
             ->when($request->search, function ($query, $search) {
-                $query->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
-            })
-            ->orderBy('name')
-            ->get();
+                $query->where('name', 'like', '%' . $search . '%');
+            });
+		if($request->has('sortField') && $request->has('sortOrder')) {
+			// validation sortField:current_balance, sortOrder:asc|desc
+			$allowedSortFields = ['name', 'current_balance', 'created_at'];
+			$allowedSortOrders = ['asc', 'desc'];
+			if(!in_array($request->sortField, $allowedSortFields) || !in_array($request->sortOrder, $allowedSortOrders)) {
+				$accounts->orderBy('name', 'asc');
+			}else{
+				$accounts->orderBy($request->sortField, $request->sortOrder);
+			}
+		} else {
+			$accounts->orderBy('name', 'asc');
+		}
+		
+		$accounts = $accounts->get();
 
-        $categories = AccountCategory::where('user_id', Auth::id())
-            ->orderBy('name')
-            ->get();
+        $categories = AccountCategory::where('user_id', Auth::id())->get();
 
         return Inertia::render('Settings/Accounts/Index', [
             'accounts' => $accounts,
