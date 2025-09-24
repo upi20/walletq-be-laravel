@@ -22,7 +22,7 @@ class AccountController extends Controller
                     ->orWhere('description', 'like', '%' . $search . '%');
             })
             ->orderBy('name')
-            ->paginate(10);
+            ->get();
 
         $categories = AccountCategory::where('user_id', Auth::id())
             ->orderBy('name')
