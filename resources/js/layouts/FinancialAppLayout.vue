@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { usePage } from '@inertiajs/vue3';
+import { usePage, Link } from '@inertiajs/vue3';
 import { useDarkMode } from '@/composables/useDarkMode';
 import { 
   Home, 
@@ -133,15 +133,16 @@ const bottomNavItems = [
       v-if="showBottomNav" 
       class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 h-16 flex items-center justify-around px-4 transition-colors duration-300"
     >
-      <button 
+      <Link 
         v-for="item in bottomNavItems" 
         :key="item.route"
+        :href="`/${item.route}`"
         class="flex flex-col items-center justify-center w-12 h-12 transition-colors duration-200"
         :class="item.active ? 'text-teal-600 dark:text-teal-400' : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400'"
       >
         <component :is="item.icon" class="w-6 h-6" />
         <span class="text-xs mt-1">{{ item.label }}</span>
-      </button>
+      </Link>
     </nav>
 
     <!-- Floating Action Button -->

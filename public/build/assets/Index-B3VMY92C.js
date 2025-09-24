@@ -1,0 +1,26 @@
+import{d as p,h as n,o as r,w as c,f as s,e as t,u as i,j as x,a as m,F as h,r as f,m as y,g as l,i as k,t as d}from"./app-CrsL1Z1_.js";import{F as u}from"./FinancialAppLayout-DVljQRBg.js";import{c as a}from"./createLucideIcon-DTv-zW1P.js";import{C as b}from"./chevron-right-BaJ8jvTB.js";import"./useDarkMode-vhZTfyDE.js";import"./sun-C4_4yzBG.js";import"./plus-CsaWJl8u.js";import"./trending-up-CGWOUB5Z.js";import"./settings-CTWOfaWB.js";/**
+ * @license lucide-vue-next v0.468.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const v=a("ArrowRightLeftIcon",[["path",{d:"m16 3 4 4-4 4",key:"1x1c3m"}],["path",{d:"M20 7H4",key:"zbl0bi"}],["path",{d:"m8 21-4-4 4-4",key:"h9nckh"}],["path",{d:"M4 17h16",key:"g4d7ey"}]]);/**
+ * @license lucide-vue-next v0.468.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const C=a("CreditCardIcon",[["rect",{width:"20",height:"14",x:"2",y:"5",rx:"2",key:"ynyp8z"}],["line",{x1:"2",x2:"22",y1:"10",y2:"10",key:"1b3vmo"}]]);/**
+ * @license lucide-vue-next v0.468.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const _=a("FolderOpenIcon",[["path",{d:"m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2",key:"usdka0"}]]);/**
+ * @license lucide-vue-next v0.468.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const w=a("InfoIcon",[["circle",{cx:"12",cy:"12",r:"10",key:"1mglay"}],["path",{d:"M12 16v-4",key:"1dtifu"}],["path",{d:"M12 8h.01",key:"e9boi3"}]]);/**
+ * @license lucide-vue-next v0.468.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const B=a("TagIcon",[["path",{d:"M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z",key:"vktsd0"}],["circle",{cx:"7.5",cy:"7.5",r:".5",fill:"currentColor",key:"kqv944"}]]),I={class:"px-6 pt-6 pb-24"},A={class:"space-y-4"},M={class:"flex items-center justify-between"},z={class:"flex items-center gap-4"},F={class:"font-medium text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors"},H={class:"text-sm text-gray-600 dark:text-gray-400 mt-1"},G=p({__name:"Index",setup(L){const g=[{title:"Accounts",description:"Manage your financial accounts",icon:C,href:"/settings/accounts",iconBg:"bg-teal-100 dark:bg-teal-900",iconColor:"text-teal-600 dark:text-teal-400"},{title:"Account Categories",description:"Organize your accounts by categories",icon:_,href:"/settings/account-categories",iconBg:"bg-coral-100 dark:bg-coral-900",iconColor:"text-coral-600 dark:text-coral-400"},{title:"Transaction Categories",description:"Manage income and expense categories",icon:v,href:"/settings/transaction-categories",iconBg:"bg-gradient-to-r from-teal-100 to-coral-100 dark:from-teal-900 dark:to-coral-900",iconColor:"text-teal-600 dark:text-teal-400"},{title:"Tags",description:"Create and manage transaction tags",icon:B,href:"/settings/tags",iconBg:"bg-gradient-to-r from-coral-100 to-teal-100 dark:from-coral-900 dark:to-teal-900",iconColor:"text-coral-600 dark:text-coral-400"},{title:"About",description:"App information and system details",icon:w,href:"/settings/about",iconBg:"bg-gray-100 dark:bg-gray-800",iconColor:"text-gray-600 dark:text-gray-400"}];return(T,o)=>(r(),n(u,null,{default:c(()=>[s(i(x),{title:"Settings"}),t("div",I,[o[0]||(o[0]=t("div",{class:"mb-8"},[t("h1",{class:"text-2xl font-semibold text-gray-900 dark:text-white mb-2"}," Settings "),t("p",{class:"text-gray-600 dark:text-gray-400"}," Manage your financial data and preferences ")],-1)),t("div",A,[(r(),m(h,null,f(g,e=>s(i(y),{key:e.href,href:e.href,class:"group block p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300"},{default:c(()=>[t("div",M,[t("div",z,[t("div",{class:l(["w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105",e.iconBg])},[(r(),n(k(e.icon),{class:l(["w-6 h-6",e.iconColor])},null,8,["class"]))],2),t("div",null,[t("h3",F,d(e.title),1),t("p",H,d(e.description),1)])]),s(i(b),{class:"w-5 h-5 text-gray-400 group-hover:text-teal-500 transition-colors"})])]),_:2},1032,["href"])),64))]),o[1]||(o[1]=t("div",{class:"mt-12 grid grid-cols-2 gap-4"},[t("div",{class:"bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-2xl p-4 text-white"},[t("div",{class:"text-2xl font-bold mb-1"},"5"),t("div",{class:"text-sm opacity-90"},"Categories")]),t("div",{class:"bg-gradient-to-r from-coral-500 to-coral-600 dark:from-coral-600 dark:to-coral-700 rounded-2xl p-4 text-white"},[t("div",{class:"text-2xl font-bold mb-1"},"∞"),t("div",{class:"text-sm opacity-90"},"Customizable")])],-1))])]),_:1}))}});export{G as default};

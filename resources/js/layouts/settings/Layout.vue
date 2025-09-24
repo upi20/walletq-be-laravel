@@ -27,6 +27,26 @@ const sidebarNavItems: NavItem[] = [
         title: 'Appearance',
         href: editAppearance(),
     },
+    {
+        title: 'Accounts',
+        href: '/settings/accounts',
+    },
+    {
+        title: 'Account Categories',
+        href: '/settings/account-categories',
+    },
+    {
+        title: 'Transaction Categories',
+        href: '/settings/transaction-categories',
+    },
+    {
+        title: 'Tags',
+        href: '/settings/tags',
+    },
+    {
+        title: 'About',
+        href: '/settings/about',
+    },
 ];
 
 const currentPath = typeof window !== undefined ? window.location.pathname : '';
