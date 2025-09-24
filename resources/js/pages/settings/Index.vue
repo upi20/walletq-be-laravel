@@ -67,68 +67,65 @@ const settingsItems = [
   <FinancialAppLayout>
     <Head title="Settings" />
 
-    <!-- Content Area -->
-    <div class="px-6 pt-6 pb-24">
-      <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-          Settings
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400">
-          Manage your financial data and preferences
-        </p>
-      </div>
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+        Settings
+      </h1>
+      <p class="text-gray-600 dark:text-gray-400">
+        Manage your financial data and preferences
+      </p>
+    </div>
 
-      <!-- Settings Items -->
-      <div class="space-y-4">
-        <Link
-          v-for="item in settingsItems"
-          :key="item.href"
-          :href="item.href"
-          class="group block p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300"
-        >
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
-              <!-- Icon -->
-              <div 
-                :class="[
-                  'w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105',
-                  item.iconBg
-                ]"
-              >
-                <component 
-                  :is="item.icon" 
-                  :class="['w-6 h-6', item.iconColor]" 
-                />
-              </div>
-
-              <!-- Content -->
-              <div>
-                <h3 class="font-medium text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
-                  {{ item.title }}
-                </h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {{ item.description }}
-                </p>
-              </div>
+    <!-- Settings Items -->
+    <div class="space-y-4">
+      <Link
+        v-for="item in settingsItems"
+        :key="item.href"
+        :href="item.href"
+        class="group block p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300"
+      >
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <!-- Icon -->
+            <div 
+              :class="[
+                'w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105',
+                item.iconBg
+              ]"
+            >
+              <component 
+                :is="item.icon" 
+                :class="['w-6 h-6', item.iconColor]" 
+              />
             </div>
 
-            <!-- Arrow -->
-            <ChevronRight class="w-5 h-5 text-gray-400 group-hover:text-teal-500 transition-colors" />
+            <!-- Content -->
+            <div>
+              <h3 class="font-medium text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                {{ item.title }}
+              </h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {{ item.description }}
+              </p>
+            </div>
           </div>
-        </Link>
-      </div>
 
-      <!-- Stats Cards -->
-      <div class="mt-12 grid grid-cols-2 gap-4">
-        <div class="bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-2xl p-4 text-white">
-          <div class="text-2xl font-bold mb-1">5</div>
-          <div class="text-sm opacity-90">Categories</div>
+          <!-- Arrow -->
+          <ChevronRight class="w-5 h-5 text-gray-400 group-hover:text-teal-500 transition-colors" />
         </div>
-        <div class="bg-gradient-to-r from-coral-500 to-coral-600 dark:from-coral-600 dark:to-coral-700 rounded-2xl p-4 text-white">
-          <div class="text-2xl font-bold mb-1">∞</div>
-          <div class="text-sm opacity-90">Customizable</div>
-        </div>
+      </Link>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="mt-12 grid grid-cols-2 gap-4">
+      <div class="bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-2xl p-4 text-white">
+        <div class="text-2xl font-bold mb-1">5</div>
+        <div class="text-sm opacity-90">Categories</div>
+      </div>
+      <div class="bg-gradient-to-r from-coral-500 to-coral-600 dark:from-coral-600 dark:to-coral-700 rounded-2xl p-4 text-white">
+        <div class="text-2xl font-bold mb-1">∞</div>
+        <div class="text-sm opacity-90">Customizable</div>
       </div>
     </div>
   </FinancialAppLayout>
