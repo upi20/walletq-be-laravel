@@ -8,10 +8,12 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
-{    public function index(Request $request)
+{
+    public function index(Request $request)
     {
         $query = $request->user()->transactions()
             ->with(['category', 'account', 'tags']);        // Exclude initial balance transactions
@@ -27,17 +29,18 @@ class TransactionController extends Controller
         if ($request->has('type')) {
             $query->where('type', $request->type);
         }
-        
+
         // Date range filtering
         if ($request->has('start_date')) {
             $query->whereDate('date', '>=', date('Y-m-d', strtotime($request->start_date)));
-        }        if ($request->has('end_date')) {
+        }
+        if ($request->has('end_date')) {
             $query->whereDate('date', '<=', date('Y-m-d', strtotime($request->end_date)));
         }
 
         // Apply sorting
         $query->orderBy('date', 'desc')
-              ->orderBy('created_at', 'desc');
+            ->orderBy('created_at', 'desc');
 
         $transactions = $query->get();
 
@@ -46,7 +49,9 @@ class TransactionController extends Controller
             'message' => 'Transactions fetched successfully',
             'data' => $transactions
         ]);
-    }    public function store(Request $request)
+    }
+
+    public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'account_id' => 'required|exists:accounts,id',
@@ -66,7 +71,7 @@ class TransactionController extends Controller
         try {
             DB::beginTransaction();
 
-            \Log::debug('Creating transaction', [
+            Log::debug('Creating transaction', [
                 'user_id' => $request->user()->id,
                 'account_id' => $request->account_id,
                 'amount' => $request->amount,
@@ -104,7 +109,7 @@ class TransactionController extends Controller
 
             // Update account balance
             $account->updateBalance($transaction->amount, $transaction->type);
-            
+
             // Update user's total balance
             User::refreshBalance($request->user()->id);
 
@@ -112,7 +117,7 @@ class TransactionController extends Controller
             if ($request->has('tags')) {
                 $transaction->tags()->attach($request->tags);
             }
-            
+
             DB::commit();
 
             // Load relationships for response
@@ -122,9 +127,10 @@ class TransactionController extends Controller
                 'status' => 201,
                 'message' => 'Transaction created successfully',
                 'data' => $transaction
-            ], 201);} catch (\Exception $e) {
+            ], 201);
+        } catch (\Exception $e) {
             DB::rollback();
-            \Log::error('Error creating transaction', [
+            Log::error('Error creating transaction', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -134,7 +140,9 @@ class TransactionController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
-    }    public function storeBulk(Request $request)
+    }
+
+    public function storeBulk(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'transactions' => 'required|array|min:1',
@@ -160,12 +168,12 @@ class TransactionController extends Controller
 
             // First verify balances for all transactions
             foreach ($request->transactions as $transactionData) {
-                $account = $accounts->get($transactionData['account_id']) ?? 
+                $account = $accounts->get($transactionData['account_id']) ??
                     $request->user()->accounts()
-                        ->where('id', $transactionData['account_id'])
-                        ->lockForUpdate()
-                        ->firstOrFail();
-                
+                    ->where('id', $transactionData['account_id'])
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
                 $accounts->put($transactionData['account_id'], $account);
 
                 if ($transactionData['type'] === 'expense' && !$account->hasSufficientBalance($transactionData['amount'])) {
@@ -180,7 +188,7 @@ class TransactionController extends Controller
             // Create all transactions and update balances
             foreach ($request->transactions as $transactionData) {
                 $account = $accounts->get($transactionData['account_id']);
-                
+
                 $transaction = new Transaction([
                     'user_id' => $request->user()->id,
                     'account_id' => $account->id,
@@ -207,11 +215,11 @@ class TransactionController extends Controller
 
             // Update user's total balance after all transactions
             User::refreshBalance($request->user()->id);
-            
+
             DB::commit();
 
             // Load relationships for response
-            $transactions = collect($createdTransactions)->map(function($transaction) {
+            $transactions = collect($createdTransactions)->map(function ($transaction) {
                 return $transaction->load(['category', 'account', 'tags']);
             });
 
@@ -220,7 +228,6 @@ class TransactionController extends Controller
                 'message' => 'Bulk transactions created successfully',
                 'data' => $transactions
             ]);
-
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
@@ -301,7 +308,7 @@ class TransactionController extends Controller
             }
 
             User::refreshBalance($request->user()->id);
-            
+
             DB::commit();
 
             return response()->json([
@@ -309,7 +316,6 @@ class TransactionController extends Controller
                 'message' => 'Transaction updated successfully',
                 'data' => $transaction->load(['category', 'account', 'tags'])
             ]);
-
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
@@ -340,19 +346,18 @@ class TransactionController extends Controller
 
         try {
             DB::beginTransaction();
-            
+
             $transaction->tags()->detach();
             $transaction->delete();
-            
+
             User::refreshBalance($request->user()->id);
-            
+
             DB::commit();
 
             return response()->json([
                 'status' => 200,
                 'message' => 'Transaction deleted successfully'
             ]);
-
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([

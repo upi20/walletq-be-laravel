@@ -1,11 +1,178 @@
-@import 'tailwindcss';
+@import 'tw-animate-css';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+@layer utilities {
+    body,
+    html {
+        --font-sans:
+            'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    }
+}
+
+:root {
+    /* Financial App Design System Colors */
+    --teal-primary: 32 178 170;
+    --teal-light: 77 208 225;
+    --teal-dark: 0 131 143;
+    --coral-primary: 255 107 107;
+    --coral-light: 255 138 128;
+    --coral-dark: 229 57 53;
+    
+    /* Light mode colors */
+    --background: 245 245 245; /* #F5F5F5 */
+    --foreground: 33 33 33; /* #212121 */
+    --card: 255 255 255; /* #FFFFFF */
+    --card-foreground: 33 33 33;
+    --popover: 255 255 255;
+    --popover-foreground: 33 33 33;
+    --primary: rgb(var(--teal-primary));
+    --primary-foreground: 255 255 255;
+    --secondary: rgb(var(--coral-primary));
+    --secondary-foreground: 255 255 255;
+    --muted: 245 245 245;
+    --muted-foreground: 117 117 117;
+    --accent: 224 224 224;
+    --accent-foreground: 66 66 66;
+    --destructive: rgb(var(--coral-primary));
+    --destructive-foreground: 255 255 255;
+    --border: 224 224 224;
+    --input: 224 224 224;
+    --ring: rgb(var(--teal-primary));
+    --chart-1: rgb(var(--teal-primary));
+    --chart-2: rgb(var(--coral-primary));
+    --chart-3: 33 150 243;
+    --chart-4: 255 152 0;
+    --chart-5: 156 39 176;
+    --radius: 1rem;
+    
+    /* Header gradient variables */
+    --header-gradient-from: rgb(var(--teal-primary));
+    --header-gradient-to: rgb(var(--teal-dark));
+    
+    /* Sidebar colors */
+    --sidebar-background: hsl(0 0% 98%);
+    --sidebar-foreground: hsl(240 5.3% 26.1%);
+    --sidebar-primary: hsl(0 0% 10%);
+    --sidebar-primary-foreground: hsl(0 0% 98%);
+    --sidebar-accent: hsl(0 0% 94%);
+    --sidebar-accent-foreground: hsl(0 0% 30%);
+    --sidebar-border: hsl(0 0% 91%);
+    --sidebar-ring: hsl(217.2 91.2% 59.8%);
+    --sidebar: hsl(0 0% 98%);
+}
+
+.dark {
+    /* Dark mode colors based on design system */
+    --background: 10 10 11; /* #0A0A0B */
+    --foreground: 255 255 255; /* #FFFFFF */
+    --card: 26 26 27; /* #1A1A1B */
+    --card-foreground: 255 255 255;
+    --popover: 26 26 27;
+    --popover-foreground: 255 255 255;
+    --primary: rgb(var(--teal-primary));
+    --primary-foreground: 255 255 255;
+    --secondary: rgb(var(--coral-primary));
+    --secondary-foreground: 255 255 255;
+    --muted: 36 36 38; /* #242426 */
+    --muted-foreground: 179 179 179; /* #B3B3B3 */
+    --accent: 46 46 48; /* #2E2E30 */
+    --accent-foreground: 255 255 255;
+    --destructive: rgb(var(--coral-primary));
+    --destructive-foreground: 255 255 255;
+    --border: 51 51 53; /* #333335 */
+    --input: 64 64 66; /* #404042 */
+    --ring: rgb(var(--teal-primary));
+    --chart-1: rgb(var(--teal-light));
+    --chart-2: rgb(var(--coral-light));
+    --chart-3: 66 165 245;
+    --chart-4: 255 183 77;
+    --chart-5: 171 71 188;
+    
+    /* Dark header gradient */
+    --header-gradient-from: rgb(var(--teal-dark));
+    --header-gradient-to: rgb(0 96 100);
+    
+    /* Dark sidebar colors */
+    --sidebar-background: 10 10 11;
+    --sidebar-foreground: 255 255 255;
+    --sidebar-primary: 255 255 255;
+    --sidebar-primary-foreground: 10 10 11;
+    --sidebar-accent: 36 36 38;
+    --sidebar-accent-foreground: 255 255 255;
+    --sidebar-border: 51 51 53;
+    --sidebar-ring: rgb(var(--teal-primary));
+    --sidebar: 10 10 11;
+    --card: hsl(0 0% 3.9%);
+    --card-foreground: hsl(0 0% 98%);
+    --popover: hsl(0 0% 3.9%);
+    --popover-foreground: hsl(0 0% 98%);
+    --primary: hsl(0 0% 98%);
+    --primary-foreground: hsl(0 0% 9%);
+    --secondary: hsl(0 0% 14.9%);
+    --secondary-foreground: hsl(0 0% 98%);
+    --muted: hsl(0 0% 16.08%);
+    --muted-foreground: hsl(0 0% 63.9%);
+    --accent: hsl(0 0% 14.9%);
+    --accent-foreground: hsl(0 0% 98%);
+    --destructive: hsl(0 84% 60%);
+    --destructive-foreground: hsl(0 0% 98%);
+    --border: hsl(0 0% 14.9%);
+    --input: hsl(0 0% 14.9%);
+    --ring: hsl(0 0% 83.1%);
+    --chart-1: hsl(220 70% 50%);
+    --chart-2: hsl(160 60% 45%);
+    --chart-3: hsl(30 80% 55%);
+    --chart-4: hsl(280 65% 60%);
+    --chart-5: hsl(340 75% 55%);
+    --sidebar-background: hsl(0 0% 7%);
+    --sidebar-foreground: hsl(0 0% 95.9%);
+    --sidebar-primary: hsl(360, 100%, 100%);
+    --sidebar-primary-foreground: hsl(0 0% 100%);
+    --sidebar-accent: hsl(0 0% 15.9%);
+    --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+    --sidebar-border: hsl(0 0% 15.9%);
+    --sidebar-ring: hsl(217.2 91.2% 59.8%);
+    --sidebar: hsl(240 5.9% 10%);
+}
+
+/* Design System CSS Variables untuk referensi */
+@layer base {
+  :root {
+    /* Financial App Colors */
+    --teal-primary: 32, 178, 170;
+    --teal-light: 77, 208, 225;
+    --teal-dark: 0, 131, 143;
+    --coral-primary: 255, 107, 107;
+    --coral-light: 255, 138, 128;
+    --coral-dark: 229, 57, 53;
+  }
+}
+
+@layer base {
+    body {
+        font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+        background-color: rgb(var(--background));
+        color: rgb(var(--foreground));
+    }
 }

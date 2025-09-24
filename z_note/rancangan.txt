@@ -1,0 +1,166 @@
+upi20: Saya ingin membuat aplikasi pencatatan keuangan dengan lengkap bersifat offline saja. hanya pencatatan keuangan pribadi. bisa banyak rekening, transfer antar rekeing, utang, piutang dan lainnya. buatkan konsep nya.
+
+GitHub Copilot: Berikut konsep aplikasi pencatatan keuangan pribadi offline (multi-rekening, transfer, utang/piutang) yang ringkas namun lengkap.
+
+Tujuan dan prinsip
+- Offline-first, cepat, aman, dan mudah dipakai harian.
+- Data lokal sepenuhnya; dukung backup/restore terenkripsi.
+- Akurasi via pencatatan berprinsip double-entry (transaksi bisa multi-split).
+
+Fitur inti
+- Rekening: kas, giro/tabungan, e-wallet, kartu kredit, aset, kewajiban.
+- Transaksi: keluar/masuk, split kategori, lampiran, payee, tag.
+- Transfer antar rekening (termasuk biaya admin/fee).
+- Utang/Piutang: saldo, jadwal angsuran, bunga, pelunasan parsial.
+- Anggaran per kategori per bulan; sisa anggaran dan carry-over (opsional).
+- Transaksi berulang (gaji, tagihan) dengan notifikasi lokal.
+- Rekonsiliasi rekening dengan saldo mutasi/statement.
+- Multi-mata uang, kurs manual/offline.
+- Laporan: arus kas, pengeluaran per kategori, income vs expense, tren, kekayaan bersih.
+- Ekspor/Impor: CSV/JSON, lampiran; file backup terenkripsi.
+
+Arsitektur offline
+- Database lokal: SQLite (disarankan) dengan migrasi skema; simpan angka dalam satuan terkecil (integer, mis. sen) untuk akurasi.
+- Enkripsi: SQLCipher atau enkripsi file DB; kunci disimpan di Keychain (macOS).
+- Layer domain: aturan bisnis (saldo, validasi, rekonsiliasi).
+- UI: bebas teknologi (contoh)
+  - Desktop: Tauri + React/Svelte atau Electron.
+  - Mobile: Flutter + Drift/Isar; React Native + WatermelonDB.
+  - PWA (offline): IndexedDB; enkripsi di atas DB.
+- Sinkronisasi: tidak ada (offline only); sediakan “Export/Import”.
+
+Model data (inti)
+- accounts(id, name, type, currency, opening_balance)
+- transactions(id, date, payee_id, memo, cleared, reconciled_id)
+- transaction_splits(id, transaction_id, account_id, category_id, amount_minor, is_transfer, linked_split_id)
+- categories(id, name, type[income|expense], parent_id)
+- payees(id, name)
+- debts(id, counterparty, type[utang|piutang], account_id, principal_minor, interest_rate, start_date, due_date, status)
+- debt_entries(id, debt_id, date, amount_minor, kind[disbursement|payment|interest|fee|writeoff], transaction_id)
+- budgets(period_id, month, currency), budget_items(period_id, category_id, amount_minor)
+- exchange_rates(id, base, quote, rate, date) — opsional
+- reconciliations(id, account_id, statement_start, statement_end, statement_balance_minor, date)
+- tags(id, name), transaction_tags(transaction_id, tag_id)
+- attachments(id, transaction_id, path/hash)
+
+Contoh skema SQLite inti (disederhanakan)
+
+````sql
+-- Angka dalam satuan terkecil (amount_minor: INTEGER)
+CREATE TABLE accounts (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  type TEXT NOT NULL,            -- cash, bank, ewallet, credit, asset, liability
+  currency TEXT NOT NULL,        -- ISO 4217
+  opening_balance_minor INTEGER DEFAULT 0,
+  archived INTEGER DEFAULT 0,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE categories (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  type TEXT NOT NULL,            -- income or expense
+  parent_id INTEGER REFERENCES categories(id)
+);
+
+CREATE TABLE payees (
+  id INTEGER PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE transactions (
+  id INTEGER PRIMARY KEY,
+  date TEXT NOT NULL,            -- ISO date
+  payee_id INTEGER REFERENCES payees(id),
+  memo TEXT,
+  cleared INTEGER DEFAULT 0,     -- 0/1
+  reconciled_id INTEGER          -- references reconciliations(id)
+);
+
+CREATE TABLE transaction_splits (
+  id INTEGER PRIMARY KEY,
+  transaction_id INTEGER NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
+  account_id INTEGER NOT NULL REFERENCES accounts(id),
+  category_id INTEGER REFERENCES categories(id), -- NULL untuk transfer
+  amount_minor INTEGER NOT NULL,                 -- debit(+)/kredit(-) relatif ke account
+  is_transfer INTEGER DEFAULT 0,
+  linked_split_id INTEGER                       -- pasangannya pada transfer
+);
+
+-- Invarian: SUM(amount_minor) per transaction_id = 0 (double-entry)
+CREATE TRIGGER validate_balanced_tx AFTER INSERT ON transaction_splits
+BEGIN
+  SELECT
+    CASE WHEN (SELECT COALESCE(SUM(amount_minor),0) FROM transaction_splits WHERE transaction_id = NEW.transaction_id) != 0
+    THEN RAISE(ABORT, 'Unbalanced transaction') END;
+END;
+
+CREATE TABLE debts (
+  id INTEGER PRIMARY KEY,
+  counterparty TEXT NOT NULL,
+  type TEXT NOT NULL,    -- utang / piutang
+  account_id INTEGER NOT NULL REFERENCES accounts(id), -- akun kewajiban/aset terkait
+  principal_minor INTEGER NOT NULL,
+  interest_rate REAL DEFAULT 0,
+  start_date TEXT,
+  due_date TEXT,
+  status TEXT DEFAULT 'active'
+);
+
+CREATE TABLE debt_entries (
+  id INTEGER PRIMARY KEY,
+  debt_id INTEGER NOT NULL REFERENCES debts(id) ON DELETE CASCADE,
+  date TEXT NOT NULL,
+  amount_minor INTEGER NOT NULL,
+  kind TEXT NOT NULL,    -- disbursement|payment|interest|fee|writeoff
+  transaction_id INTEGER REFERENCES transactions(id)
+);
+
+CREATE TABLE reconciliations (
+  id INTEGER PRIMARY KEY,
+  account_id INTEGER NOT NULL REFERENCES accounts(id),
+  statement_start TEXT,
+  statement_end TEXT,
+  statement_balance_minor INTEGER NOT NULL,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+````
+
+Alur utama
+- Tambah transaksi: pilih rekening, tanggal, payee, kategori atau split beberapa kategori, lampiran. Simpan sebagai 1 transaksi dengan ≥1 split.
+- Transfer: 1 transaksi dengan dua split saling tertaut (akun A dan B). Biaya bank sebagai split tambahan ke kategori “Bank Fees”.
+- Utang/Piutang:
+  - Buat akun “liability/asset” khusus + record debt.
+  - Pencairan: transfer dari akun sumber ke akun debt (kind=disbursement).
+  - Angsuran: transfer dari akun kas ke akun debt; bunga dicatat ke kategori “Interest Expense/Income”.
+- Rekonsiliasi: tandai cleared, cocokkan dengan statement, simpan statement_balance dan periode; hitung selisih.
+- Anggaran: target per kategori per bulan, tampilkan realisasi vs anggaran, carry-over opsional.
+- Transaksi berulang: simpan template + RRULE; generator membuat transaksi pada due date, dukung notifikasi lokal.
+
+Aturan bisnis dan validasi
+- Total split per transaksi harus 0.
+- Transfer tidak memiliki kategori pada kedua split (opsional: fee displit terpisah).
+- Tidak boleh hapus akun bila ada saldo ≠ 0 tanpa penyesuaian.
+- Multi-mata uang: simpan currency per akun; untuk transfer lintas mata uang, simpan kedua nominal dan kurs di metadata/extra field.
+
+Keamanan dan backup
+- Kunci aplikasi (PIN/biometrik), enkripsi DB, auto-lock.
+- Backup manual/otomatis ke file terenkripsi; ekspor CSV/JSON tanpa kunci.
+- Versi skema dan migrasi teruji.
+
+Laporan
+- Ringkasan saldo, arus kas per periode, pengeluaran per kategori, tren 12 bulan, net worth, utang/piutang outstanding.
+
+Teknologi yang direkomendasikan
+- Desktop (macOS fokus): Tauri + React/Svelte + SQLite (SQLCipher) untuk footprint ringan.
+- Mobile: Flutter + Drift/SQLite jika ingin lintas platform.
+- Library uang: gunakan integer minor units, hindari floating.
+
+Langkah MVP
+1) Accounts, Categories, Transactions + Splits, Transfers, Dashboard saldo.
+2) Rekonsiliasi dasar, Ekspor CSV, Backup.
+3) Utang/Piutang, Anggaran, Transaksi berulang.
+4) Lampiran, Tag, Laporan lanjutan, Multi-currency.
+
+Butuh contoh struktur proyek (mis. Tauri + SQLite) atau skema migrasi awal?

@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Http\JsonResponse;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
@@ -75,32 +77,51 @@ class AuthController extends Controller
             'message' => 'Login success',
             'data' => [
                 'token' => $token,
-                'user'  => auth()->user(),
+                'user'  => JWTAuth::user(),
             ]
         ]);
     }
 
     public function logout()
     {
-        auth('api')->logout();
+        JWTAuth::logout();
 
         return response()->json(['status' => 200, 'message' => 'Logged out successfully']);
     }
 
-    public function refresh()
+    public function refresh(): JsonResponse
     {
-        return response()->json([
-            'status' => 200,
-            'message' => 'Token refreshed',
-            'data' => [
-                'token' => auth('api')->refresh()
-            ]
-        ]);
+        try {
+            $token = JWTAuth::getToken();
+            if (!$token) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'A token is required'
+                ], 400);
+            }
+            $newToken = JWTAuth::refresh($token);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'auth_token' => $newToken,
+                    'token_type' => 'bearer',
+                    'expires_in' => config('jwt.ttl') * 60
+                ]
+            ]);
+
+        } catch (JWTException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token cannot be refreshed',
+                'errors' => $e->getMessage()
+            ], 401);
+        }
     }
 
     public function me()
     {
-        $user = auth()->user();
+        $user = JWTAuth::user();
         $user->load(['accounts'=>function($query) {
             $query->orderBy('created_at');
         }]);

@@ -1,0 +1,581 @@
+{
+  "designSystem": {
+    "name": "Modern Financial App Design System",
+    "version": "1.0",
+    "description": "Clean, modern design system for financial applications with curved elements and vibrant gradients"
+  },
+  
+  "colorPalette": {
+    "primary": {
+      "teal": "#20B2AA",
+      "tealGradient": "linear-gradient(135deg, #20B2AA 0%, #17A2B8 100%)",
+      "tealLight": "#4DD0E1",
+      "tealDark": "#00838F",
+      "tealGradientDark": "linear-gradient(135deg, #00838F 0%, #006064 100%)"
+    },
+    "secondary": {
+      "coral": "#FF6B6B",
+      "coralGradient": "linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%)",
+      "coralLight": "#FF8A80",
+      "coralDark": "#E53935",
+      "coralGradientDark": "linear-gradient(135deg, #E53935 0%, #C62828 100%)"
+    },
+    "neutral": {
+      "light": {
+        "white": "#FFFFFF",
+        "lightGray": "#F5F5F5",
+        "mediumGray": "#E0E0E0",
+        "darkGray": "#757575",
+        "charcoal": "#424242",
+        "black": "#212121"
+      },
+      "dark": {
+        "background": "#0A0A0B",
+        "surface": "#1A1A1B",
+        "surfaceElevated": "#242426",
+        "surfaceHigh": "#2E2E30",
+        "border": "#333335",
+        "borderLight": "#404042",
+        "textPrimary": "#FFFFFF",
+        "textSecondary": "#B3B3B3",
+        "textTertiary": "#808080",
+        "textInverse": "#1A1A1B"
+      }
+    },
+    "status": {
+      "light": {
+        "success": "#4CAF50",
+        "warning": "#FF9800",
+        "error": "#F44336",
+        "info": "#2196F3"
+      },
+      "dark": {
+        "success": "#66BB6A",
+        "warning": "#FFB74D",
+        "error": "#EF5350",
+        "info": "#42A5F5"
+      }
+    }
+  },
+
+  "typography": {
+    "fontFamily": {
+      "primary": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "fallback": "Arial, sans-serif"
+    },
+    "fontSizes": {
+      "xs": "12px",
+      "sm": "14px",
+      "base": "16px",
+      "lg": "18px",
+      "xl": "20px",
+      "2xl": "24px",
+      "3xl": "32px",
+      "4xl": "40px",
+      "5xl": "48px"
+    },
+    "fontWeights": {
+      "light": 300,
+      "normal": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    },
+    "textStyles": {
+      "greeting": {
+        "light": {
+          "fontSize": "24px",
+          "fontWeight": 600,
+          "color": "white",
+          "letterSpacing": "0.02em"
+        },
+        "dark": {
+          "fontSize": "24px",
+          "fontWeight": 600,
+          "color": "white",
+          "letterSpacing": "0.02em"
+        }
+      },
+      "balance": {
+        "light": {
+          "fontSize": "40px",
+          "fontWeight": 700,
+          "color": "white",
+          "letterSpacing": "-0.02em"
+        },
+        "dark": {
+          "fontSize": "40px",
+          "fontWeight": 700,
+          "color": "white",
+          "letterSpacing": "-0.02em"
+        }
+      },
+      "balanceLabel": {
+        "light": {
+          "fontSize": "16px",
+          "fontWeight": 400,
+          "color": "rgba(255,255,255,0.8)"
+        },
+        "dark": {
+          "fontSize": "16px",
+          "fontWeight": 400,
+          "color": "rgba(255,255,255,0.9)"
+        }
+      },
+      "sectionHeader": {
+        "light": {
+          "fontSize": "20px",
+          "fontWeight": 600,
+          "color": "#424242"
+        },
+        "dark": {
+          "fontSize": "20px",
+          "fontWeight": 600,
+          "color": "#FFFFFF"
+        }
+      },
+      "amount": {
+        "light": {
+          "fontSize": "18px",
+          "fontWeight": 600,
+          "color": "#424242"
+        },
+        "dark": {
+          "fontSize": "18px",
+          "fontWeight": 600,
+          "color": "#FFFFFF"
+        }
+      },
+      "transactionLabel": {
+        "light": {
+          "fontSize": "16px",
+          "fontWeight": 500,
+          "color": "#424242"
+        },
+        "dark": {
+          "fontSize": "16px",
+          "fontWeight": 500,
+          "color": "#FFFFFF"
+        }
+      },
+      "transactionDate": {
+        "light": {
+          "fontSize": "14px",
+          "fontWeight": 400,
+          "color": "#757575"
+        },
+        "dark": {
+          "fontSize": "14px",
+          "fontWeight": 400,
+          "color": "#B3B3B3"
+        }
+      }
+    }
+  },
+
+  "spacing": {
+    "xs": "4px",
+    "sm": "8px",
+    "md": "16px",
+    "lg": "24px",
+    "xl": "32px",
+    "2xl": "48px",
+    "3xl": "64px"
+  },
+
+  "borderRadius": {
+    "none": "0px",
+    "sm": "4px",
+    "md": "8px",
+    "lg": "16px",
+    "xl": "24px",
+    "2xl": "32px",
+    "full": "9999px"
+  },
+
+  "shadows": {
+    "light": {
+      "soft": "0 2px 8px rgba(0,0,0,0.08)",
+      "medium": "0 4px 16px rgba(0,0,0,0.12)",
+      "strong": "0 8px 32px rgba(0,0,0,0.16)"
+    },
+    "dark": {
+      "soft": "0 2px 8px rgba(0,0,0,0.3)",
+      "medium": "0 4px 16px rgba(0,0,0,0.4)",
+      "strong": "0 8px 32px rgba(0,0,0,0.6)",
+      "glow": "0 0 20px rgba(32, 178, 170, 0.2)"
+    }
+  },
+
+  "components": {
+    "header": {
+      "structure": "curved bottom edge with gradient background",
+      "height": "280px",
+      "light": {
+        "background": "primary teal gradient",
+        "borderRadius": "0 0 32px 32px",
+        "shadow": "none"
+      },
+      "dark": {
+        "background": "primary teal gradient dark variant",
+        "borderRadius": "0 0 32px 32px",
+        "shadow": "0 4px 20px rgba(0,0,0,0.4)",
+        "border": "1px solid rgba(255,255,255,0.1)"
+      },
+      "padding": "24px",
+      "elements": {
+        "greeting": "top-left positioned",
+        "notification": "top-right icon with badge",
+        "balance": "centered large text",
+        "balanceLabel": "below balance, smaller text"
+      }
+    },
+    
+    "tabNavigation": {
+      "structure": "rounded pill-shaped container with active state",
+      "light": {
+        "background": "white with shadow",
+        "inactiveColor": "#9E9E9E",
+        "shadow": "0 2px 8px rgba(0,0,0,0.08)"
+      },
+      "dark": {
+        "background": "#242426 with border",
+        "border": "1px solid #333335",
+        "inactiveColor": "#808080",
+        "shadow": "0 2px 8px rgba(0,0,0,0.3)"
+      },
+      "borderRadius": "full",
+      "height": "48px",
+      "margin": "-24px 24px 0 24px",
+      "position": "overlapping header",
+      "tabs": {
+        "active": {
+          "background": "gradient (teal or coral based on section)",
+          "color": "white",
+          "fontWeight": 600,
+          "shadow": "inner glow effect in dark mode"
+        },
+        "inactive": {
+          "background": "transparent",
+          "fontWeight": 500
+        }
+      }
+    },
+
+    "dataVisualization": {
+      "chart": {
+        "type": "curved line chart",
+        "height": "120px",
+        "light": {
+          "background": "transparent",
+          "gridColor": "rgba(0,0,0,0.05)",
+          "textColor": "#757575"
+        },
+        "dark": {
+          "background": "transparent",
+          "gridColor": "rgba(255,255,255,0.1)",
+          "textColor": "#B3B3B3",
+          "glowEffect": "subtle glow on data lines"
+        },
+        "lineColor": "matches section theme",
+        "fillGradient": "subtle gradient below line",
+        "dataPoint": "circular indicator with value popup"
+      }
+    },
+
+    "transactionList": {
+      "structure": "vertical list with icon, details, and amount",
+      "itemHeight": "64px",
+      "padding": "16px 24px",
+      "separator": "none (white space)",
+      "light": {
+        "background": "white",
+        "hoverBackground": "#F5F5F5"
+      },
+      "dark": {
+        "background": "#1A1A1B",
+        "hoverBackground": "#242426",
+        "borderColor": "#333335"
+      },
+      "item": {
+        "icon": {
+          "size": "40px",
+          "borderRadius": "full or rounded",
+          "background": "themed color",
+          "position": "left",
+          "dark": {
+            "border": "1px solid rgba(255,255,255,0.1)",
+            "shadow": "0 2px 4px rgba(0,0,0,0.2)"
+          }
+        },
+        "content": {
+          "title": "primary text, medium weight",
+          "subtitle": "secondary text, lighter color",
+          "amount": "right-aligned, bold, color-coded (+/-)"
+        },
+        "badge": {
+          "size": "16px",
+          "position": "bottom-right of icon",
+          "colors": "green for income, red for expense",
+          "dark": {
+            "border": "1px solid rgba(255,255,255,0.2)",
+            "glowEffect": "subtle glow matching badge color"
+          }
+        }
+      }
+    },
+
+    "buttons": {
+      "primary": {
+        "borderRadius": "full",
+        "height": "56px",
+        "fontWeight": 600,
+        "light": {
+          "background": "gradient",
+          "color": "white",
+          "shadow": "0 4px 16px rgba(0,0,0,0.12)"
+        },
+        "dark": {
+          "background": "gradient with enhanced saturation",
+          "color": "white",
+          "shadow": "0 4px 16px rgba(0,0,0,0.4)",
+          "border": "1px solid rgba(255,255,255,0.1)",
+          "glowEffect": "0 0 20px rgba(32, 178, 170, 0.3)"
+        }
+      },
+      "fab": {
+        "shape": "circular",
+        "size": "56px",
+        "color": "white",
+        "position": "bottom-right",
+        "icon": "plus or relevant action",
+        "light": {
+          "background": "gradient",
+          "shadow": "0 8px 32px rgba(0,0,0,0.16)"
+        },
+        "dark": {
+          "background": "gradient with enhanced saturation",
+          "shadow": "0 8px 32px rgba(0,0,0,0.6)",
+          "border": "1px solid rgba(255,255,255,0.2)",
+          "glowEffect": "0 0 30px rgba(32, 178, 170, 0.4)"
+        }
+      }
+    },
+
+    "bottomNavigation": {
+      "structure": "four icon navigation",
+      "height": "64px",
+      "light": {
+        "background": "white",
+        "borderTop": "1px solid #E0E0E0",
+        "activeColor": "#20B2AA",
+        "inactiveColor": "#9E9E9E"
+      },
+      "dark": {
+        "background": "#1A1A1B",
+        "borderTop": "1px solid #333335",
+        "activeColor": "#4DD0E1",
+        "inactiveColor": "#808080",
+        "shadow": "0 -2px 8px rgba(0,0,0,0.2)"
+      },
+      "icons": {
+        "size": "24px"
+      }
+    },
+
+    "illustration": {
+      "style": "minimal, friendly character design",
+      "light": {
+        "colors": "warm, approachable palette",
+        "background": "matches app theme"
+      },
+      "dark": {
+        "colors": "slightly desaturated with higher contrast",
+        "background": "darker variants with subtle highlights",
+        "glowEffects": "subtle rim lighting on characters"
+      },
+      "usage": "onboarding and empty states"
+    },
+
+    "cards": {
+      "light": {
+        "background": "white",
+        "border": "none",
+        "shadow": "0 2px 8px rgba(0,0,0,0.08)"
+      },
+      "dark": {
+        "background": "#242426",
+        "border": "1px solid #333335",
+        "shadow": "0 2px 8px rgba(0,0,0,0.3)"
+      },
+      "borderRadius": "16px",
+      "padding": "20px",
+      "margin": "8px 0"
+    }
+  },
+
+  "layoutPatterns": {
+    "screenStructure": {
+      "header": "curved gradient section with key info",
+      "content": "themed background with cards/lists",
+      "navigation": "bottom tab bar",
+      "overlay": "floating action button"
+    },
+    
+    "cardDesign": {
+      "light": {
+        "background": "white",
+        "shadow": "0 2px 8px rgba(0,0,0,0.08)"
+      },
+      "dark": {
+        "background": "#242426",
+        "border": "1px solid #333335",
+        "shadow": "0 2px 8px rgba(0,0,0,0.3)"
+      },
+      "borderRadius": "16px",
+      "padding": "20px",
+      "margin": "8px 0"
+    },
+
+    "spacing": {
+      "screenPadding": "24px horizontal",
+      "sectionSpacing": "32px vertical",
+      "itemSpacing": "16px vertical"
+    },
+
+    "backgrounds": {
+      "light": {
+        "primary": "#FFFFFF",
+        "secondary": "#F5F5F5"
+      },
+      "dark": {
+        "primary": "#0A0A0B",
+        "secondary": "#1A1A1B"
+      }
+    }
+  },
+
+  "accessibility": {
+    "minimumTouchTarget": "44px",
+    "colorContrast": {
+      "light": "WCAG AA compliant",
+      "dark": "WCAG AAA compliant with enhanced contrast"
+    },
+    "focusIndicator": {
+      "light": "2px solid primary color with offset",
+      "dark": "2px solid primary color with glow effect"
+    }
+  },
+
+  "interactions": {
+    "transitions": {
+      "duration": "300ms",
+      "easing": "cubic-bezier(0.4, 0.0, 0.2, 1)",
+      "properties": "transform, opacity, background-color"
+    },
+    "hover": {
+      "light": {
+        "scale": "1.02",
+        "shadow": "elevated"
+      },
+      "dark": {
+        "scale": "1.02",
+        "shadow": "elevated with glow",
+        "brightness": "1.1"
+      }
+    },
+    "active": {
+      "scale": "0.98",
+      "opacity": "0.8"
+    },
+    "themeTransition": {
+      "duration": "400ms",
+      "easing": "cubic-bezier(0.4, 0.0, 0.2, 1)",
+      "properties": "background-color, color, border-color, box-shadow"
+    }
+  },
+
+  "responsiveBreakpoints": {
+    "mobile": "320px - 767px",
+    "tablet": "768px - 1023px",
+    "desktop": "1024px+"
+  },
+
+  "themeToggle": {
+    "implementation": {
+      "storageKey": "theme-preference",
+      "systemPreference": "respects prefers-color-scheme",
+      "toggleAnimation": "300ms ease-in-out transition",
+      "iconTransition": "rotate and fade animation"
+    },
+    "modes": {
+      "light": "default bright theme",
+      "dark": "enhanced dark theme with glow effects",
+      "auto": "follows system preference"
+    }
+  },
+
+  "darkModeEnhancements": {
+    "visualEffects": {
+      "glowEffects": "subtle glows on interactive elements",
+      "borderHighlights": "subtle border lighting",
+      "gradientIntensity": "slightly more saturated gradients",
+      "shadowDepth": "deeper shadows for better depth perception"
+    },
+    "accessibility": {
+      "contrastRatio": "enhanced contrast ratios",
+      "focusIndicators": "more visible focus states",
+      "colorBlindness": "tested with color blind simulation"
+    },
+    "performance": {
+      "reducedMotion": "respects prefers-reduced-motion",
+      "batteryOptimization": "darker backgrounds save battery on OLED"
+    }
+  },
+
+  "designPrinciples": {
+    "visualStyle": [
+      "Clean and minimal with purposeful use of color",
+      "Curved elements and organic shapes",
+      "Vibrant gradients for primary actions and headers",
+      "Consistent use of white space",
+      "Friendly, approachable illustrations"
+    ],
+    "userExperience": [
+      "Clear information hierarchy",
+      "Intuitive navigation patterns",
+      "Contextual color coding (green for income, red for expenses)",
+      "Progressive disclosure of information",
+      "Consistent interaction patterns"
+    ]
+  },
+
+  "implementationNotes": {
+    "cssFramework": "Tailwind CSS recommended with dark mode support",
+    "iconLibrary": "Lucide React or similar outline-style icons",
+    "chartLibrary": "Recharts or Chart.js for data visualization with dark theme support",
+    "animationLibrary": "Framer Motion for smooth transitions and theme switching",
+    "themeImplementation": {
+      "cssVariables": "use CSS custom properties for theme values",
+      "dataAttributes": "use data-theme attribute on root element",
+      "localStorage": "persist theme preference",
+      "systemDetection": "detect and respect system theme preference"
+    },
+    "darkModeSpecifics": {
+      "gradients": "use deeper, more saturated gradients",
+      "glowEffects": "implement using box-shadow and filter: drop-shadow",
+      "borders": "use subtle rgba borders for definition",
+      "animations": "ensure smooth theme transitions with CSS transitions"
+    },
+    "keyFeatures": [
+      "Curved header sections using border-radius and pseudo-elements",
+      "Gradient backgrounds with CSS linear-gradient (enhanced in dark mode)",
+      "Floating tab navigation with z-index layering",
+      "Consistent spacing using design tokens",
+      "Icon-based transaction categorization",
+      "Smooth theme transitions with CSS custom properties",
+      "Enhanced dark mode with glow effects and improved contrast",
+      "System theme preference detection and persistence"
+    ]
+  }
+}

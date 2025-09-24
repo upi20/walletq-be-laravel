@@ -1,8 +1,17 @@
 <?php
 
+use App\Http\Controllers\Web\DashboardController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
-// Serve the frontend static file
-Route::get('/{any?}', function () {
-    return file_get_contents(public_path('index.html'));
-})->where('any', '.*');
+Route::get('/', function () {
+    return Inertia::render('Welcome');
+})->name('home');
+
+
+Route::group(['middleware' => ['auth', 'verified']], function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
+
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';
