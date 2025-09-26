@@ -1,0 +1,279 @@
+export interface TranslationKeys {
+  // Common
+  common: {
+    search: string;
+    add: string;
+    edit: string;
+    delete: string;
+    view: string;
+    save: string;
+    cancel: string;
+    confirm: string;
+    loading: string;
+    no_data: string;
+    actions: string;
+    back: string;
+    name: string;
+    description: string;
+    status: string;
+    active: string;
+    inactive: string;
+    created_at: string;
+    updated_at: string;
+  };
+
+  // Navigation
+  nav: {
+    dashboard: string;
+    accounts: string;
+    transactions: string;
+    reports: string;
+    settings: string;
+  };
+
+  // Account related
+  accounts: {
+    title: string;
+    subtitle: string;
+    add_account: string;
+    create_account: string;
+    edit_account: string;
+    delete_account: string;
+    view_details: string;
+    initial_balance: string;
+    current_balance: string;
+    balance: string;
+    category: string;
+    no_accounts: string;
+    no_accounts_subtitle: string;
+    search_placeholder: string;
+    delete_confirmation: string;
+    no_results: string;
+    no_results_subtitle: string;
+  };
+
+  // Settings
+  settings: {
+    title: string;
+    profile: string;
+    appearance: string;
+    language: string;
+    about: string;
+    back_to_settings: string;
+    index: {
+      title: string;
+      description: string;
+    };
+    items: {
+      accounts: {
+        title: string;
+        description: string;
+      };
+      account_categories: {
+        title: string;
+        description: string;
+      };
+      transaction_categories: {
+        title: string;
+        description: string;
+      };
+      tags: {
+        title: string;
+        description: string;
+      };
+      about: {
+        title: string;
+        description: string;
+      };
+    };
+  };
+
+  // Messages
+  messages: {
+    success: string;
+    error: string;
+    warning: string;
+    info: string;
+  };
+}
+
+export const translations: Record<'id' | 'en', TranslationKeys> = {
+  id: {
+    common: {
+      search: 'Cari',
+      add: 'Tambah',
+      edit: 'Edit',
+      delete: 'Hapus',
+      view: 'Lihat',
+      save: 'Simpan',
+      cancel: 'Batal',
+      confirm: 'Konfirmasi',
+      loading: 'Memuat...',
+      no_data: 'Tidak ada data',
+      actions: 'Aksi',
+      back: 'Kembali',
+      name: 'Nama',
+      description: 'Deskripsi',
+      status: 'Status',
+      active: 'Aktif',
+      inactive: 'Tidak Aktif',
+      created_at: 'Dibuat pada',
+      updated_at: 'Diperbarui pada',
+    },
+    nav: {
+      dashboard: 'Dashboard',
+      accounts: 'Rekening',
+      transactions: 'Transaksi',
+      reports: 'Laporan',
+      settings: 'Pengaturan',
+    },
+    accounts: {
+      title: 'Rekening',
+      subtitle: 'Kelola rekening keuangan dan lacak saldo Anda',
+      add_account: 'Tambah Rekening',
+      create_account: 'Buat Rekening',
+      edit_account: 'Edit Rekening',
+      delete_account: 'Hapus Rekening',
+      view_details: 'Lihat Detail',
+      initial_balance: 'Saldo Awal',
+      current_balance: 'Saldo Saat Ini',
+      balance: 'Saldo',
+      category: 'Kategori',
+      no_accounts: 'Belum ada rekening',
+      no_accounts_subtitle: 'Buat rekening pertama Anda untuk memulai',
+      search_placeholder: 'Cari rekening...',
+      delete_confirmation: 'Apakah Anda yakin ingin menghapus',
+      no_results: 'Tidak ada hasil',
+      no_results_subtitle: 'Tidak ada rekening yang sesuai dengan pencarian atau filter Anda.',
+    },
+    settings: {
+      title: 'Pengaturan',
+      profile: 'Profil',
+      appearance: 'Tampilan',
+      language: 'Bahasa',
+      about: 'Tentang',
+      back_to_settings: 'Kembali ke Pengaturan',
+      index: {
+        title: 'Pengaturan',
+        description: 'Kelola data dan preferensi keuangan Anda',
+      },
+      items: {
+        accounts: {
+          title: 'Rekening',
+          description: 'Kelola rekening keuangan Anda',
+        },
+        account_categories: {
+          title: 'Kategori Rekening',
+          description: 'Organisir rekening Anda berdasarkan kategori',
+        },
+        transaction_categories: {
+          title: 'Kategori Transaksi',
+          description: 'Kelola kategori pemasukan dan pengeluaran',
+        },
+        tags: {
+          title: 'Tags',
+          description: 'Buat dan kelola tag transaksi Anda',
+        },
+        about: {
+          title: 'Tentang',
+          description: 'Informasi aplikasi dan detail sistem',
+        },
+      },
+    },
+    messages: {
+      success: 'Berhasil',
+      error: 'Terjadi kesalahan',
+      warning: 'Peringatan',
+      info: 'Informasi',
+    },
+  },
+  en: {
+    common: {
+      search: 'Search',
+      add: 'Add',
+      edit: 'Edit',
+      delete: 'Delete',
+      view: 'View',
+      save: 'Save',
+      cancel: 'Cancel',
+      confirm: 'Confirm',
+      loading: 'Loading...',
+      no_data: 'No data available',
+      actions: 'Actions',
+      back: 'Back',
+      name: 'Name',
+      description: 'Description',
+      status: 'Status',
+      active: 'Active',
+      inactive: 'Inactive',
+      created_at: 'Created at',
+      updated_at: 'Updated at',
+    },
+    nav: {
+      dashboard: 'Dashboard',
+      accounts: 'Accounts',
+      transactions: 'Transactions',
+      reports: 'Reports',
+      settings: 'Settings',
+    },
+    accounts: {
+      title: 'Accounts',
+      subtitle: 'Manage your financial accounts and track balances',
+      add_account: 'Add Account',
+      create_account: 'Create Account',
+      edit_account: 'Edit Account',
+      delete_account: 'Delete Account',
+      view_details: 'View Details',
+      initial_balance: 'Initial Balance',
+      current_balance: 'Current Balance',
+      balance: 'Balance',
+      category: 'Category',
+      no_accounts: 'No accounts yet',
+      no_accounts_subtitle: 'Create your first account to get started',
+      search_placeholder: 'Search accounts...',
+      delete_confirmation: 'Are you sure you want to delete',
+      no_results: 'No results',
+      no_results_subtitle: 'No accounts match your search or filter.',
+    },
+    settings: {
+      title: 'Settings',
+      profile: 'Profile',
+      appearance: 'Appearance',
+      language: 'Language',
+      about: 'About',
+      back_to_settings: 'Back to Settings',
+      index: {
+        title: 'Settings',
+        description: 'Manage your financial data and preferences',
+      },
+      items: {
+        accounts: {
+          title: 'Accounts',
+          description: 'Manage your financial accounts',
+        },
+        account_categories: {
+          title: 'Account Categories',
+          description: 'Organize your accounts by categories',
+        },
+        transaction_categories: {
+          title: 'Transaction Categories',
+          description: 'Manage income and expense categories',
+        },
+        tags: {
+          title: 'Tags',
+          description: 'Create and manage your transaction tags',
+        },
+        about: {
+          title: 'About',
+          description: 'Application information and system details',
+        },
+      },
+    },
+    messages: {
+      success: 'Success',
+      error: 'An error occurred',
+      warning: 'Warning',
+      info: 'Information',
+    },
+  },
+};

@@ -16,6 +16,8 @@ import {
 
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
 import formatCurrency from '@/composables/formatCurrency';
+import { useTranslation } from '@/composables/useTranslation';
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 
 interface Account {
   id: number;
@@ -45,6 +47,9 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+// Translation
+const { trans } = useTranslation();
 
 const activeMenu = ref<number | null>(null);
 
@@ -118,7 +123,7 @@ const toggleSort = (field: 'name' | 'current_balance') => {
 };
 
 const deleteAccount = (account: Account) => {
-  if (confirm(`Are you sure you want to delete "${account.name}"?`)) {
+  if (confirm(`${trans('accounts.delete_confirmation')} "${account.name}"?`)) {
     router.delete(`/settings/accounts/${account.id}`);
   }
 };
@@ -135,17 +140,21 @@ document.addEventListener('click', (event) => {
 
 <template>
   <FinancialAppLayout :showHeader="false">
-    <Head title="Rekening" />
+    <Head :title="trans('accounts.title')" />
 
     <!-- Header -->
     <div class="mb-8">
-      <Link
-        href="/settings"
-        class="inline-flex items-center text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 transition-colors mb-4"
-      >
-        <ArrowLeft class="w-4 h-4 mr-2" />
-        Back to Settings
-      </Link>
+      <div class="flex items-center justify-between mb-4">
+        <Link
+          href="/settings"
+          class="inline-flex items-center text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 transition-colors"
+        >
+          <ArrowLeft class="w-4 h-4 mr-2" />
+          {{ trans('settings.back_to_settings') }}
+        </Link>
+        
+        <LanguageSwitcher />
+      </div>
       
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -154,11 +163,11 @@ document.addEventListener('click', (event) => {
               <CreditCard class="w-5 h-5 text-white" />
             </div>
             <h1 class="text-3xl font-bold bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
-              Accounts
+              {{ trans('accounts.title') }}
             </h1>
           </div>
           <p class="text-gray-600 dark:text-gray-300">
-            Manage your financial accounts and track balances
+            {{ trans('accounts.subtitle') }}
           </p>
         </div>
         
@@ -167,7 +176,7 @@ document.addEventListener('click', (event) => {
           class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-teal-600 to-coral-600 text-white rounded-xl font-medium hover:from-teal-700 hover:to-coral-700 transition-all duration-200 shadow-lg hover:shadow-xl"
         >
           <Plus class="w-4 h-4 mr-2" />
-          Add Account
+          {{ trans('accounts.add_account') }}
         </Link>
       </div>
     </div>
@@ -180,7 +189,7 @@ document.addEventListener('click', (event) => {
           <input
             v-model="searchQuery"
             type="search"
-            placeholder="Search accounts..."
+            :placeholder="trans('accounts.search_placeholder')"
             class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             @keyup="onKeyupSearch"
           />
@@ -191,7 +200,7 @@ document.addEventListener('click', (event) => {
               @click.prevent="toggleSort('name')"
               class="px-3 py-2 text-sm flex items-center gap-2"
             >
-              Name
+              {{ trans('common.name') }}
               <ChevronUp v-if="sortField === 'name' && sortOrder === 'asc'" class="w-4 h-4" />
               <ChevronDown v-else-if="sortField === 'name' && sortOrder === 'desc'" class="w-4 h-4" />
             </button>
@@ -199,7 +208,7 @@ document.addEventListener('click', (event) => {
               @click.prevent="toggleSort('current_balance')"
               class="px-3 py-2 text-sm flex items-center gap-2 border-l border-gray-200 dark:border-gray-700"
             >
-              Balance
+              {{ trans('accounts.balance') }}
               <ChevronUp v-if="sortField === 'current_balance' && sortOrder === 'asc'" class="w-4 h-4" />
               <ChevronDown v-else-if="sortField === 'current_balance' && sortOrder === 'desc'" class="w-4 h-4" />
             </button>
@@ -219,20 +228,20 @@ document.addEventListener('click', (event) => {
       <div class="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
         <CreditCard class="w-12 h-12 text-gray-400" />
       </div>
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No accounts yet</h3>
-      <p class="text-gray-600 dark:text-gray-400 mb-6">Create your first account to get started</p>
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">{{ trans('accounts.no_accounts') }}</h3>
+      <p class="text-gray-600 dark:text-gray-400 mb-6">{{ trans('accounts.no_accounts_subtitle') }}</p>
       <Link
         href="/settings/accounts/create"
         class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-600 to-coral-600 text-white rounded-xl font-medium hover:from-teal-700 hover:to-coral-700 transition-all duration-200"
       >
         <Plus class="w-5 h-5 mr-2" />
-        Create Account
+        {{ trans('accounts.create_account') }}
       </Link>
     </div>
 
     <div v-else-if="filteredAndSortedAccounts.length === 0" class="text-center py-12">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No results</h3>
-      <p class="text-gray-600 dark:text-gray-400">No accounts match your search or filter.</p>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ trans('accounts.no_results') }}</h3>
+      <p class="text-gray-600 dark:text-gray-400">{{ trans('accounts.no_results_subtitle') }}</p>
     </div>
 
     <div v-else class="grid grid-cols-1 gap-4">
@@ -293,21 +302,21 @@ document.addEventListener('click', (event) => {
                 class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <Eye class="w-4 h-4 mr-3" />
-                View Details
+                {{ trans('accounts.view_details') }}
               </Link>
               <Link
                 :href="`/settings/accounts/${account.id}/edit`"
                 class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <Edit class="w-4 h-4 mr-3" />
-                Edit Account
+                {{ trans('accounts.edit_account') }}
               </Link>
               <button
                 @click="deleteAccount(account)"
                 class="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
               >
                 <Trash2 class="w-4 h-4 mr-3" />
-                Delete Account
+                {{ trans('accounts.delete_account') }}
               </button>
             </div>
           </div>

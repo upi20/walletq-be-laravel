@@ -8,73 +8,74 @@ import {
   Info,
   ChevronRight 
 } from 'lucide-vue-next';
-
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
+import { useTranslation } from '@/composables/useTranslation';
+import { reactive, computed } from 'vue';
 
-const breadcrumbItems: BreadcrumbItem[] = [
-  {
-    title: 'Settings',
-    href: '/settings',
-  },
-];
+// Translation
+const { trans } = useTranslation();
 
-const settingsItems = [
+const settingsItems = computed(() => [
   {
-    title: 'Rekening',
-    description: 'Kelola rekening keuangan Anda',
+    title: trans('settings.items.accounts.title'),
+    description: trans('settings.items.accounts.description'),
     icon: CreditCard,
     href: '/settings/accounts',
     iconBg: 'bg-teal-100 dark:bg-teal-900',
     iconColor: 'text-teal-600 dark:text-teal-400'
   },
   {
-    title: 'Kategori Rekening',
-    description: 'Organisir rekening Anda berdasarkan kategori',
+    title: trans('settings.items.account_categories.title'),
+    description: trans('settings.items.account_categories.description'),
     icon: FolderOpen,
     href: '/settings/account-categories',
     iconBg: 'bg-coral-100 dark:bg-coral-900',
     iconColor: 'text-coral-600 dark:text-coral-400'
   },
   {
-    title: 'Kategori Transaksi',
-    description: 'Kelola kategori pemasukan dan pengeluaran',
+    title: trans('settings.items.transaction_categories.title'),
+    description: trans('settings.items.transaction_categories.description'),
     icon: ArrowRightLeft,
     href: '/settings/transaction-categories',
     iconBg: 'bg-gradient-to-r from-teal-100 to-coral-100 dark:from-teal-900 dark:to-coral-900',
     iconColor: 'text-teal-600 dark:text-teal-400'
   },
   {
-    title: 'Tags',
-    description: 'Buat dan kelola tag transaksi Anda',
+    title: trans('settings.items.tags.title'),
+    description: trans('settings.items.tags.description'),
     icon: Tag,
     href: '/settings/tags',
     iconBg: 'bg-gradient-to-r from-coral-100 to-teal-100 dark:from-coral-900 dark:to-teal-900',
     iconColor: 'text-coral-600 dark:text-coral-400'
   },
   {
-    title: 'Tentang',
-    description: 'Informasi aplikasi dan detail sistem',
+    title: trans('settings.items.about.title'),
+    description: trans('settings.items.about.description'),
     icon: Info,
     href: '/settings/about',
     iconBg: 'bg-gray-100 dark:bg-gray-800',
     iconColor: 'text-gray-600 dark:text-gray-400'
   },
-];
+]);
+
 </script>
 
 <template>
   <FinancialAppLayout :showHeader="false">
-    <Head title="Pengaturan" />
+    <Head :title="trans('settings.index.title')" />
 
     <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-        Pengaturan
-      </h1>
-      <p class="text-gray-600 dark:text-gray-400">
-        Kelola data dan preferensi keuangan Anda
-      </p>
+    <div class="mb-8 flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+          {{ trans('settings.index.title') }}
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          {{ trans('settings.index.description') }}
+        </p>
+      </div>
+      <LanguageSwitcher />
     </div>
 
     <!-- Settings Items -->
