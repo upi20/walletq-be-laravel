@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, reactive } from 'vue';
 import { usePage, Link } from '@inertiajs/vue3';
 import { useDarkMode } from '@/composables/useDarkMode';
 import { 
@@ -12,6 +12,7 @@ import {
   Moon,
   Sun
 } from 'lucide-vue-next';
+import formatCurrency from '@/composables/formatCurrency';
 
 interface Props {
   showHeader?: boolean;
@@ -39,20 +40,20 @@ const greeting = computed(() => {
   return 'Good Evening';
 });
 
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-  }).format(amount);
-};
-
-const bottomNavItems = [
-  { icon: Home, label: 'Home', route: 'dashboard', active: true },
+const bottomNavItems = reactive([
+  { icon: Home, label: 'Home', route: 'dashboard', active: false },
   { icon: TrendingUp, label: 'Transactions', route: 'transactions', active: false },
   { icon: PieChart, label: 'Reports', route: 'reports', active: false },
   { icon: Settings, label: 'Settings', route: 'settings', active: false },
-];
+]);
+
+
+// Set active state based on current route
+const currentRoute = page.url.split('/')[1] || 'dashboard';
+bottomNavItems.forEach(item => {
+  item.active = item.route === currentRoute;
+});
+
 </script>
 
 <template>
@@ -109,7 +110,9 @@ const bottomNavItems = [
     </header>
 
     <!-- Floating Tab Navigation -->
-    <nav class="relative -mt-6 mx-6 mb-8">
+    <nav 
+      v-if="showHeader" 
+      class="relative -mt-6 mx-6 mb-8">
       <div class="bg-white dark:bg-gray-800 rounded-full h-12 shadow-lg flex items-center p-1 transition-colors duration-300">
         <button class="flex-1 h-10 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 text-white rounded-full text-sm font-semibold transition-all duration-300">
           Overview
@@ -124,7 +127,7 @@ const bottomNavItems = [
     </nav>
 
     <!-- Main Content -->
-    <main class="px-6 pb-20">
+    <main class="px-6 pb-20" :class="showHeader ? '' : 'pt-6'">
       <slot />
     </main>
 

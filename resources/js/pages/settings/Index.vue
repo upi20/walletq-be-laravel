@@ -64,7 +64,7 @@ const settingsItems = [
 </script>
 
 <template>
-  <FinancialAppLayout>
+  <FinancialAppLayout :showHeader="false">
     <Head title="Settings" />
 
     <!-- Header -->
@@ -118,7 +118,7 @@ const settingsItems = [
     </div>
 
     <!-- Stats Cards -->
-    <div class="mt-12 grid grid-cols-2 gap-4">
+    <!-- <div class="mt-12 grid grid-cols-2 gap-4">
       <div class="bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-2xl p-4 text-white">
         <div class="text-2xl font-bold mb-1">5</div>
         <div class="text-sm opacity-90">Categories</div>
@@ -127,6 +127,6 @@ const settingsItems = [
         <div class="text-2xl font-bold mb-1">∞</div>
         <div class="text-sm opacity-90">Customizable</div>
       </div>
-    </div>
+    </div> -->
   </FinancialAppLayout>
 </template>
