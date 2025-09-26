@@ -21,24 +21,24 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
 const settingsItems = [
   {
-    title: 'Accounts',
-    description: 'Manage your financial accounts',
+    title: 'Rekening',
+    description: 'Kelola rekening keuangan Anda',
     icon: CreditCard,
     href: '/settings/accounts',
     iconBg: 'bg-teal-100 dark:bg-teal-900',
     iconColor: 'text-teal-600 dark:text-teal-400'
   },
   {
-    title: 'Account Categories',
-    description: 'Organize your accounts by categories',
+    title: 'Kategori Rekening',
+    description: 'Organisir rekening Anda berdasarkan kategori',
     icon: FolderOpen,
     href: '/settings/account-categories',
     iconBg: 'bg-coral-100 dark:bg-coral-900',
     iconColor: 'text-coral-600 dark:text-coral-400'
   },
   {
-    title: 'Transaction Categories',
-    description: 'Manage income and expense categories',
+    title: 'Kategori Transaksi',
+    description: 'Kelola kategori pemasukan dan pengeluaran',
     icon: ArrowRightLeft,
     href: '/settings/transaction-categories',
     iconBg: 'bg-gradient-to-r from-teal-100 to-coral-100 dark:from-teal-900 dark:to-coral-900',
@@ -46,15 +46,15 @@ const settingsItems = [
   },
   {
     title: 'Tags',
-    description: 'Create and manage transaction tags',
+    description: 'Buat dan kelola tag transaksi Anda',
     icon: Tag,
     href: '/settings/tags',
     iconBg: 'bg-gradient-to-r from-coral-100 to-teal-100 dark:from-coral-900 dark:to-teal-900',
     iconColor: 'text-coral-600 dark:text-coral-400'
   },
   {
-    title: 'About',
-    description: 'App information and system details',
+    title: 'Tentang',
+    description: 'Informasi aplikasi dan detail sistem',
     icon: Info,
     href: '/settings/about',
     iconBg: 'bg-gray-100 dark:bg-gray-800',
@@ -65,15 +65,15 @@ const settingsItems = [
 
 <template>
   <FinancialAppLayout :showHeader="false">
-    <Head title="Settings" />
+    <Head title="Pengaturan" />
 
     <!-- Header -->
     <div class="mb-8">
       <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-        Settings
+        Pengaturan
       </h1>
       <p class="text-gray-600 dark:text-gray-400">
-        Manage your financial data and preferences
+        Kelola data dan preferensi keuangan Anda
       </p>
     </div>
 

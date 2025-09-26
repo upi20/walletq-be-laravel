@@ -71,7 +71,7 @@ const formatNumber = (value: string) => {
         <!-- Account Name -->
         <div>
           <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Account Name *
+            Account Name <span class="text-red-500">*</span>
           </label>
           <input
             id="name"
@@ -89,7 +89,7 @@ const formatNumber = (value: string) => {
         <!-- Category -->
         <div>
           <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Category *
+            Category <span class="text-red-500">*</span>
           </label>
           <select
             id="category"
@@ -113,15 +113,13 @@ const formatNumber = (value: string) => {
             Initial Balance
           </label>
           <div class="relative">
-            <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
-              <DollarSign class="w-5 h-5 text-gray-400" />
+            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              Rp
             </div>
             <input
               id="balance"
               v-model="form.initial_balance"
               type="number"
-              step="0.01"
-              placeholder="0.00"
               class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               :class="{ 'border-red-500': form.errors.initial_balance }"
             />
@@ -134,7 +132,7 @@ const formatNumber = (value: string) => {
         <!-- Description -->
         <div>
           <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Description
+            Description (Optional)
           </label>
           <textarea
             id="description"

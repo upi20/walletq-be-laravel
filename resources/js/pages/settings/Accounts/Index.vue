@@ -135,7 +135,7 @@ document.addEventListener('click', (event) => {
 
 <template>
   <FinancialAppLayout :showHeader="false">
-    <Head title="Accounts" />
+    <Head title="Rekening" />
 
     <!-- Header -->
     <div class="mb-8">

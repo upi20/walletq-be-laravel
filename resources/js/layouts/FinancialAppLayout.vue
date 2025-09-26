@@ -142,9 +142,11 @@ bottomNavItems.forEach(item => {
         :href="`/${item.route}`"
         class="flex flex-col items-center justify-center w-12 h-12 transition-colors duration-200"
         :class="item.active ? 'text-teal-600 dark:text-teal-400' : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400'"
+        :title="item.label"
+        :tooltip="item.label"
       >
         <component :is="item.icon" class="w-6 h-6" />
-        <span class="text-xs mt-1">{{ item.label }}</span>
+        <!-- <span class="text-xs mt-1">{{ item.label }}</span> -->
       </Link>
     </nav>
 
