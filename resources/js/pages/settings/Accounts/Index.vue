@@ -244,29 +244,29 @@ document.addEventListener('click', (event) => {
       <p class="text-gray-600 dark:text-gray-400">{{ trans('accounts.no_results_subtitle') }}</p>
     </div>
 
-    <div v-else class="grid grid-cols-1 gap-4">
+    <div v-else class="grid grid-cols-1 gap-1">
       <div
         v-for="(account, index) in filteredAndSortedAccounts"
         :key="account.id"
         :class="[
-          'group rounded-xl p-6 shadow-sm border transition-all duration-300',
+          'group rounded-md p-0 shadow-sm border transition-all duration-300',
           index % 2 === 0 
-            ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg hover:shadow-teal-500/10' 
-            : 'bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-700/50 hover:shadow-lg hover:shadow-coral-500/10'
+            ? 'bg-white dark:bg-gray-800 border-none hover:shadow-lg hover:shadow-teal-500/10' 
+            : 'bg-teal-50 dark:bg-teal-900/20 border-none hover:shadow-lg hover:shadow-coral-500/10'
         ]"
       >
         <!-- Account Header -->
         <div class="flex items-start justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-gradient-to-r from-teal-100 to-coral-100 dark:from-teal-900 dark:to-coral-900 rounded-xl flex items-center justify-center">
+            <div class="w-12 ms-1 h-12 bg-gradient-to-r from-teal-100 to-coral-100 dark:from-teal-900 dark:to-coral-900 rounded-md flex items-center justify-center">
               <CreditCard class="w-6 h-6 text-teal-600 dark:text-teal-400" />
             </div>
             <div>
               <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                 {{ account.name }}
               </h3>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="px-2 py-1 text-xs font-medium bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 rounded-lg">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="px-2 py-1 text-xs font-medium bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 rounded-md">
                   <!-- {{ account.category?.name }} -->
                     {{ formatCurrency(account.current_balance) }}
                 </span>
@@ -286,7 +286,7 @@ document.addEventListener('click', (event) => {
           
           <div class="relative">
             <button
-              class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center transition-colors"
+              class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center transition-colors mt-2"
               @click="toggleMenu(account.id)"
             >
               <MoreVertical class="w-4 h-4 text-gray-400" />
