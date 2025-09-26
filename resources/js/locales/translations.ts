@@ -67,7 +67,34 @@ export interface TranslationKeys {
     items: {
       accounts: {
         title: string;
+        title_create: string;
         description: string;
+        description_create: string;
+        back_to_list: string;
+        add_account: string;
+        edit_account: string;
+        delete_account: string;
+        no_accounts: string;
+        no_accounts_subtitle: string;
+        search_placeholder: string;
+        delete_confirmation: string;
+        no_results: string;
+        no_results_subtitle: string;
+        form: {
+          name: string;
+          name_placeholder: string;
+          description: string;
+          description_placeholder: string;
+          category: string;
+          category_first_option: string;
+          initial_balance: string;
+          is_active: string;
+        };
+        btn: {
+          save: string;
+          save_progress: string;
+          cancel: string;
+        };
       };
       account_categories: {
         title: string;
@@ -160,7 +187,34 @@ export const translations: Record<'id' | 'en', TranslationKeys> = {
       items: {
         accounts: {
           title: 'Rekening',
+          title_create: 'Buat Rekening',
           description: 'Kelola rekening keuangan Anda',
+          description_create: 'Buat rekening baru untuk mulai melacak keuangan Anda',
+          back_to_list: 'Kembali ke Daftar',
+          add_account: 'Tambah Rekening',
+          edit_account: 'Edit Rekening',
+          delete_account: 'Hapus Rekening',
+          no_accounts: 'Belum ada rekening',
+          no_accounts_subtitle: 'Buat rekening pertama Anda untuk memulai',
+          search_placeholder: 'Cari rekening...',
+          delete_confirmation: 'Apakah Anda yakin ingin menghapus',
+          no_results: 'Tidak ada hasil',
+          no_results_subtitle: 'Tidak ada rekening yang sesuai dengan pencarian atau filter Anda.',
+          form: {
+            name: 'Nama',
+            name_placeholder: 'Masukkan nama rekening',
+            description: 'Deskripsi',
+            description_placeholder: 'Masukkan deskripsi rekening',
+            category: 'Kategori',
+            category_first_option: 'Pilih Kategori',
+            initial_balance: 'Saldo Awal',
+            is_active: 'Rekening Aktif',
+          },
+          btn: {
+            save: 'Buat Rekening',
+            save_progress: 'Membuat...',
+            cancel: 'Batal',
+          },
         },
         account_categories: {
           title: 'Kategori Rekening',
@@ -249,7 +303,34 @@ export const translations: Record<'id' | 'en', TranslationKeys> = {
       items: {
         accounts: {
           title: 'Accounts',
+          title_create: 'Create Account',
           description: 'Manage your financial accounts',
+          description_create: 'Create a new account to start tracking your finances',
+          back_to_list: 'Back to List',
+          add_account: 'Add Account',
+          edit_account: 'Edit Account',
+          delete_account: 'Delete Account',
+          no_accounts: 'No accounts yet',
+          no_accounts_subtitle: 'Create your first account to get started',
+          search_placeholder: 'Search accounts...',
+          delete_confirmation: 'Are you sure you want to delete',
+          no_results: 'No results',
+          no_results_subtitle: 'No accounts match your search or filter.',
+          form: {
+            name: 'Name',
+            name_placeholder: 'Enter account name',
+            description: 'Description',
+            description_placeholder: 'Enter account description',
+            category: 'Category',
+            category_first_option: 'Select Category',
+            initial_balance: 'Initial Balance',
+            is_active: 'Active Account',
+          },
+          btn: {
+            save: 'Create Account',
+            save_progress: 'Creating...',
+            cancel: 'Cancel',
+          },
         },
         account_categories: {
           title: 'Account Categories',

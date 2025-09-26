@@ -6,8 +6,12 @@ import {
   Save,
   DollarSign
 } from 'lucide-vue-next';
-
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
+import { useTranslation } from '@/composables/useTranslation';
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
+
+// Translation
+const { trans } = useTranslation();
 
 interface AccountCategory {
   id: number;
@@ -44,24 +48,27 @@ const formatNumber = (value: string) => {
 
     <!-- Header -->
     <div class="mb-8">
-      <Link
-        href="/settings/accounts"
-        class="inline-flex items-center text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 transition-colors mb-4"
-      >
-        <ArrowLeft class="w-4 h-4 mr-2" />
-        Back to Accounts
-      </Link>
+      <div class="flex items-center justify-between">
+        <Link
+          href="/settings/accounts"
+          class="inline-flex items-center text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 transition-colors mb-4"
+        >
+          <ArrowLeft class="w-4 h-4 mr-2" />
+          {{ trans('settings.items.accounts.back_to_list') }}
+        </Link>
+        <LanguageSwitcher />
+      </div>
       
       <div class="flex items-center gap-3 mb-2">
         <div class="w-10 h-10 bg-gradient-to-r from-teal-500 to-coral-500 rounded-xl flex items-center justify-center">
           <CreditCard class="w-5 h-5 text-white" />
         </div>
         <h1 class="text-3xl font-bold bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
-          Create Account
+          {{ trans('settings.items.accounts.title_create') }}
         </h1>
       </div>
       <p class="text-gray-600 dark:text-gray-300">
-        Add a new financial account to track your money
+        {{ trans('settings.items.accounts.description_create') }}
       </p>
     </div>
 
@@ -71,13 +78,14 @@ const formatNumber = (value: string) => {
         <!-- Account Name -->
         <div>
           <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Account Name <span class="text-red-500">*</span>
+            {{ trans('settings.items.accounts.form.name') }} 
+            <span class="text-red-500">*</span>
           </label>
           <input
             id="name"
             v-model="form.name"
             type="text"
-            placeholder="e.g., Main Checking Account"
+            :placeholder="trans('settings.items.accounts.form.name_placeholder')"
             class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             :class="{ 'border-red-500': form.errors.name }"
           />
@@ -89,7 +97,8 @@ const formatNumber = (value: string) => {
         <!-- Category -->
         <div>
           <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Category <span class="text-red-500">*</span>
+            {{ trans('settings.items.accounts.form.category') }}
+            <span class="text-red-500">*</span>
           </label>
           <select
             id="category"
@@ -97,7 +106,7 @@ const formatNumber = (value: string) => {
             class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             :class="{ 'border-red-500': form.errors.account_category_id }"
           >
-            <option value="">Select a category</option>
+            <option value="">{{ trans('settings.items.accounts.form.category_first_option') }}</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
               {{ category.name }}
             </option>
@@ -110,7 +119,7 @@ const formatNumber = (value: string) => {
         <!-- Initial Balance -->
         <div>
           <label for="balance" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Initial Balance
+            {{ trans('settings.items.accounts.form.initial_balance') }}
           </label>
           <div class="relative">
             <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
@@ -132,13 +141,13 @@ const formatNumber = (value: string) => {
         <!-- Description -->
         <div>
           <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Description (Optional)
+            {{ trans('settings.items.accounts.form.description') }}
           </label>
           <textarea
             id="description"
             v-model="form.description"
             rows="3"
-            placeholder="Optional description for this account"
+            :placeholder="trans('settings.items.accounts.form.description_placeholder')"
             class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none"
             :class="{ 'border-red-500': form.errors.description }"
           />
@@ -156,7 +165,7 @@ const formatNumber = (value: string) => {
             class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 rounded focus:ring-teal-500 dark:focus:ring-teal-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
           />
           <label for="is_active" class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Active account
+            {{ trans('settings.items.accounts.form.is_active') }}
           </label>
         </div>
 
@@ -169,14 +178,14 @@ const formatNumber = (value: string) => {
               class="flex-1 flex items-center justify-center px-6 py-3 bg-gradient-to-r from-teal-600 to-coral-600 text-white rounded-xl font-medium hover:from-teal-700 hover:to-coral-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save class="w-5 h-5 mr-2" />
-              {{ form.processing ? 'Creating...' : 'Create Account' }}
+              {{ form.processing ? trans('settings.items.accounts.btn.save_progress') : trans('settings.items.accounts.btn.save') }}
             </button>
             
             <Link
               href="/settings/accounts"
               class="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              Cancel
+              {{ trans('settings.items.accounts.btn.cancel') }}
             </Link>
           </div>
         </div>

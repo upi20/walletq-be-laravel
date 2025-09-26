@@ -297,13 +297,13 @@ document.addEventListener('click', (event) => {
               v-if="activeMenu === account.id"
               class="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10"
             >
-              <Link
+              <!-- <Link
                 :href="`/settings/accounts/${account.id}`"
                 class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <Eye class="w-4 h-4 mr-3" />
                 {{ trans('accounts.view_details') }}
-              </Link>
+              </Link> -->
               <Link
                 :href="`/settings/accounts/${account.id}/edit`"
                 class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
