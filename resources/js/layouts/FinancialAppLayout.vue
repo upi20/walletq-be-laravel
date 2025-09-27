@@ -20,12 +20,14 @@ interface Props {
   showHeader?: boolean;
   showBottomNav?: boolean;
   showFab?: boolean;
+  containerClass?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showHeader: true,
   showBottomNav: true,
   showFab: true,
+  containerClass: 'px-6',
 });
 
 const page = usePage();
@@ -129,7 +131,7 @@ bottomNavItems.forEach(item => {
     </nav>
 
     <!-- Main Content -->
-    <main class="px-6 pb-20" :class="showHeader ? '' : 'pt-6'">
+    <main :class="showHeader ? '' : 'pt-6' + 'pb-20' + ' ' + containerClass">
       <slot />
     </main>
 

@@ -160,7 +160,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <FinancialAppLayout :showHeader="false" :showFab="false">
+  <FinancialAppLayout :showHeader="false" :showFab="false" containerClass="px-0">
     <Head :title="pageTitle" />
     
     <!-- Header Section -->
