@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ref, computed, onBeforeUnmount } from 'vue';
 import { 
   CreditCard, 
@@ -11,7 +11,8 @@ import {
   MoreVertical,
   ArrowLeft,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Filter
 } from 'lucide-vue-next';
 
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
@@ -47,6 +48,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const page = usePage();
+const totalBalance = page.props.auth?.user.balance || 0;
 
 // Translation
 const { trans } = useTranslation();
@@ -58,6 +61,11 @@ const toggleMenu = (accountId: number) => {
 };
 
 const searchQuery = ref(props.filters.search || '');
+const showFilterModal = ref(false);
+
+const toggleFilterModal = () => {
+  showFilterModal.value = !showFilterModal.value;
+};
 
 // debounce timer for search (keyup)
 let searchTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -139,11 +147,11 @@ document.addEventListener('click', (event) => {
 </script>
 
 <template>
-  <FinancialAppLayout :showHeader="false">
+  <FinancialAppLayout :showHeader="false" :showFab="false">
     <Head :title="trans('accounts.title')" />
 
     <!-- Header -->
-    <div class="mb-8">
+    <div class="mb-1">
       <div class="flex items-center justify-between mb-4">
         <Link
           href="/settings"
@@ -162,27 +170,23 @@ document.addEventListener('click', (event) => {
             <div class="w-10 h-10 bg-gradient-to-r from-teal-500 to-coral-500 rounded-xl flex items-center justify-center">
               <CreditCard class="w-5 h-5 text-white" />
             </div>
-            <h1 class="text-3xl font-bold bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
-              {{ trans('accounts.title') }}
-            </h1>
+            <div>
+              <h1 class="text-1xl font-bold bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
+                Total Saldo
+              </h1>
+              <h3 class="text-xs">
+                {{ formatCurrency(totalBalance) }}
+              </h3>
+            </div>
           </div>
-          <p class="text-gray-600 dark:text-gray-300">
-            {{ trans('accounts.subtitle') }}
-          </p>
         </div>
-        
-        <Link
-          href="/settings/accounts/create"
-          class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-teal-600 to-coral-600 text-white rounded-xl font-medium hover:from-teal-700 hover:to-coral-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-        >
-          <Plus class="w-4 h-4 mr-2" />
-          {{ trans('accounts.add_account') }}
-        </Link>
       </div>
     </div>
 
     <!-- Search -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+    <div 
+      v-if="showFilterModal"
+      class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-6 mt-5">
       <div class="flex flex-col sm:flex-row gap-4">
         <form class="relative flex-1" @submit.prevent="search">
           <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -244,7 +248,7 @@ document.addEventListener('click', (event) => {
       <p class="text-gray-600 dark:text-gray-400">{{ trans('accounts.no_results_subtitle') }}</p>
     </div>
 
-    <div v-else class="grid grid-cols-1 gap-1">
+    <div v-else class="grid grid-cols-1 gap-1 mb-20">
       <div
         v-for="(account, index) in filteredAndSortedAccounts"
         :key="account.id"
@@ -258,7 +262,7 @@ document.addEventListener('click', (event) => {
         <!-- Account Header -->
         <div class="flex items-start justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-12 ms-1 h-12 bg-gradient-to-r from-teal-100 to-coral-100 dark:from-teal-900 dark:to-coral-900 rounded-md flex items-center justify-center">
+            <div class="ms-2 w-8 h-8 bg-gradient-to-r from-teal-100 to-coral-100 dark:from-teal-900 dark:to-coral-900 rounded-md flex items-center justify-center">
               <CreditCard class="w-6 h-6 text-teal-600 dark:text-teal-400" />
             </div>
             <div>
@@ -266,20 +270,9 @@ document.addEventListener('click', (event) => {
                 {{ account.name }}
               </h3>
               <div class="flex items-center gap-2 mb-1">
-                <span class="px-2 py-1 text-xs font-medium bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 rounded-md">
-                  <!-- {{ account.category?.name }} -->
-                    {{ formatCurrency(account.current_balance) }}
+                <span class="text-xs text-teal-700">
+                  {{ formatCurrency(account.current_balance) }}
                 </span>
-                <!-- <span 
-                  :class="[
-                    'px-2 py-1 text-xs font-medium rounded-lg',
-                    account.is_active 
-                      ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
-                      : 'bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300'
-                  ]"
-                >
-                  {{ account.is_active ? 'Active' : 'Inactive' }}
-                </span> -->
               </div>
             </div>
           </div>
@@ -297,13 +290,6 @@ document.addEventListener('click', (event) => {
               v-if="activeMenu === account.id"
               class="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10"
             >
-              <!-- <Link
-                :href="`/settings/accounts/${account.id}`"
-                class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-              >
-                <Eye class="w-4 h-4 mr-3" />
-                {{ trans('accounts.view_details') }}
-              </Link> -->
               <Link
                 :href="`/settings/accounts/${account.id}/edit`"
                 class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -321,39 +307,23 @@ document.addEventListener('click', (event) => {
             </div>
           </div>
         </div>
-
-        <!-- Account Details -->
-        <!-- <div class="space-y-3">
-          <div v-if="account.description" class="text-sm text-gray-600 dark:text-gray-400">
-            {{ account.description }}
-          </div>
-          
-          <div class="bg-gradient-to-r from-teal-50 to-coral-50 dark:from-teal-900/20 dark:to-coral-900/20 rounded-lg p-4">
-            <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Initial Balance</div>
-            <div class="text-2xl font-bold bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
-              {{ formatCurrency(account.initial_balance) }}
-            </div>
-          </div>
-        </div> -->
-
-        <!-- Account Actions -->
-        <!-- <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <div class="flex gap-2">
-            <Link
-              :href="`/settings/accounts/${account.id}`"
-              class="flex-1 px-3 py-2 text-sm font-medium text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-lg transition-colors text-center"
-            >
-              View
-            </Link>
-            <Link
-              :href="`/settings/accounts/${account.id}/edit`"
-              class="flex-1 px-3 py-2 text-sm font-medium text-coral-600 dark:text-coral-400 hover:bg-coral-50 dark:hover:bg-coral-900/20 rounded-lg transition-colors text-center"
-            >
-              Edit
-            </Link>
-          </div>
-        </div> -->
       </div>
     </div>
+
+    <!-- Floating Action Button Filter data -->
+    <button
+      @click="toggleFilterModal"
+    class="fixed bottom-20 w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
+    >
+      <Filter class="w-6 h-6 text-white" />
+    </button>
+
+    <Link
+      href="/settings/accounts/create"
+      :title="trans('accounts.add_account')"
+      class="fixed bottom-20 right-6 w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
+    >
+      <Plus class="w-6 h-6 text-white" />
+    </Link>
   </FinancialAppLayout>
 </template>

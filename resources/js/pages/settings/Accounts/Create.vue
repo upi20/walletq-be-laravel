@@ -43,7 +43,7 @@ const formatNumber = (value: string) => {
 </script>
 
 <template>
-  <FinancialAppLayout :showHeader="false">
+  <FinancialAppLayout :showHeader="false" :showFab="false">
     <Head title="Create Account" />
 
     <!-- Header -->
