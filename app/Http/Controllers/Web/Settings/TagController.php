@@ -17,8 +17,7 @@ class TagController extends Controller
     {
         $tags = Tag::where('user_id', Auth::id())
             ->when($request->search, function ($query, $search) {
-                $query->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
+                $query->where('name', 'like', '%' . $search . '%');
             })
             ->orderBy('name')
             ->paginate(10);
@@ -38,13 +37,9 @@ class TagController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'color' => 'nullable|string|max:7',
-            'is_active' => 'boolean',
         ]);
 
         $validated['user_id'] = Auth::id();
-        $validated['is_active'] = $validated['is_active'] ?? true;
 
         Tag::create($validated);
 
@@ -64,7 +59,9 @@ class TagController extends Controller
 
     public function edit(Tag $tag)
     {
-        $this->authorize('update', $tag);
+        if ($tag->user_id !== Auth::id()) {
+            return back()->with('error', 'Tidak dapat mengubah tag milik orang lain.');
+        }
 
         return Inertia::render('Settings/Tags/Edit', [
             'tag' => $tag,
@@ -73,37 +70,31 @@ class TagController extends Controller
 
     public function update(Request $request, Tag $tag)
     {
-        $this->authorize('update', $tag);
+        if ($tag->user_id !== Auth::id()) {
+            return back()->with('error', 'Tidak dapat mengubah tag milik orang lain.');
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'color' => 'nullable|string|max:7',
-            'is_active' => 'boolean',
         ]);
-
-        $validated['is_active'] = $validated['is_active'] ?? $tag->is_active;
 
         $tag->update($validated);
 
         return redirect()
             ->route('settings.tags.index')
-            ->with('success', 'Tag updated successfully.');
+            ->with('success', 'Tag berhasil diperbarui.');
     }
 
     public function destroy(Tag $tag)
     {
-        $this->authorize('delete', $tag);
-
-        // Check if tag has transactions
-        if ($tag->transactions()->exists()) {
-            return back()->with('error', 'Cannot delete tag that has transactions.');
+        if ($tag->user_id !== Auth::id()) {
+            return back()->with('error', 'Tidak dapat menghapus tag milik orang lain.');
         }
 
         $tag->delete();
 
         return redirect()
             ->route('settings.tags.index')
-            ->with('success', 'Tag deleted successfully.');
+            ->with('success', 'Tag berhasil dihapus.');
     }
 }

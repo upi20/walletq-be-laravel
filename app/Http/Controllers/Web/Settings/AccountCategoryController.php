@@ -17,8 +17,7 @@ class AccountCategoryController extends Controller
     {
         $categories = AccountCategory::where('user_id', Auth::id())
             ->when($request->search, function ($query, $search) {
-                $query->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
+                $query->where('name', 'like', '%' . $search . '%');
             })
             ->orderBy('name')
             ->paginate(10);
@@ -38,12 +37,11 @@ class AccountCategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
+            'type' => 'nullable|string|in:cash,bank,e-wallet',
         ]);
 
         $validated['user_id'] = Auth::id();
-        $validated['is_active'] = $validated['is_active'] ?? true;
+        $validated['is_default'] = false;
 
         AccountCategory::create($validated);
 
@@ -54,7 +52,9 @@ class AccountCategoryController extends Controller
 
     public function show(AccountCategory $accountCategory)
     {
-        $this->authorize('view', $accountCategory);
+        if ($accountCategory->user_id !== Auth::id()) {
+            return back()->with('error', 'Tidak dapat menghapus kategori akun milik orang lain.');
+        }
 
         return Inertia::render('Settings/AccountCategories/Show', [
             'category' => $accountCategory,
@@ -63,7 +63,9 @@ class AccountCategoryController extends Controller
 
     public function edit(AccountCategory $accountCategory)
     {
-        $this->authorize('update', $accountCategory);
+        if ($accountCategory->user_id !== Auth::id()) {
+            return back()->with('error', 'Tidak dapat mengubah kategori akun milik orang lain.');
+        }
 
         return Inertia::render('Settings/AccountCategories/Edit', [
             'category' => $accountCategory,
@@ -72,15 +74,14 @@ class AccountCategoryController extends Controller
 
     public function update(Request $request, AccountCategory $accountCategory)
     {
-        $this->authorize('update', $accountCategory);
+        if ($accountCategory->user_id !== Auth::id()) {
+            return back()->with('error', 'Tidak dapat mengubah kategori akun milik orang lain.');
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
+            'type' => 'nullable|string|in:cash,bank,e-wallet',
         ]);
-
-        $validated['is_active'] = $validated['is_active'] ?? $accountCategory->is_active;
 
         $accountCategory->update($validated);
 
@@ -91,17 +92,14 @@ class AccountCategoryController extends Controller
 
     public function destroy(AccountCategory $accountCategory)
     {
-        $this->authorize('delete', $accountCategory);
-
-        // Check if category has accounts
-        if ($accountCategory->accounts()->exists()) {
-            return back()->with('error', 'Cannot delete category that has accounts.');
+        if ($accountCategory->user_id !== Auth::id()) {
+            return back()->with('error', 'Tidak dapat menghapus kategori akun milik orang lain.');
         }
 
         $accountCategory->delete();
 
         return redirect()
             ->route('settings.account-categories.index')
-            ->with('success', 'Account category deleted successfully.');
+            ->with('success', 'Kategori akun berhasil dihapus.');
     }
 }

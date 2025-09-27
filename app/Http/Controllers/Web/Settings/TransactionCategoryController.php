@@ -17,8 +17,7 @@ class TransactionCategoryController extends Controller
     {
         $categories = TransactionCategory::where('user_id', Auth::id())
             ->when($request->search, function ($query, $search) {
-                $query->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
+                $query->where('name', 'like', '%' . $search . '%');
             })
             ->when($request->type, function ($query, $type) {
                 $query->where('type', $type);
@@ -41,13 +40,12 @@ class TransactionCategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
             'type' => 'required|in:income,expense',
-            'is_active' => 'boolean',
         ]);
 
         $validated['user_id'] = Auth::id();
-        $validated['is_active'] = $validated['is_active'] ?? true;
+        $validated['is_default'] = false;
+        $validated['is_hide'] = false;
 
         TransactionCategory::create($validated);
 
@@ -58,7 +56,9 @@ class TransactionCategoryController extends Controller
 
     public function show(TransactionCategory $transactionCategory)
     {
-        $this->authorize('view', $transactionCategory);
+        if ($transactionCategory->user_id !== Auth::id()) {
+            return back()->with('error', 'Tidak dapat menghapus kategori transaksi milik orang lain.');
+        }
 
         return Inertia::render('Settings/TransactionCategories/Show', [
             'category' => $transactionCategory,
@@ -67,7 +67,9 @@ class TransactionCategoryController extends Controller
 
     public function edit(TransactionCategory $transactionCategory)
     {
-        $this->authorize('update', $transactionCategory);
+        if ($transactionCategory->user_id !== Auth::id()) {
+            return back()->with('error', 'Tidak dapat mengubah kategori transaksi milik orang lain.');
+        }
 
         return Inertia::render('Settings/TransactionCategories/Edit', [
             'category' => $transactionCategory,
@@ -76,16 +78,14 @@ class TransactionCategoryController extends Controller
 
     public function update(Request $request, TransactionCategory $transactionCategory)
     {
-        $this->authorize('update', $transactionCategory);
+        if ($transactionCategory->user_id !== Auth::id()) {
+            return back()->with('error', 'Tidak dapat mengubah kategori transaksi milik orang lain.');
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
             'type' => 'required|in:income,expense',
-            'is_active' => 'boolean',
         ]);
-
-        $validated['is_active'] = $validated['is_active'] ?? $transactionCategory->is_active;
 
         $transactionCategory->update($validated);
 
@@ -96,11 +96,8 @@ class TransactionCategoryController extends Controller
 
     public function destroy(TransactionCategory $transactionCategory)
     {
-        $this->authorize('delete', $transactionCategory);
-
-        // Check if category has transactions
-        if ($transactionCategory->transactions()->exists()) {
-            return back()->with('error', 'Cannot delete category that has transactions.');
+        if ($transactionCategory->user_id !== Auth::id()) {
+            return back()->with('error', 'Tidak dapat menghapus kategori transaksi milik orang lain.');
         }
 
         $transactionCategory->delete();
