@@ -7,7 +7,9 @@ import {
   CreditCard,
   FolderOpen,
   Tag as TagIcon,
-  DollarSign
+  DollarSign,
+  Calendar,
+  Search
 } from 'lucide-vue-next';
 
 interface Props {
@@ -51,7 +53,22 @@ const emit = defineEmits<{
 }>();
 
 // Local filter state
-const localFilters = ref({ ...props.filters });
+const localFilters = ref({
+  period: 'month',
+  type: 'both',
+  account_ids: [],
+  category_ids: [],
+  tag_ids: [],
+  flags: [],
+  month: new Date().toISOString().slice(0, 7), // YYYY-MM format
+  year: new Date().getFullYear().toString(),
+  date_from: '',
+  date_to: '',
+  search: '',
+  amount_min: undefined,
+  amount_max: undefined,
+  ...props.filters
+});
 
 // Available categories based on type
 const availableCategories = computed(() => {
@@ -85,24 +102,25 @@ const toggleStringArrayValue = (array: string[], value: string): string[] => {
 
 // Toggle methods
 const toggleAccount = (accountId: number) => {
-  localFilters.value.account_ids = toggleArrayValue(localFilters.value.account_ids, accountId);
+  localFilters.value.account_ids = toggleArrayValue(localFilters.value.account_ids || [], accountId);
 };
 
 const toggleCategory = (categoryId: number) => {
-  localFilters.value.category_ids = toggleArrayValue(localFilters.value.category_ids, categoryId);
+  localFilters.value.category_ids = toggleArrayValue(localFilters.value.category_ids || [], categoryId);
 };
 
 const toggleTag = (tagId: number) => {
-  localFilters.value.tag_ids = toggleArrayValue(localFilters.value.tag_ids, tagId);
+  localFilters.value.tag_ids = toggleArrayValue(localFilters.value.tag_ids || [], tagId);
 };
 
 const toggleFlag = (flag: string) => {
-  localFilters.value.flags = toggleStringArrayValue(localFilters.value.flags, flag);
+  localFilters.value.flags = toggleStringArrayValue(localFilters.value.flags || [], flag);
 };
 
 // Actions
 const applyFilters = () => {
   emit('apply', { ...localFilters.value });
+  emit('close');
 };
 
 const resetFilters = () => {
@@ -162,6 +180,91 @@ watch(() => localFilters.value.type, () => {
 
       <!-- Filter Content - Scrollable -->
       <div class="flex-1 overflow-y-auto p-4 space-y-5">
+        <!-- Period Selection -->
+        <div>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 block">
+            Periode
+          </label>
+          <select
+            v-model="localFilters.period"
+            class="w-full px-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+          >
+            <option 
+              v-for="option in masterData.period_options" 
+              :key="option.value" 
+              :value="option.value"
+            >
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Custom Date Range (show when period is custom) -->
+        <div v-if="localFilters.period === 'custom'">
+          <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <Calendar class="w-4 h-4" />
+            Rentang Tanggal Kustom
+          </label>
+          <div class="space-y-3">
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400 block mb-1">Dari Tanggal</label>
+              <input
+                v-model="localFilters.date_from"
+                type="date"
+                class="w-full px-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+              />
+            </div>
+            <div>
+              <label class="text-xs text-gray-500 dark:text-gray-400 block mb-1">Sampai Tanggal</label>
+              <input
+                v-model="localFilters.date_to"
+                type="date"
+                class="w-full px-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Month Selection (show when period is month) -->
+        <div v-if="localFilters.period === 'month'">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 block">
+            Pilih Bulan
+          </label>
+          <input
+            v-model="localFilters.month"
+            type="month"
+            class="w-full px-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+          />
+        </div>
+
+        <!-- Year Selection (show when period is year) -->
+        <div v-if="localFilters.period === 'year'">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 block">
+            Pilih Tahun
+          </label>
+          <input
+            v-model="localFilters.year"
+            type="number"
+            min="2020"
+            max="2030"
+            class="w-full px-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+          />
+        </div>
+
+        <!-- Search -->
+        <div>
+          <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <Search class="w-4 h-4" />
+            Pencarian
+          </label>
+          <input
+            v-model="localFilters.search"
+            type="text"
+            placeholder="Cari di catatan, akun, atau kategori..."
+            class="w-full px-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+          />
+        </div>
+
         <!-- Transaction Type -->
         <div>
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 block">
@@ -193,12 +296,12 @@ watch(() => localFilters.value.type, () => {
               :key="account.id"
               class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors duration-200"
             >
-              <input
-                type="checkbox"
-                :checked="localFilters.account_ids.includes(account.id)"
-                @change="toggleAccount(account.id)"
-                class="text-teal-600 border-gray-300 rounded focus:ring-teal-500 flex-shrink-0"
-              />
+                <input
+                  type="checkbox"
+                  :checked="(localFilters.account_ids || []).includes(account.id)"
+                  @change="toggleAccount(account.id)"
+                  class="text-teal-600 border-gray-300 rounded focus:ring-teal-500 flex-shrink-0"
+                />
               <div class="flex-1 min-w-0">
                 <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
                   {{ account.name }}
@@ -224,12 +327,12 @@ watch(() => localFilters.value.type, () => {
               :key="category.id"
               class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors duration-200"
             >
-              <input
-                type="checkbox"
-                :checked="localFilters.category_ids.includes(category.id)"
-                @change="toggleCategory(category.id)"
-                class="text-teal-600 border-gray-300 rounded focus:ring-teal-500 flex-shrink-0"
-              />
+                <input
+                  type="checkbox"
+                  :checked="(localFilters.category_ids || []).includes(category.id)"
+                  @change="toggleCategory(category.id)"
+                  class="text-teal-600 border-gray-300 rounded focus:ring-teal-500 flex-shrink-0"
+                />
               <div class="flex-1">
                 <div class="text-sm text-gray-900 dark:text-white">
                   {{ category.name }}
@@ -259,12 +362,12 @@ watch(() => localFilters.value.type, () => {
               :key="tag.id"
               class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors duration-200"
             >
-              <input
-                type="checkbox"
-                :checked="localFilters.tag_ids.includes(tag.id)"
-                @change="toggleTag(tag.id)"
-                class="text-teal-600 border-gray-300 rounded focus:ring-teal-500 flex-shrink-0"
-              />
+                <input
+                  type="checkbox"
+                  :checked="(localFilters.tag_ids || []).includes(tag.id)"
+                  @change="toggleTag(tag.id)"
+                  class="text-teal-600 border-gray-300 rounded focus:ring-teal-500 flex-shrink-0"
+                />
               <span class="text-sm text-gray-900 dark:text-white">{{ tag.name }}</span>
             </label>
           </div>
@@ -313,12 +416,12 @@ watch(() => localFilters.value.type, () => {
               :key="flag.value"
               class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors duration-200"
             >
-              <input
-                type="checkbox"
-                :checked="localFilters.flags.includes(flag.value)"
-                @change="toggleFlag(flag.value)"
-                class="text-teal-600 border-gray-300 rounded focus:ring-teal-500 flex-shrink-0"
-              />
+                <input
+                  type="checkbox"
+                  :checked="(localFilters.flags || []).includes(flag.value)"
+                  @change="toggleFlag(flag.value)"
+                  class="text-teal-600 border-gray-300 rounded focus:ring-teal-500 flex-shrink-0"
+                />
               <span class="text-sm text-gray-900 dark:text-white">{{ flag.label }}</span>
             </label>
           </div>

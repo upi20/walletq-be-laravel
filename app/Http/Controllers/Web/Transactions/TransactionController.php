@@ -32,8 +32,8 @@ class TransactionController extends Controller
         // Get master data for filters
         $masterData = [
             'accounts' => $this->transactionService->getUserAccounts($user),
-            'income_categories' => $this->transactionService->getUserTransactionCategories($user)->where('type', 'income'),
-            'expense_categories' => $this->transactionService->getUserTransactionCategories($user)->where('type', 'expense'),
+            'income_categories' => $this->transactionService->getUserTransactionCategories($user)->where('type', 'income')->values()->toArray(),
+            'expense_categories' => $this->transactionService->getUserTransactionCategories($user)->where('type', 'expense')->values()->toArray(),
             'tags' => $this->transactionService->getUserTags($user),
             'flag_options' => [
                 ['value' => 'normal', 'label' => 'Normal'],
