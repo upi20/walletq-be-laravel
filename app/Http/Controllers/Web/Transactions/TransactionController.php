@@ -70,6 +70,61 @@ class TransactionController extends Controller
     }
 
     /**
+     * Show create transaction form
+     */
+    public function create(Request $request)
+    {
+        $user = $request->user();
+        $masterData = $this->transactionService->getCreateFormData($user);
+
+        return Inertia::render('Transactions/Create', [
+            'masterData' => $masterData,
+            'pageTitle' => 'Tambah Transaksi',
+        ]);
+    }
+
+    /**
+     * Store new transaction(s)
+     */
+    public function store(Request $request)
+    {
+        $user = $request->user();
+        
+        // Simple validation
+        $request->validate([
+            'transactions' => 'required|array|min:1',
+            'transactions.*.type' => 'required|in:income,expense',
+            'transactions.*.account_id' => 'required|exists:accounts,id',
+            'transactions.*.transaction_category_id' => 'required|exists:transaction_categories,id',
+            'transactions.*.amount' => 'required|numeric|min:0.01',
+            'transactions.*.date' => 'required|date',
+            'transactions.*.note' => 'nullable|string|max:255',
+            'transactions.*.flag' => 'nullable|string',
+            'transactions.*.tag_ids' => 'nullable|array',
+            'transactions.*.tag_ids.*' => 'exists:tags,id',
+        ]);
+
+        try {
+            $transactionData = $request->input('transactions');
+            
+            if (count($transactionData) === 1) {
+                // Single transaction
+                $transaction = $this->transactionService->createTransaction($user, $transactionData[0]);
+                return redirect()->route('transactions.index')
+                    ->with('success', 'Transaksi berhasil ditambahkan');
+            } else {
+                // Bulk transactions
+                $transactions = $this->transactionService->bulkCreateTransactions($user, $transactionData);
+                return redirect()->route('transactions.index')
+                    ->with('success', 'Berhasil menambahkan ' . count($transactions) . ' transaksi');
+            }
+            
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal menyimpan transaksi: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    /**
      * Get filters from request
      */
     protected function getFiltersFromRequest(Request $request): array

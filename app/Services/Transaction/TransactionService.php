@@ -5,6 +5,7 @@ namespace App\Services\Transaction;
 use App\Models\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class TransactionService
 {
@@ -228,5 +229,86 @@ class TransactionService
     public function getUserTags(User $user)
     {
         return $user->tags()->get();
+    }
+
+    /**
+     * Create a single transaction
+     */
+    public function createTransaction(User $user, array $data): Transaction
+    {
+        // Validate and prepare data
+        $transactionData = $this->prepareTransactionData($user, $data);
+        
+        // Create transaction
+        $transaction = Transaction::create($transactionData);
+        
+        // Attach tags if provided
+        if (!empty($data['tag_ids'])) {
+            $transaction->tags()->attach($data['tag_ids']);
+        }
+        
+        // Update account balance
+        if ($transaction->account) {
+            $transaction->account->updateBalance($transaction->amount, $transaction->type);
+        }
+        
+        return $transaction->load(['account', 'category', 'tags']);
+    }
+
+    /**
+     * Bulk create transactions
+     */
+    public function bulkCreateTransactions(User $user, array $transactions): array
+    {
+        $createdTransactions = [];
+        
+        foreach ($transactions as $transactionData) {
+            try {
+                $createdTransactions[] = $this->createTransaction($user, $transactionData);
+            } catch (\Exception $e) {
+                // Log error but continue with other transactions
+                Log::error('Failed to create transaction: ' . $e->getMessage(), $transactionData);
+            }
+        }
+        
+        return $createdTransactions;
+    }
+
+    /**
+     * Prepare transaction data for creation
+     */
+    protected function prepareTransactionData(User $user, array $data): array
+    {
+        return [
+            'user_id' => $user->id,
+            'account_id' => $data['account_id'],
+            'transaction_category_id' => $data['transaction_category_id'],
+            'type' => $data['type'],
+            'amount' => (float) $data['amount'],
+            'date' => $data['date'] ?? now(),
+            'note' => $data['note'] ?? null,
+            'flag' => $data['flag'] ?? Transaction::FLAG_NORMAL,
+        ];
+    }
+
+    /**
+     * Get master data for create form
+     */
+    public function getCreateFormData(User $user): array
+    {
+        return [
+            'accounts' => $this->getUserAccounts($user),
+            'income_categories' => $this->getUserTransactionCategories($user)->where('type', 'income'),
+            'expense_categories' => $this->getUserTransactionCategories($user)->where('type', 'expense'),
+            'tags' => $this->getUserTags($user),
+            'flag_options' => [
+                ['value' => Transaction::FLAG_NORMAL, 'label' => 'Normal'],
+                ['value' => Transaction::FLAG_TRANSFER_IN, 'label' => 'Transfer Masuk'],
+                ['value' => Transaction::FLAG_TRANSFER_OUT, 'label' => 'Transfer Keluar'],
+                ['value' => Transaction::FLAG_DEBT_PAYMENT, 'label' => 'Pembayaran Hutang'],
+                ['value' => Transaction::FLAG_DEBT_COLLECT, 'label' => 'Penagihan Piutang'],
+                ['value' => Transaction::FLAG_INITIAL_BALANCE, 'label' => 'Saldo Awal'],
+            ],
+        ];
     }
 }
