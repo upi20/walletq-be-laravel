@@ -91,6 +91,7 @@ export interface Account {
 }
 
 export interface Transaction {
+    flag_label: any;
     id: number;
     import_id?: number | null;
     user_id?: number | null;

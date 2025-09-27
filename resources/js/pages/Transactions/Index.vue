@@ -19,7 +19,6 @@ import { useToast } from '@/composables/useToast';
 import formatCurrency from '@/composables/formatCurrency';
 
 // Components
-import TransactionSummaryCards from '@/pages/Transactions/Partials/SummaryCards.vue';
 import SearchModal from './Partials/SearchModal.vue';
 import FilterModal from './Partials/FilterModal.vue';
 import TransactionCard from './Partials/TransactionCard.vue';
@@ -166,8 +165,7 @@ const clearAllFilters = () => {
     type: 'both'
   });
 };
-
-const quickFilterByPeriod = (period: string) => {
+const quickFilterByPeriod = (period: 'month' | 'year' | 'today' | 'week' | 'all' | 'custom' | undefined) => {
   applyFilters({ ...currentFilters.value, period });
 };
 
@@ -291,7 +289,7 @@ onMounted(() => {
           <button
             v-for="period in transactions.master_data.period_options"
             :key="period.value"
-            @click="quickFilterByPeriod(period.value)"
+            @click="quickFilterByPeriod(period.value as 'month' | 'year' | 'today' | 'week' | 'all' | 'custom' | undefined)"
             class="flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap min-h-[36px]"
             :class="currentFilters.period === period.value || (!currentFilters.period && period.value === 'month')
               ? 'bg-white text-teal-600 shadow-md'
@@ -417,9 +415,9 @@ onMounted(() => {
     <!-- Main Content: Daily Grouped Transactions -->
     <div class="px-2">
       <div v-for="group in transactions.data" :key="group.date"
-        class="bg-white dark:bg-gray-800 shadow-md border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mb-4">
+        class="bg-white dark:bg-gray-800 shadow-md border-gray-200 dark:border-gray-700 rounded-xl mb-4 overflow-visible">
         <!-- Date Header with Subtotal -->
-        <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+        <div class="bg-gray-50/95 dark:bg-gray-700/95 px-4 py-3 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-20 backdrop-blur-sm rounded-t-xl">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <Calendar class="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -458,7 +456,7 @@ onMounted(() => {
           <p class="text-sm text-gray-500 mt-1">
             {{ hasActiveFilters
               ? 'Tidak ada transaksi yang sesuai dengan filter yang dipilih'
-              : `Belum ada transaksi di ${currentMonthLabel}`
+              : `Belum ada transaksi di ${$page.props.currentMonthLabel}`
             }}
           </p>
         </div>
@@ -492,7 +490,24 @@ onMounted(() => {
     <FilterModal 
       v-if="showFilterModal"
       :filters="currentFilters"
-      :master-data="transactions.master_data"
+      :master-data="{
+        accounts: transactions.master_data.accounts?.map(account => ({
+          id: account.id,
+          name: account.name,
+          current_balance: account.current_balance,
+          category: account.category ? {
+            id: account.category.id,
+            name: account.category.name,
+            type: account.category.type || ''
+          } : null
+        })) || [],
+        income_categories: transactions.master_data.income_categories,
+        expense_categories: transactions.master_data.expense_categories,
+        tags: transactions.master_data.tags,
+        flag_options: transactions.master_data.flag_options,
+        type_options: transactions.master_data.type_options,
+        period_options: transactions.master_data.period_options
+      }"
       @apply="applyFilters"
       @close="closeFilterModal" 
     />

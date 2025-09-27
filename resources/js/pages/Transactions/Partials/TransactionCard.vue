@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { 
+import {
   MoreVertical,
   TrendingUp,
   TrendingDown,
@@ -45,20 +45,20 @@ const transactionIcon = computed(() => {
 });
 
 const amountColor = computed(() => {
-  return props.transaction.type === 'income' 
+  return props.transaction.type === 'income'
     ? 'text-teal-600 dark:text-teal-400'
     : 'text-coral-600 dark:text-coral-400';
 });
 
 const iconBgColor = computed(() => {
-  return props.transaction.type === 'income' 
-    ? 'bg-teal-100 dark:bg-teal-900' 
+  return props.transaction.type === 'income'
+    ? 'bg-teal-100 dark:bg-teal-900'
     : 'bg-coral-100 dark:bg-coral-900';
 });
 
 const iconColor = computed(() => {
-  return props.transaction.type === 'income' 
-    ? 'text-teal-600 dark:text-teal-400' 
+  return props.transaction.type === 'income'
+    ? 'text-teal-600 dark:text-teal-400'
     : 'text-coral-600 dark:text-coral-400';
 });
 
@@ -77,12 +77,6 @@ const flagBadgeColor = computed(() => {
   }
 });
 
-const formattedAmount = computed(() => {
-  const amount = formatCurrency(props.transaction.amount, 'decimal');
-  const prefix = props.transaction.type === 'income' ? '+' : '-';
-  return `${prefix}Rp ${amount}`;
-});
-
 // Methods
 const toggleActionMenu = () => {
   showActionMenu.value = !showActionMenu.value;
@@ -92,21 +86,26 @@ const handleAction = (action: string) => {
   emit('action', action, props.transaction.id);
   showActionMenu.value = false;
 };
+
+const dateTimeOnly = (date: string) => {
+  return new Date(date).toLocaleTimeString('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 </script>
 
 <template>
   <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-200">
     <div class="flex items-start gap-3">
       <!-- Transaction Icon -->
-      <div 
+      <div
         class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
-        :class="iconBgColor"
-      >
-        <component 
-          :is="transactionIcon" 
+        :class="iconBgColor">
+        <component
+          :is="transactionIcon"
           class="w-5 h-5"
-          :class="iconColor"
-        />
+          :class="iconColor" />
       </div>
 
       <!-- Main Content -->
@@ -117,82 +116,78 @@ const handleAction = (action: string) => {
             <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
               {{ transaction.note || `Transaksi ${transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}` }}
             </h4>
-            
+
             <!-- Account & Category Info -->
             <div class="flex items-center gap-2 mt-1 text-xs text-gray-500 dark:text-gray-400">
-              <button 
+              <button
                 @click="emit('accountClick', transaction.account_id!)"
-                class="flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-1 py-0.5 -mx-1 transition-colors duration-200"
-              >
+                class="flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-1 py-0.5 -mx-1 transition-colors duration-200">
                 <CreditCard class="w-3 h-3" />
                 <span>{{ transaction.account?.name || 'Akun Tidak Diketahui' }}</span>
               </button>
-              
+
               <span class="text-gray-300 dark:text-gray-600">•</span>
-              
-              <button 
+
+              <button
                 @click="emit('categoryClick', transaction.transaction_category_id!)"
-                class="flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-1 py-0.5 -mx-1 transition-colors duration-200"
-              >
-                <div 
+                class="flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-1 py-0.5 -mx-1 transition-colors duration-200">
+                <div
                   class="w-2 h-2 rounded-full"
-                  :class="transaction.category?.type === 'income' ? 'bg-teal-500' : 'bg-coral-500'"
-                ></div>
+                  :class="transaction.category?.type === 'income' ? 'bg-teal-500' : 'bg-coral-500'"></div>
                 <span>{{ transaction.category?.name || 'Kategori Tidak Diketahui' }}</span>
               </button>
+
+              <!-- time -->
+              {{ dateTimeOnly(transaction.date) }}
             </div>
 
             <!-- Flag Badge & Tags -->
             <div class="flex items-center gap-2 mt-2">
               <!-- Flag Badge -->
-              <span 
+              <span
                 v-if="transaction.flag !== 'normal'"
                 class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
-                  :class="flagBadgeColor"
-                >
-                  {{ transaction.flag_label }}
-                </span>
-              
+                :class="flagBadgeColor">
+                {{ transaction.flag_label }}
+              </span>
+
               <!-- Tags -->
               <div v-if="transaction.tags && transaction.tags.length > 0" class="flex items-center gap-1">
                 <TagIcon class="w-3 h-3 text-gray-400" />
                 <div class="flex gap-1">
-                  <span 
-                    v-for="tag in transaction.tags.slice(0, 2)" 
+                  <span
+                    v-for="tag in transaction.tags.slice(0, 2)"
                     :key="tag.id"
-                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
-                  >
+                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
                     {{ tag.name }}
                   </span>
-                  <span 
+                  <span
                     v-if="transaction.tags.length > 2"
-                    class="text-xs text-gray-500 dark:text-gray-400"
-                  >
+                    class="text-xs text-gray-500 dark:text-gray-400">
                     +{{ transaction.tags.length - 2 }}
                   </span>
                 </div>
               </div>
             </div>
           </div>
-          
+
           <!-- Amount & Action -->
           <div class="flex items-start gap-3 ml-3">
             <!-- Amount -->
             <div class="text-right">
               <div class="text-sm font-semibold" :class="amountColor">
-                {{ formattedAmount }}
+                {{ formatCurrency(transaction.type === 'income' ? transaction.amount : -transaction.amount, 'currency')
+                }}
               </div>
             </div>
-            
+
             <!-- Action Menu -->
             <div class="relative">
               <button
                 @click="toggleActionMenu"
-                class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
-              >
+                class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
                 <MoreVertical class="w-4 h-4" />
               </button>
-
             </div>
           </div>
         </div>
@@ -201,35 +196,32 @@ const handleAction = (action: string) => {
   </div>
 
   <!-- Action Menu Modal -->
-  <div 
-    v-if="showActionMenu" 
+  <div
+    v-if="showActionMenu"
     class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-    @click.self="showActionMenu = false"
-  >
-    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl w-full max-w-xs mx-auto">
+    @click.self="showActionMenu = false">
+    <div
+      class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl w-full max-w-xs mx-auto">
       <div class="py-2">
         <button
           @click="handleAction('view')"
-          class="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-        >
+          class="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
           <Eye class="w-4 h-4" />
           Lihat Detail
         </button>
-        
+
         <button
           @click="handleAction('edit')"
-          class="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-        >
+          class="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
           <Edit class="w-4 h-4" />
           Edit Transaksi
         </button>
-        
+
         <hr class="my-1 border-gray-200 dark:border-gray-600" />
-        
+
         <button
           @click="handleAction('delete')"
-          class="flex items-center gap-3 w-full px-4 py-3 text-sm text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
-        >
+          class="flex items-center gap-3 w-full px-4 py-3 text-sm text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200">
           <Trash2 class="w-4 h-4" />
           Hapus Transaksi
         </button>

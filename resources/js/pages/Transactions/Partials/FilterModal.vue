@@ -33,8 +33,7 @@ interface Props {
       id: number;
       name: string;
       current_balance: number;
-      formatted_balance: string;
-      category?: { id: number; name: string; type: string; };
+      category?: { id: number; name: string; type: string; } | null;
     }>;
     income_categories: Array<{ id: number; name: string; type: string; }>;
     expense_categories: Array<{ id: number; name: string; type: string; }>;
@@ -42,7 +41,7 @@ interface Props {
     flag_options: Array<{ value: string; label: string; }>;
     type_options: Array<{ value: string; label: string; }>;
     period_options: Array<{ value: string; label: string; }>;
-  };
+  }|null;
 }
 
 const props = defineProps<Props>();
