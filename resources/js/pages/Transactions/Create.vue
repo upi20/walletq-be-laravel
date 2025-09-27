@@ -358,7 +358,7 @@ onUnmounted(() => {
             </button>
 
             <!-- Account Dropdown -->
-            <div v-if="showAccountDropdown" class="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 max-h-64 overflow-hidden">
+            <div v-if="showAccountDropdown" class="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50">
               <!-- Search -->
               <div class="p-3 border-b border-gray-200 dark:border-gray-700">
                 <div class="relative">
@@ -372,15 +372,15 @@ onUnmounted(() => {
                 </div>
               </div>
               <!-- Options -->
-              <div class="max-h-48 overflow-y-auto">
+              <div class="max-h-64 overflow-y-auto overscroll-contain">
                 <button
                   v-for="account in filteredAccounts"
                   :key="account.id"
                   @click="selectAccount(account.id)"
-                  class="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-between"
+                  class="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-between border-none bg-transparent focus:bg-gray-50 dark:focus:bg-gray-700 transition-colors"
                 >
-                  <span class="text-gray-900 dark:text-white">{{ account.name }}</span>
-                  <span class="text-sm text-gray-500">{{ formatCurrency(account.current_balance, 'decimal') }}</span>
+                  <span class="text-gray-900 dark:text-white truncate">{{ account.name }}</span>
+                  <span class="text-sm text-gray-500 ml-2 flex-shrink-0">{{ formatCurrency(account.current_balance, 'decimal') }}</span>
                 </button>
               </div>
             </div>
@@ -407,7 +407,7 @@ onUnmounted(() => {
             </button>
 
             <!-- Category Dropdown -->
-            <div v-if="showCategoryDropdown" class="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 max-h-64 overflow-hidden">
+            <div v-if="showCategoryDropdown" class="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50">
               <!-- Search -->
               <div class="p-3 border-b border-gray-200 dark:border-gray-700">
                 <div class="relative">
@@ -421,18 +421,18 @@ onUnmounted(() => {
                 </div>
               </div>
               <!-- Options -->
-              <div class="max-h-48 overflow-y-auto">
+              <div class="max-h-64 overflow-y-auto overscroll-contain">
                 <button
                   v-for="category in filteredCategories"
                   :key="category.id"
                   @click="selectCategory(category.id)"
-                  class="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                  class="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 border-none bg-transparent focus:bg-gray-50 dark:focus:bg-gray-700 transition-colors"
                 >
                   <div 
-                    class="w-3 h-3 rounded-full"
+                    class="w-3 h-3 rounded-full flex-shrink-0"
                     :class="category.type === 'income' ? 'bg-teal-500' : 'bg-coral-500'"
                   ></div>
-                  <span class="text-gray-900 dark:text-white">{{ category.name }}</span>
+                  <span class="text-gray-900 dark:text-white truncate">{{ category.name }}</span>
                 </button>
               </div>
             </div>

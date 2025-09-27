@@ -212,7 +212,7 @@ class TransactionService
      */
     public function getUserAccounts(User $user)
     {
-        return $user->accounts()->with('category')->get();
+        return $user->accounts()->orderBy('name')->with('category')->get();
     }
 
     /**
@@ -220,7 +220,7 @@ class TransactionService
      */
     public function getUserTransactionCategories(User $user)
     {
-        return $user->transactionCategories()->get();
+        return $user->transactionCategories()->orderBy('name')->get();
     }
 
     /**
@@ -236,6 +236,8 @@ class TransactionService
      */
     public function createTransaction(User $user, array $data): Transaction
     {
+        // remove all characer except number
+        $data['amount'] = preg_replace('/[^0-9]/', '', $data['amount']);
         // Validate and prepare data
         $transactionData = $this->prepareTransactionData($user, $data);
         
@@ -298,8 +300,8 @@ class TransactionService
     {
         return [
             'accounts' => $this->getUserAccounts($user),
-            'income_categories' => $this->getUserTransactionCategories($user)->where('type', 'income'),
-            'expense_categories' => $this->getUserTransactionCategories($user)->where('type', 'expense'),
+            'income_categories' => $this->getUserTransactionCategories($user)->where('type', 'income')->values()->toArray(),
+            'expense_categories' => $this->getUserTransactionCategories($user)->where('type', 'expense')->values()->toArray(),
             'tags' => $this->getUserTags($user),
             'flag_options' => [
                 ['value' => Transaction::FLAG_NORMAL, 'label' => 'Normal'],
