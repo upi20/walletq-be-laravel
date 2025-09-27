@@ -62,7 +62,7 @@ const settingsItems = computed(() => [
 </script>
 
 <template>
-  <FinancialAppLayout :showHeader="false">
+  <FinancialAppLayout :showHeader="false" :showFab="false">
     <Head :title="trans('settings.index.title')" />
 
     <!-- Header -->
