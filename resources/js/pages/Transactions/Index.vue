@@ -49,6 +49,11 @@ const currentFilters = ref<TransactionFilters>({
   ...props.transactions.filters
 });
 
+// Watch for props changes and update current filters
+watch(() => props.transactions.filters, (newFilters) => {
+  currentFilters.value = { ...newFilters };
+}, { immediate: true, deep: true });
+
 // Computed
 const currentPeriodLabel = computed(() => {
   const period = currentFilters.value.period || 'month';

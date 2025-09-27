@@ -70,6 +70,26 @@ const localFilters = ref({
   ...props.filters
 });
 
+// Watch for props changes and update local filters
+watch(() => props.filters, (newFilters) => {
+  localFilters.value = {
+    period: 'month',
+    type: 'both',
+    account_ids: [],
+    category_ids: [],
+    tag_ids: [],
+    flags: [],
+    month: new Date().toISOString().slice(0, 7),
+    year: new Date().getFullYear().toString(),
+    date_from: '',
+    date_to: '',
+    search: '',
+    amount_min: undefined,
+    amount_max: undefined,
+    ...newFilters
+  };
+}, { immediate: true, deep: true });
+
 // Available categories based on type
 const availableCategories = computed(() => {
   if (localFilters.value.type === 'income') {
@@ -429,7 +449,7 @@ watch(() => localFilters.value.type, () => {
       </div>
 
       <!-- Footer Actions -->
-      <div class="flex gap-3 p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 flex-shrink-0">
+      <div class="flex gap-3 p-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
         <button
           @click="resetFilters"
           class="flex-1 py-3 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 font-medium text-sm"

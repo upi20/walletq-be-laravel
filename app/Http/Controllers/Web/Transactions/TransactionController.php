@@ -91,24 +91,42 @@ class TransactionController extends Controller
         $filters['account_ids'] = $this->convertToArray($request->get('account_ids'));
         $filters['category_ids'] = $this->convertToArray($request->get('category_ids'));
         $filters['tag_ids'] = $this->convertToArray($request->get('tag_ids'));
-        $filters['flags'] = $this->convertToArray($request->get('flags'));
+        $filters['flags'] = $this->convertToStringArray($request->get('flags'));
 
         // Amount filters
         $filters['amount_min'] = $request->get('amount_min') ? (float) $request->get('amount_min') : null;
         $filters['amount_max'] = $request->get('amount_max') ? (float) $request->get('amount_max') : null;
 
+        // Don't filter out empty arrays, we need them for UI state
         return array_filter($filters, function($value) {
-            return $value !== null && $value !== '' && $value !== [];
+            return $value !== null && $value !== '';
         });
     }
 
     /**
-     * Convert comma-separated string to array
+     * Convert comma-separated string to array of integers
      */
-    protected function convertToArray($value): ?array
+    protected function convertToArray($value): array
     {
         if (empty($value)) {
-            return null;
+            return [];
+        }
+        
+        if (is_array($value)) {
+            return array_map('intval', array_filter($value));
+        }
+        
+        $result = array_filter(explode(',', $value));
+        return array_map('intval', $result); // Convert to integers for IDs
+    }
+
+    /**
+     * Convert comma-separated string to array of strings
+     */
+    protected function convertToStringArray($value): array
+    {
+        if (empty($value)) {
+            return [];
         }
         
         if (is_array($value)) {

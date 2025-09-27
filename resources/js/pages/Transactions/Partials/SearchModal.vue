@@ -81,7 +81,7 @@ onMounted(async () => {
       </div>
 
       <!-- Footer Actions -->
-      <div class="flex gap-3 p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+      <div class="flex gap-3 p-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
         <button
           @click="searchQuery = ''"
           class="flex-1 py-3 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 font-medium text-sm"
