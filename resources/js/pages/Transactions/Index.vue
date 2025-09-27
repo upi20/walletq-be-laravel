@@ -167,6 +167,10 @@ const applySearchFilter = (query: string) => {
 
 const applyFilters = (filters: TransactionFilters) => {
   loading.value = true;
+
+  if(filters.period !== 'month') {
+    filters.month = null;
+  }
   
   // Clean up empty values
   const cleanFilters = Object.fromEntries(
@@ -427,7 +431,7 @@ onMounted(() => {
       </div>
 
       <!-- Quick Period Filters -->
-      <div class="mb-4">
+      <div class="mb-4 hidden">
         <div class="flex overflow-x-auto pb-2 -mx-4 px-4 gap-2 scrollbar-hide">
           <button
             v-for="period in transactions.master_data.period_options"

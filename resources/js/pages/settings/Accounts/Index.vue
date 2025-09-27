@@ -13,7 +13,8 @@ import {
   ChevronUp,
   ChevronDown,
   Filter,
-  Check
+  Check,
+  RefreshCcw
 } from 'lucide-vue-next';
 
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
@@ -236,6 +237,14 @@ const totalCurrentBalanceSelected = computed(() => {
     .reduce((sum, account) => Number(sum) + Number(account.current_balance), 0); 
 });
 
+const refresh = () => {
+  // notification
+  success('Rekening berhasil direfresh!', {
+    message: 'Rekening berhasil direfresh.',
+    duration: 5000
+  });
+  router.get('/settings/accounts/refresh');
+};
 </script>
 
 <template>
@@ -277,7 +286,7 @@ const totalCurrentBalanceSelected = computed(() => {
         </div>
       </div>
       
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="flex items-center justify-between gap-4">
         <div>
           <div class="flex items-center gap-3 mb-2">
             <div class="w-10 h-10 bg-gradient-to-r from-teal-500 to-coral-500 rounded-xl flex items-center justify-center">
@@ -295,7 +304,15 @@ const totalCurrentBalanceSelected = computed(() => {
               </h3>
             </div>
           </div>
+
         </div>
+        <!-- refresh button -->
+        <button
+          @click="refresh"
+          class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+        >
+          <RefreshCcw class="w-4 h-4" />
+        </button>
       </div>
     </div>
 

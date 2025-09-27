@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     // Master Data Settings Routes
     Route::prefix('settings')->name('settings.')->group(function () {
         // Accounts
+        Route::get('accounts/refresh', [AccountController::class, 'refresh'])->name('accounts.refresh');
         Route::resource('accounts', AccountController::class);
         
         // Account Categories

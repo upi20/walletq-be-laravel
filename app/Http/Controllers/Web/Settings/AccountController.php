@@ -235,4 +235,13 @@ class AccountController extends Controller
             ->route('settings.accounts.index')
             ->with('success', 'Rekening berhasil dihapus.');
     }
+
+    public function refresh()
+    {
+        $user = Auth::user();
+        $user->syncBalance();
+        return redirect()
+            ->route('settings.accounts.index')
+            ->with('success', 'Rekening berhasil direfresh.');
+    }
 }

@@ -237,7 +237,7 @@ export interface TransactionFilters {
   period?: 'today' | 'week' | 'month' | 'year' | 'all' | 'custom';
   date_from?: string;
   date_to?: string;
-  month?: string;
+  month?: string | null;
   year?: string;
   type?: 'income' | 'expense' | 'both';
   account_ids?: number[];
