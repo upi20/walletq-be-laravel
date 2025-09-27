@@ -204,70 +204,26 @@ export interface ImportTransaction {
 
 export type BreadcrumbItemType = BreadcrumbItem;
 
-// Transaction List Response Types
+// Transaction List Response Types (Simplified)
 export interface TransactionListResponse {
   data: Transaction[];
-  meta: {
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    from: number;
-    to: number;
-    links: {
-      first: string;
-      last: string;
-      prev: string | null;
-      next: string | null;
-    };
-  };
   summary: {
     total_income: number;
     total_expense: number;
     net_amount: number;
     transaction_count: number;
-    period_label: string;
+    month: string;
   };
-  quick_stats: {
-    today: { income: number; expense: number; };
-    this_week: { income: number; expense: number; };
-    this_month: { income: number; expense: number; };
+  master_data: {
+    accounts: Account[];
+    income_categories: TransactionCategory[];
+    expense_categories: TransactionCategory[];
+    tags: Tag[];
+    flag_options: Array<{ value: string; label: string; }>;
+    type_options: Array<{ value: string; label: string; }>;
   };
-  filters: TransactionFilters;
-  master_data: TransactionMasterData;
+  filters: {
+    month?: string;
+  };
 }
 
-export interface TransactionFilters {
-  date_from?: string;
-  date_to?: string;
-  date_preset?: 'today' | 'week' | 'month' | 'year' | 'custom' | 'all';
-  account_ids?: number[];
-  category_ids?: number[];
-  type?: 'income' | 'expense' | 'both';
-  flags?: Array<'normal' | 'transfer_in' | 'transfer_out' | 'debt_payment' | 'debt_collect' | 'initial_balance'>;
-  amount_min?: number;
-  amount_max?: number;
-  tag_ids?: number[];
-  search?: string;
-  page?: number;
-  per_page?: number;
-  sort_by?: 'date' | 'amount' | 'account' | 'category';
-  sort_order?: 'asc' | 'desc';
-}
-
-export interface TransactionMasterData {
-  accounts: Array<{
-    id: number;
-    name: string;
-    current_balance: number;
-    formatted_balance: string;
-    category?: { id: number; name: string; type: string; };
-  }>;
-  income_categories: Array<{ id: number; name: string; type: string; }>;
-  expense_categories: Array<{ id: number; name: string; type: string; }>;
-  tags: Array<{ id: number; name: string; }>;
-  flag_options: Array<{ value: string; label: string; }>;
-  type_options: Array<{ value: string; label: string; }>;
-  sort_options: Array<{ value: string; label: string; }>;
-  per_page_options: Array<{ value: number; label: string; }>;
-}

@@ -18,10 +18,9 @@ import formatCurrency from '@/composables/formatCurrency';
 
 // Components
 import TransactionSummaryCards from '@/pages/Transactions/Partials/SummaryCards.vue';
-// import SearchModal from '@/pages/Transactions/Partials/SearchModal.vue';
-import FilterModal from '@/pages/Transactions/Partials/FilterPanel.vue';
-import TransactionCard from './Partials/TransactionCard.vue';
 import SearchModal from './Partials/SearchModal.vue';
+import FilterModal from './Partials/FilterModal.vue';
+import TransactionCard from './Partials/TransactionCard.vue';
 
 interface Props {
   transactions: TransactionListResponse;
@@ -132,6 +131,8 @@ const dailyGroups = computed(() => {
 
     return true;
   });
+
+  console.log(props.transactions.data);
 
   // Group by date
   const groups: Record<string, any> = {};

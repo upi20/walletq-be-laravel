@@ -31,6 +31,8 @@ class Transaction extends Model
         'date' => 'datetime',
     ];
 
+    protected $appends = ['flag_label'];
+
     const CATEGORY_INITIAL_BALANCE = 'Saldo Awal';
     const TYPE_INCOME = 'income';
     const TYPE_EXPENSE = 'expense';
@@ -82,5 +84,21 @@ class Transaction extends Model
     public function tags()
     {
         return $this->belongsToMany(Tag::class, 'transaction_tag');
+    }
+
+    /**
+     * Get the formatted flag label
+     */
+    public function getFlagLabelAttribute(): string
+    {
+        return match($this->flag) {
+            self::FLAG_NORMAL => 'Normal',
+            self::FLAG_TRANSFER_IN => 'Transfer Masuk',
+            self::FLAG_TRANSFER_OUT => 'Transfer Keluar', 
+            self::FLAG_DEBT_PAYMENT => 'Pembayaran Hutang',
+            self::FLAG_DEBT_COLLECT => 'Penagihan Piutang',
+            self::FLAG_INITIAL_BALANCE => 'Saldo Awal',
+            default => ucfirst(str_replace('_', ' ', $this->flag))
+        };
     }
 }

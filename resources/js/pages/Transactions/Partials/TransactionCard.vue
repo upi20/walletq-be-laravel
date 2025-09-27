@@ -138,10 +138,10 @@ const handleAction = (action: string) => {
               <span 
                 v-if="transaction.flag !== 'normal'"
                 class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
-                :class="flagBadgeColor"
-              >
-                {{ transaction.flag }}
-              </span>
+                  :class="flagBadgeColor"
+                >
+                  {{ transaction.flag_label }}
+                </span>
               
               <!-- Tags -->
               <div v-if="transaction.tags && transaction.tags.length > 0" class="flex items-center gap-1">

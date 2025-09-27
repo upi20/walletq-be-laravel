@@ -15,39 +15,42 @@ class TransactionController extends Controller
 {
     public function index(Request $request)
     {
-        $query = $request->user()->transactions()
-            ->with(['category', 'account', 'tags']);        // Exclude initial balance transactions
-        $query->where('flag', Transaction::FLAG_NORMAL);
+        $user = $request->user();
+        $filters = $this->validateAndPrepareFilters($request, $user);
 
-        // Apply filters if any
-        if ($request->has('account_id')) {
-            $query->where('account_id', $request->account_id);
-        }
-        if ($request->has('category_id')) {
-            $query->where('transaction_category_id', $request->category_id);
-        }
-        if ($request->has('type')) {
-            $query->where('type', $request->type);
-        }
+        $query = $user->transactions()->with(['category', 'account', 'tags']);
 
-        // Date range filtering
-        if ($request->has('start_date')) {
-            $query->whereDate('date', '>=', date('Y-m-d', strtotime($request->start_date)));
-        }
-        if ($request->has('end_date')) {
-            $query->whereDate('date', '<=', date('Y-m-d', strtotime($request->end_date)));
-        }
+        // Apply filters
+        $this->applyFilters($query, $filters);
 
         // Apply sorting
-        $query->orderBy('date', 'desc')
-            ->orderBy('created_at', 'desc');
+        $sortBy = $filters['sort_by'] ?? 'date';
+        $sortOrder = $filters['sort_order'] ?? 'desc';
 
+        if ($sortBy === 'date') {
+            $query->orderBy('date', $sortOrder)->orderBy('created_at', $sortOrder);
+        } elseif ($sortBy === 'amount') {
+            $query->orderBy('amount', $sortOrder);
+        } elseif ($sortBy === 'account') {
+            $query->join('accounts', 'transactions.account_id', '=', 'accounts.id')
+                ->orderBy('accounts.name', $sortOrder)
+                ->select('transactions.*');
+        } elseif ($sortBy === 'category') {
+            $query->join('transaction_categories', 'transactions.transaction_category_id', '=', 'transaction_categories.id')
+                ->orderBy('transaction_categories.name', $sortOrder)
+                ->select('transactions.*');
+        }
+
+        // Get all transactions without pagination
         $transactions = $query->get();
 
         return response()->json([
             'status' => 200,
             'message' => 'Transactions fetched successfully',
-            'data' => $transactions
+            'data' => $transactions,
+            'meta' => [
+                'total' => $transactions->count(),
+            ]
         ]);
     }
 
@@ -365,6 +368,161 @@ class TransactionController extends Controller
                 'message' => 'Error deleting transaction',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Validate and prepare filter data from request for API
+     */
+    private function validateAndPrepareFilters(Request $request, $user): array
+    {
+        // Prepare data
+        $data = $request->all();
+
+        // Convert string arrays to arrays if needed
+        if (isset($data['account_ids']) && is_string($data['account_ids'])) {
+            $data['account_ids'] = explode(',', $data['account_ids']);
+        }
+
+        if (isset($data['category_ids']) && is_string($data['category_ids'])) {
+            $data['category_ids'] = explode(',', $data['category_ids']);
+        }
+
+        if (isset($data['tag_ids']) && is_string($data['tag_ids'])) {
+            $data['tag_ids'] = explode(',', $data['tag_ids']);
+        }
+
+        if (isset($data['flags']) && is_string($data['flags'])) {
+            $data['flags'] = explode(',', $data['flags']);
+        }
+
+        // Handle backward compatibility with old API parameters
+        if (isset($data['account_id'])) {
+            $data['account_ids'] = [$data['account_id']];
+        }
+        if (isset($data['category_id'])) {
+            $data['category_ids'] = [$data['category_id']];
+        }
+        if (isset($data['start_date'])) {
+            $data['date_from'] = $data['start_date'];
+        }
+        if (isset($data['end_date'])) {
+            $data['date_to'] = $data['end_date'];
+        }
+
+        // Set default values
+        $data['type'] = $data['type'] ?? 'both';
+        $data['sort_by'] = $data['sort_by'] ?? 'date';
+        $data['sort_order'] = $data['sort_order'] ?? 'desc';
+        $data['flags'] = $data['flags'] ?? [Transaction::FLAG_NORMAL];
+
+        // Validation rules (more lenient for API)
+        $rules = [
+            'date_from' => 'nullable|date',
+            'date_to' => 'nullable|date|after_or_equal:date_from',
+            'account_ids' => 'nullable|array',
+            'account_ids.*' => 'integer|exists:accounts,id',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'integer|exists:transaction_categories,id',
+            'type' => 'nullable|in:income,expense,both',
+            'flags' => 'nullable|array',
+            'flags.*' => 'string|in:' . implode(',', Transaction::FLAGS),
+            'amount_min' => 'nullable|numeric|min:0',
+            'amount_max' => 'nullable|numeric|min:0|gte:amount_min',
+            'tag_ids' => 'nullable|array',
+            'tag_ids.*' => 'integer|exists:tags,id',
+            'search' => 'nullable|string|max:255',
+            'sort_by' => 'nullable|in:date,amount,account,category',
+            'sort_order' => 'nullable|in:asc,desc',
+        ];
+
+        $validator = Validator::make($data, $rules);
+
+        if ($validator->fails()) {
+            throw new \Illuminate\Validation\ValidationException($validator);
+        }
+
+        $validated = $validator->validated();
+
+        // Add user_id for security
+        $validated['user_id'] = $user->id;
+
+        // Remove empty arrays and null values
+        return array_filter($validated, function ($value) {
+            if (is_array($value)) {
+                return !empty($value);
+            }
+            return $value !== null && $value !== '';
+        });
+    }
+
+    /**
+     * Apply filters to transaction query
+     */
+    private function applyFilters($query, array $filters): void
+    {
+        // Flag filters (default to normal transactions)
+        if (isset($filters['flags'])) {
+            $query->whereIn('flag', $filters['flags']);
+        } else {
+            $query->where('flag', Transaction::FLAG_NORMAL);
+        }
+
+        // Account filters
+        if (isset($filters['account_ids'])) {
+            $query->whereIn('account_id', $filters['account_ids']);
+        }
+
+        // Category filters
+        if (isset($filters['category_ids'])) {
+            $query->whereIn('transaction_category_id', $filters['category_ids']);
+        }
+
+        // Type filters
+        if (isset($filters['type']) && $filters['type'] !== 'both') {
+            $query->where('type', $filters['type']);
+        }
+
+        // Date filters
+        if (isset($filters['date_from'])) {
+            $query->whereDate('date', '>=', $filters['date_from']);
+        }
+        if (isset($filters['date_to'])) {
+            $query->whereDate('date', '<=', $filters['date_to']);
+        }
+
+        // Amount filters
+        if (isset($filters['amount_min'])) {
+            $query->where('amount', '>=', $filters['amount_min']);
+        }
+        if (isset($filters['amount_max'])) {
+            $query->where('amount', '<=', $filters['amount_max']);
+        }
+
+        // Tag filters
+        if (isset($filters['tag_ids'])) {
+            $query->whereHas('tags', function ($tagQuery) use ($filters) {
+                $tagQuery->whereIn('tags.id', $filters['tag_ids']);
+            });
+        }
+
+        // Search filter
+        if (isset($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($searchQuery) use ($search) {
+                $searchQuery->where('note', 'like', "%{$search}%")
+                    ->orWhereHas('category', function ($catQuery) use ($search) {
+                        $catQuery->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('account', function ($accQuery) use ($search) {
+                        $accQuery->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // User filter (security)
+        if (isset($filters['user_id'])) {
+            $query->where('user_id', $filters['user_id']);
         }
     }
 }
