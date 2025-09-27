@@ -13,6 +13,7 @@ import {
   Sun
 } from 'lucide-vue-next';
 import formatCurrency from '@/composables/formatCurrency';
+import ToastContainer from '@/components/Toast/ToastContainer.vue';
 
 interface Props {
   showHeader?: boolean;
@@ -157,6 +158,9 @@ bottomNavItems.forEach(item => {
     >
       <Plus class="w-6 h-6 text-white" />
     </button>
+
+    <!-- Toast Container -->
+    <ToastContainer />
   </div>
 </template>
 

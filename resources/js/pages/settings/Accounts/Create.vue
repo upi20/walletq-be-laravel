@@ -8,10 +8,14 @@ import {
 } from 'lucide-vue-next';
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
 import { useTranslation } from '@/composables/useTranslation';
+import { useToast } from '@/composables/useToast';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 
 // Translation
 const { trans } = useTranslation();
+
+// Toast notifications
+const { success, error, warning, info } = useToast();
 
 interface AccountCategory {
   id: number;
@@ -33,7 +37,39 @@ const form = useForm({
 });
 
 const submit = () => {
-  form.post('/settings/accounts');
+  form.post('/settings/accounts', {
+    onStart: () => {
+      info('Menyimpan akun...', {
+        message: 'Sedang memproses data akun baru.',
+        duration: 2000
+      });
+    },
+    onSuccess: () => {
+      success('Akun berhasil dibuat!', {
+        message: 'Akun baru telah ditambahkan ke daftar akun Anda.',
+        duration: 5000
+      });
+    },
+    onError: (errors) => {
+      // Show specific error messages for validation
+      if (errors.name) {
+        error('Nama akun diperlukan', {
+          message: 'Silakan masukkan nama untuk akun baru.',
+          duration: 4000
+        });
+      } else if (errors.account_category_id) {
+        error('Kategori akun diperlukan', {
+          message: 'Silakan pilih kategori untuk akun baru.',
+          duration: 4000
+        });
+      } else {
+        error('Gagal membuat akun', {
+          message: 'Terjadi kesalahan saat menyimpan data akun. Silakan coba lagi.',
+          persistent: true
+        });
+      }
+    }
+  });
 };
 
 const formatNumber = (value: string) => {

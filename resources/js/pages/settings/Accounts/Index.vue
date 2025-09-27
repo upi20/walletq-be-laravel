@@ -19,6 +19,7 @@ import {
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
 import formatCurrency from '@/composables/formatCurrency';
 import { useTranslation } from '@/composables/useTranslation';
+import { useToast } from '@/composables/useToast';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 
 interface Account {
@@ -54,6 +55,9 @@ const totalBalance = page.props.auth?.user.balance || 0;
 
 // Translation
 const { trans } = useTranslation();
+
+// Toast notifications
+const { success, error, warning, info } = useToast();
 
 const activeMenu = ref<number | null>(null);
 
@@ -133,8 +137,60 @@ const toggleSort = (field: 'name' | 'current_balance') => {
 
 const deleteAccount = (account: Account) => {
   if (confirm(`${trans('accounts.delete_confirmation')} "${account.name}"?`)) {
-    router.delete(`/settings/accounts/${account.id}`);
+    router.delete(`/settings/accounts/${account.id}`, {
+      onStart: () => {
+        info('Menghapus akun...', {
+          message: 'Sedang memproses permintaan Anda.',
+          duration: 2000
+        });
+      },
+      onSuccess: () => {
+        success('Akun berhasil dihapus!', {
+          message: `Akun "${account.name}" telah dihapus dari sistem.`,
+          duration: 5000
+        });
+      },
+      onError: () => {
+        error('Gagal menghapus akun', {
+          message: 'Terjadi kesalahan saat menghapus akun. Silakan coba lagi.',
+          persistent: true
+        });
+      }
+    });
   }
+};
+
+// Example toast functions for demonstration
+const showToastExamples = () => {
+  // Success toast
+  success('Operasi berhasil!', {
+    message: 'Data telah disimpan dengan baik.',
+    duration: 4000
+  });
+  
+  // Error toast with persistent option
+  setTimeout(() => {
+    error('Terjadi kesalahan sistem', {
+      message: 'Hubungi administrator jika masalah berlanjut.',
+      persistent: true
+    });
+  }, 1000);
+  
+  // Warning toast
+  setTimeout(() => {
+    warning('Peringatan penting', {
+      message: 'Pastikan data yang dimasukkan sudah benar.',
+      duration: 6000
+    });
+  }, 2000);
+  
+  // Info toast
+  setTimeout(() => {
+    info('Informasi sistem', {
+      message: 'Pemeliharaan sistem dijadwalkan pada hari Minggu.',
+      duration: 5000
+    });
+  }, 3000);
 };
 
 // hide all toggle menu when clicking outside
@@ -181,7 +237,17 @@ const totalCurrentBalanceSelected = computed(() => {
           {{ trans('settings.back_to_settings') }}
         </Link>
         
-        <LanguageSwitcher />
+        <div class="flex items-center gap-2">
+          <LanguageSwitcher />
+          <!-- Demo Toast Button -->
+          <button
+            @click="showToastExamples"
+            class="px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 shadow-md hover:shadow-lg"
+            title="Demo Toast Notifications"
+          >
+            🔔 Demo
+          </button>
+        </div>
       </div>
       
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -337,7 +403,7 @@ const totalCurrentBalanceSelected = computed(() => {
     <!-- Floating Action Button Filter data -->
     <button
       @click="toggleFilterModal"
-    class="fixed bottom-20 w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
+    class="fixed bottom-20 left-6 w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
     >
       <Filter class="w-6 h-6 text-white" />
     </button>
