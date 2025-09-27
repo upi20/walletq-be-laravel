@@ -62,17 +62,18 @@ class TransactionService
     public function getMonthlySummary(User $user, string $month = null): array
     {
         $month = $month ?: Carbon::now()->format('Y-m');
+        $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
         
-        $transactions = $this->getMonthlyTransactions($user, $month);
-        
-        $totalIncome = $transactions->where('type', 'income')->sum('amount');
-        $totalExpense = $transactions->where('type', 'expense')->sum('amount');
+        $totalIncome = $user->transactions()->whereBetween('date', [$startDate, $endDate])->where('type', 'income')->sum('amount');
+        $totalExpense = $user->transactions()->whereBetween('date', [$startDate, $endDate])->where('type', 'expense')->sum('amount');
+        $transactionCount = $user->transactions()->whereBetween('date', [$startDate, $endDate])->count();
         
         return [
             'total_income' => $totalIncome,
-            'total_expense' => $totalExpense,
+            'total_expense' => (-$totalExpense),
             'net_amount' => $totalIncome - $totalExpense,
-            'transaction_count' => $transactions->count(),
+            'transaction_count' => $transactionCount,
             'month' => $month,
         ];
     }

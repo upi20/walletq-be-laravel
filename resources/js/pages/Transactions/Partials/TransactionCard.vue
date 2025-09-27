@@ -183,39 +183,6 @@ const handleAction = (action: string) => {
                 <MoreVertical class="w-4 h-4" />
               </button>
 
-              <!-- Dropdown Menu -->
-              <div 
-                v-if="showActionMenu"
-                class="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20"
-              >
-                <div class="py-1">
-                  <button
-                    @click="handleAction('view')"
-                    class="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-                  >
-                    <Eye class="w-4 h-4" />
-                    Lihat
-                  </button>
-                  
-                  <button
-                    @click="handleAction('edit')"
-                    class="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-                  >
-                    <Edit class="w-4 h-4" />
-                    Edit
-                  </button>
-                  
-                  <hr class="my-1 border-gray-200 dark:border-gray-600" />
-                  
-                  <button
-                    @click="handleAction('delete')"
-                    class="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
-                  >
-                    <Trash2 class="w-4 h-4" />
-                    Hapus
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -223,12 +190,42 @@ const handleAction = (action: string) => {
     </div>
   </div>
 
-  <!-- Click outside to close menu -->
+  <!-- Action Menu Modal -->
   <div 
     v-if="showActionMenu" 
-    @click="showActionMenu = false" 
-    class="fixed inset-0 z-10"
-  ></div>
+    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+    @click.self="showActionMenu = false"
+  >
+    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl w-full max-w-xs mx-auto">
+      <div class="py-2">
+        <button
+          @click="handleAction('view')"
+          class="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+        >
+          <Eye class="w-4 h-4" />
+          Lihat Detail
+        </button>
+        
+        <button
+          @click="handleAction('edit')"
+          class="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+        >
+          <Edit class="w-4 h-4" />
+          Edit Transaksi
+        </button>
+        
+        <hr class="my-1 border-gray-200 dark:border-gray-600" />
+        
+        <button
+          @click="handleAction('delete')"
+          class="flex items-center gap-3 w-full px-4 py-3 text-sm text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
+        >
+          <Trash2 class="w-4 h-4" />
+          Hapus Transaksi
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>

@@ -53,7 +53,7 @@ const bottomNavItems = reactive([
 
 
 // Set active state based on current route
-const currentRoute = page.url.split('/')[1] || 'dashboard';
+const currentRoute = page.url.split('?')[0].split('/')[1] || 'dashboard';
 bottomNavItems.forEach(item => {
   item.active = item.route === currentRoute;
 });

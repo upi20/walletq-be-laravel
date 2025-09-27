@@ -7,7 +7,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Calendar,
-  DollarSign
+  DollarSign,
+  TrendingUp,
+  TrendingDown
 } from 'lucide-vue-next';
 
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
@@ -193,7 +195,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <FinancialAppLayout :showHeader="false" :showFab="false" containerClass="px-0">
+  <FinancialAppLayout :showHeader="false" :showFab="false" containerClass="px-0 mb-20">
 
     <Head :title="pageTitle" />
 
@@ -247,13 +249,41 @@ onMounted(() => {
       </div>
 
       <!-- 3 Summary Cards for Current Month -->
-      <!-- <TransactionSummaryCards :summary="currentMonthSummary" /> -->
+      <!-- 3 Cards Summary -->
+      <div class="grid grid-cols-3 gap-3">
+        <!-- Income -->
+        <div class="bg-white/10 rounded-xl p-3 text-center">
+          <TrendingUp class="w-4 h-4 text-white mx-auto mb-1" />
+          <p class="text-xs text-white/70 mb-1">Masuk</p>
+          <p class="text-sm font-bold text-white">
+            {{ formatCurrency(transactions.summary.total_income, 'decimal') }}
+          </p>
+        </div>
+        
+        <!-- Expense -->
+        <div class="bg-white/10 rounded-xl p-3 text-center">
+          <TrendingDown class="w-4 h-4 text-white mx-auto mb-1" />
+          <p class="text-xs text-white/70 mb-1">Keluar</p>
+          <p class="text-sm font-bold text-white">
+            {{ formatCurrency(transactions.summary.total_expense, 'decimal') }}
+          </p>
+        </div>
+        
+        <!-- Net -->
+        <div class="bg-white/10 rounded-xl p-3 text-center">
+          <DollarSign class="w-4 h-4 text-white mx-auto mb-1" />
+          <p class="text-xs text-white/70 mb-1">Selisih</p>
+          <p class="text-sm font-bold" :class="transactions.summary.net_amount >= 0 ? 'text-white' : 'text-coral-200'">
+            {{ formatCurrency(transactions.summary.net_amount, 'decimal') }}
+          </p>
+        </div>
+      </div>
     </div>
 
     <!-- Main Content: Daily Grouped Transactions -->
-    <div class="px-0">
+    <div class="px-2">
       <div v-for="group in transactions.data" :key="group.date"
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mb-4">
+        class="bg-white dark:bg-gray-800 shadow-md border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mb-4">
         <!-- Date Header with Subtotal -->
         <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
           <div class="flex items-center justify-between">

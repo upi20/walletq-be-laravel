@@ -1,0 +1,1 @@
+function a(r,i="decimal",n=!0){if(isNaN(r)||r===null||r===void 0)return"0";const m=r<0,e=Math.abs(r);let t;return i==="decimal"?t=new Intl.NumberFormat("id-ID").format(e):t=new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",minimumFractionDigits:0,maximumFractionDigits:0}).format(e),m&&n?`-${t}`:t}export{a as f};
