@@ -12,7 +12,8 @@ import {
   ArrowLeft,
   ChevronUp,
   ChevronDown,
-  Filter
+  Filter,
+  Check
 } from 'lucide-vue-next';
 
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
@@ -144,6 +145,25 @@ document.addEventListener('click', (event) => {
   }
 });
 
+const selectedAccountsIds = ref<number[]>([]);
+const handleSelectAccount = (accountId: number) => {
+  if (selectedAccountsIds.value.includes(accountId)) {
+    selectedAccountsIds.value = selectedAccountsIds.value.filter(id => id !== accountId);
+  } else {
+    selectedAccountsIds.value.push(accountId);
+  }
+};
+
+const idHasBeenSelected = (accountId: number) => {
+  return selectedAccountsIds.value.includes(accountId);
+};
+
+const totalCurrentBalanceSelected = computed(() => {
+  return props.accounts
+    .filter(account => selectedAccountsIds.value.includes(account.id))
+    .reduce((sum, account) => Number(sum) + Number(account.current_balance), 0); 
+});
+
 </script>
 
 <template>
@@ -175,7 +195,10 @@ document.addEventListener('click', (event) => {
                 Total Saldo
               </h1>
               <h3 class="text-xs">
-                {{ formatCurrency(totalBalance) }}
+                {{ formatCurrency(totalBalance) }} 
+                <template v-if="selectedAccountsIds.length > 0">
+                  | Dipilih : {{ formatCurrency(totalCurrentBalanceSelected) }}
+                </template>
               </h3>
             </div>
           </div>
@@ -261,9 +284,10 @@ document.addEventListener('click', (event) => {
       >
         <!-- Account Header -->
         <div class="flex items-start justify-between">
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-3" @click="handleSelectAccount(account.id)">
             <div class="ms-2 w-8 h-8 bg-gradient-to-r from-teal-100 to-coral-100 dark:from-teal-900 dark:to-coral-900 rounded-md flex items-center justify-center">
-              <CreditCard class="w-6 h-6 text-teal-600 dark:text-teal-400" />
+              <CreditCard v-if="idHasBeenSelected(account.id) == false" class="w-6 h-6 text-teal-600 dark:text-teal-400" />
+              <Check v-else class="w-6 h-6 text-teal-600 dark:text-teal-400" />
             </div>
             <div>
               <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
