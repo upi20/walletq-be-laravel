@@ -146,6 +146,6 @@ const props = defineProps<{
         </div>
 
         <!-- Transaction Overview Component -->
-        <TransactionOverview :transactions="recentTransactions" />
+        <TransactionOverview :transactions="recentTransactions" class="pb-32" />
     </FinancialAppLayout>
 </template>

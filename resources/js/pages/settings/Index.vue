@@ -62,11 +62,11 @@ const settingsItems = computed(() => [
 </script>
 
 <template>
-  <FinancialAppLayout :showHeader="false" :showFab="false">
+  <FinancialAppLayout :showHeader="false" :showFab="false" containerClass="px-3 pt-6 pb-32">
     <Head :title="trans('settings.index.title')" />
 
     <!-- Header -->
-    <div class="mb-8 flex items-center justify-between">
+    <div class="mb-8 flex items-center justify-between pt-6">
       <div>
         <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
           {{ trans('settings.index.title') }}

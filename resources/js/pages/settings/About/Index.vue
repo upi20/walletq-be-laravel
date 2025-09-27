@@ -33,7 +33,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-  <FinancialAppLayout :showHeader="false" :showFab="false">
+  <FinancialAppLayout :showHeader="false" :showFab="false" containerClass="px-3 pt-6">
     <Head :title="trans('settings.index.title')" />
 
     <!-- Header -->

@@ -195,7 +195,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <FinancialAppLayout :showHeader="false" :showFab="false" containerClass="px-0 mb-20">
+  <FinancialAppLayout :showHeader="false" :showFab="false" containerClass="px-0 pb-32">
 
     <Head :title="pageTitle" />
 

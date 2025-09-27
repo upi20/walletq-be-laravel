@@ -190,7 +190,7 @@ const getTypeBadgeClass = (type?: string | null) => {
 </script>
 
 <template>
-  <FinancialAppLayout :showHeader="false" :showFab="false">
+  <FinancialAppLayout :showHeader="false" :showFab="false" containerClass="px-3 pt-6 pb-32">
     <Head title="Kategori Rekening" />
 
     <!-- Header -->
