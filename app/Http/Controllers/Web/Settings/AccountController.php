@@ -63,6 +63,15 @@ class AccountController extends Controller
             'account_category_id' => 'required|exists:account_categories,id',
             'initial_balance' => 'nullable|numeric',
             'is_active' => 'boolean',
+        ], [
+            'name.required' => 'Nama rekening wajib diisi.',
+            'name.string' => 'Nama rekening harus berupa teks.',
+            'name.max' => 'Nama rekening maksimal 255 karakter.',
+            'description.string' => 'Deskripsi harus berupa teks.',
+            'account_category_id.required' => 'Kategori rekening wajib dipilih.',
+            'account_category_id.exists' => 'Kategori rekening tidak valid.',
+            'initial_balance.numeric' => 'Saldo awal harus berupa angka.',
+            'is_active.boolean' => 'Status aktif harus berupa true atau false.',
         ]);
 
         $validated['user_id'] = Auth::id();
@@ -73,7 +82,7 @@ class AccountController extends Controller
 
         return redirect()
             ->route('settings.accounts.index')
-            ->with('success', 'Account created successfully.');
+            ->with('success', 'Rekening berhasil ditambahkan.');
     }
 
     public function show(Account $account)
@@ -89,7 +98,11 @@ class AccountController extends Controller
 
     public function edit(Account $account)
     {
-        $this->authorize('update', $account);
+        if($account->user_id !== Auth::id()) {
+            return redirect()
+                ->route('settings.accounts.index')
+                ->with('error', 'Anda tidak memiliki izin untuk mengedit rekening ini.');
+        }
 
         $categories = AccountCategory::where('user_id', Auth::id())
             ->orderBy('name')
@@ -103,7 +116,11 @@ class AccountController extends Controller
 
     public function update(Request $request, Account $account)
     {
-        $this->authorize('update', $account);
+        if($account->user_id !== Auth::id()) {
+            return redirect()
+                ->route('settings.accounts.index')
+                ->with('error', 'Anda tidak memiliki izin untuk mengupdate rekening ini.');
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -125,18 +142,15 @@ class AccountController extends Controller
 
     public function destroy(Account $account)
     {
-        dd('masuk');
-        $this->authorize('delete', $account);
-
-        // Check if account has transactions
-        if ($account->transactions()->exists() || $account->transfersFrom()->exists() || $account->transfersTo()->exists()) {
-            return back()->with('error', 'Cannot delete account that has transactions.');
+        $user = Auth::id();
+        if($account->user_id !== $user) {
+            return redirect()
+                ->route('settings.accounts.index')
+                ->with('error', 'Anda tidak memiliki izin untuk menghapus rekening ini.');
         }
-
         $account->delete();
-
         return redirect()
             ->route('settings.accounts.index')
-            ->with('success', 'Account deleted successfully.');
+            ->with('success', 'Rekening berhasil dihapus.');
     }
 }

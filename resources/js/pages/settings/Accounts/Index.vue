@@ -145,20 +145,20 @@ const deleteAccount = async (account: Account) => {
   if (confirmed) {
     router.delete(`/settings/accounts/${account.id}`, {
       onStart: () => {
-        info('Menghapus akun...', {
+        info('Menghapus rekening...', {
           message: 'Sedang memproses permintaan Anda.',
           duration: 2000
         });
       },
       onSuccess: () => {
-        success('Akun berhasil dihapus!', {
-          message: `Akun "${account.name}" telah dihapus dari sistem.`,
+        success('Rekening berhasil dihapus!', {
+          message: `Rekening "${account.name}" telah dihapus dari sistem.`,
           duration: 5000
         });
       },
       onError: () => {
-        error('Gagal menghapus akun', {
-          message: 'Terjadi kesalahan saat menghapus akun. Silakan coba lagi.',
+        error('Gagal menghapus rekening', {
+          message: 'Terjadi kesalahan saat menghapus rekening. Silakan coba lagi.',
           persistent: true
         });
       }
