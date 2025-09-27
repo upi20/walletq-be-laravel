@@ -2,7 +2,14 @@
   "designSystem": {
     "name": "Modern Financial App Design System",
     "version": "1.0",
-    "description": "Clean, modern design system for financial applications with curved elements and vibrant gradients"
+    "description": "Clean, modern design system for financial applications with curved elements and vibrant gradients",
+    "platform": "MOBILE ONLY",
+    "targetDevice": {
+      "primary": "Mobile First - Optimized exclusively for mobile devices",
+      "screenSizes": "320px - 480px (mobile portrait and landscape)",
+      "touchInterface": "Touch-optimized interactions and gestures",
+      "mobileSpecific": "Designed for thumb navigation and one-handed use"
+    }
   },
   
   "colorPalette": {
@@ -496,9 +503,11 @@
   },
 
   "responsiveBreakpoints": {
-    "mobile": "320px - 767px",
-    "tablet": "768px - 1023px",
-    "desktop": "1024px+"
+    "mobile": "320px - 480px (PRIMARY TARGET)",
+    "mobileLandscape": "481px - 767px (secondary support)",
+    "tablet": "DEPRECATED - Not supported",
+    "desktop": "DEPRECATED - Not supported",
+    "note": "This application is designed EXCLUSIVELY for mobile devices. Desktop and tablet layouts are not supported."
   },
 
   "themeToggle": {
@@ -534,27 +543,40 @@
   },
 
   "designPrinciples": {
+    "platformFocus": {
+      "primary": "MOBILE ONLY APPLICATION",
+      "philosophy": "Designed exclusively for mobile devices with touch-first interactions",
+      "optimization": "Optimized for one-handed use and thumb navigation",
+      "screenTarget": "Primary: 320px-480px, Secondary: 481px-767px"
+    },
     "visualStyle": [
       "Clean and minimal with purposeful use of color",
       "Curved elements and organic shapes",
       "Vibrant gradients for primary actions and headers",
       "Consistent use of white space",
-      "Friendly, approachable illustrations"
+      "Friendly, approachable illustrations",
+      "MOBILE-OPTIMIZED: Large touch targets (minimum 44px)",
+      "MOBILE-OPTIMIZED: Thumb-friendly bottom navigation"
     ],
     "userExperience": [
       "Clear information hierarchy",
       "Intuitive navigation patterns",
       "Contextual color coding (green for income, red for expenses)",
       "Progressive disclosure of information",
-      "Consistent interaction patterns"
+      "Consistent interaction patterns",
+      "MOBILE-FIRST: Touch gestures and swipe interactions",
+      "MOBILE-FIRST: Bottom-heavy interface design",
+      "MOBILE-FIRST: Single-column layouts only"
     ]
   },
 
   "implementationNotes": {
-    "cssFramework": "Tailwind CSS recommended with dark mode support",
-    "iconLibrary": "Lucide React or similar outline-style icons",
-    "chartLibrary": "Recharts or Chart.js for data visualization with dark theme support",
-    "animationLibrary": "Framer Motion for smooth transitions and theme switching",
+    "platform": "MOBILE ONLY - NO DESKTOP/TABLET SUPPORT",
+    "viewport": "Always use viewport meta tag: width=device-width, initial-scale=1.0",
+    "cssFramework": "Tailwind CSS with mobile-first breakpoints only",
+    "iconLibrary": "Lucide Vue with touch-optimized sizing",
+    "chartLibrary": "Chart.js optimized for mobile viewports",
+    "animationLibrary": "Vue transitions optimized for mobile performance",
     "themeImplementation": {
       "cssVariables": "use CSS custom properties for theme values",
       "dataAttributes": "use data-theme attribute on root element",
@@ -568,6 +590,10 @@
       "animations": "ensure smooth theme transitions with CSS transitions"
     },
     "keyFeatures": [
+      "MOBILE ONLY: Single-column responsive design (320px-480px primary)",
+      "MOBILE ONLY: Touch-optimized interactions with 44px minimum touch targets",
+      "MOBILE ONLY: Bottom navigation for thumb accessibility",
+      "MOBILE ONLY: Swipe gestures and mobile-specific animations",
       "Curved header sections using border-radius and pseudo-elements",
       "Gradient backgrounds with CSS linear-gradient (enhanced in dark mode)",
       "Floating tab navigation with z-index layering",
@@ -576,6 +602,13 @@
       "Smooth theme transitions with CSS custom properties",
       "Enhanced dark mode with glow effects and improved contrast",
       "System theme preference detection and persistence"
-    ]
+    ],
+    "platformRestrictions": {
+      "IMPORTANT": "THIS APPLICATION IS DESIGNED EXCLUSIVELY FOR MOBILE DEVICES",
+      "supportedDevices": ["Smartphones (portrait)", "Smartphones (landscape)"],
+      "unsupportedDevices": ["Tablets", "Desktop computers", "Large screens"],
+      "breakpointStrategy": "Mobile-first only, no responsive design for larger screens",
+      "testingRequirement": "All testing must be done on actual mobile devices or mobile viewport simulation"
+    }
   }
 }

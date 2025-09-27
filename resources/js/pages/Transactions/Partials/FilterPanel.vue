@@ -139,18 +139,18 @@ const formatCurrency = (amount: number): string => {
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-    <!-- Header -->
+  <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg mx-4">
+    <!-- Header - Mobile Optimized -->
     <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
       <div class="flex items-center gap-2">
         <Filter class="w-5 h-5 text-teal-600 dark:text-teal-400" />
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Filter Transaksi</h3>
+        <h3 class="text-base font-semibold text-gray-900 dark:text-white">Filter Transaksi</h3>
       </div>
       
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1">
         <button
           @click="clearFilters"
-          class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+          class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
           title="Reset filter"
         >
           <RotateCcw class="w-4 h-4" />
@@ -158,36 +158,36 @@ const formatCurrency = (amount: number): string => {
         
         <button
           @click="closePanel"
-          class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+          class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
         >
           <X class="w-4 h-4" />
         </button>
       </div>
     </div>
 
-    <!-- Filter Content -->
-    <div class="p-4 space-y-6">
+    <!-- Filter Content - Mobile Optimized -->
+    <div class="p-4 space-y-5 max-h-[70vh] overflow-y-auto">
       <!-- Date Range -->
       <div>
         <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           <Calendar class="w-4 h-4" />
           Rentang Tanggal
         </label>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="space-y-3">
           <div>
-            <label class="text-xs text-gray-500 dark:text-gray-400">Dari</label>
+            <label class="text-xs text-gray-500 dark:text-gray-400 block mb-1">Dari</label>
             <input
               v-model="localFilters.date_from"
               type="date"
-              class="w-full mt-1 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              class="w-full px-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
             />
           </div>
           <div>
-            <label class="text-xs text-gray-500 dark:text-gray-400">Sampai</label>
+            <label class="text-xs text-gray-500 dark:text-gray-400 block mb-1">Sampai</label>
             <input
               v-model="localFilters.date_to"
               type="date"
-              class="w-full mt-1 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              class="w-full px-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
             />
           </div>
         </div>
@@ -200,7 +200,7 @@ const formatCurrency = (amount: number): string => {
         </label>
         <select
           v-model="localFilters.type"
-          class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+          class="w-full px-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
         >
           <option 
             v-for="option in masterData.type_options" 
@@ -218,25 +218,25 @@ const formatCurrency = (amount: number): string => {
           <CreditCard class="w-4 h-4" />
           Akun
         </label>
-        <div class="max-h-40 overflow-y-auto space-y-2 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+        <div class="max-h-36 overflow-y-auto space-y-1 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
           <label
             v-for="account in masterData.accounts"
             :key="account.id"
-            class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors duration-200"
+            class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-3 rounded-lg transition-colors duration-200"
           >
             <input
               type="checkbox"
               :checked="localFilters.account_ids?.includes(account.id)"
               @change="toggleAccount(account.id)"
-              class="text-teal-600 border-gray-300 rounded focus:ring-teal-500"
+              class="text-teal-600 border-gray-300 rounded focus:ring-teal-500 flex-shrink-0"
             />
-            <div class="flex-1">
-              <div class="text-sm font-medium text-gray-900 dark:text-white">
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
                 {{ account.name }}
               </div>
-              <div class="text-xs text-gray-500 dark:text-gray-400">
+              <div class="text-xs text-gray-500 dark:text-gray-400 truncate">
                 {{ account.formatted_balance }}
-                <span v-if="account.category">• {{ account.category.name }}</span>
+                <span v-if="account.category" class="ml-1">• {{ account.category.name }}</span>
               </div>
             </div>
           </label>
@@ -406,31 +406,31 @@ const formatCurrency = (amount: number): string => {
       </div>
     </div>
 
-    <!-- Footer -->
-    <div class="flex items-center justify-between p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
-      <button
-        @click="clearFilters"
-        class="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors duration-200"
-      >
-        Reset Semua
-      </button>
-      
+    <!-- Footer - Mobile Optimized -->
+    <div class="sticky bottom-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 space-y-3">
       <div class="flex gap-3">
         <button
-          @click="closePanel"
-          class="px-4 py-2 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
+          @click="clearFilters"
+          class="flex-1 py-3 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 font-medium text-sm"
         >
-          Batal
+          Reset Semua
         </button>
         
         <button
-          @click="applyFilters"
-          :disabled="loading"
-          class="px-6 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg hover:from-teal-600 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          @click="closePanel"
+          class="flex-1 py-3 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 font-medium text-sm"
         >
-          {{ loading ? 'Memuat...' : 'Terapkan Filter' }}
+          Batal
         </button>
       </div>
+      
+      <button
+        @click="applyFilters"
+        :disabled="loading"
+        class="w-full py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl hover:from-teal-600 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium text-sm"
+      >
+        {{ loading ? 'Memuat...' : 'Terapkan Filter' }}
+      </button>
     </div>
   </div>
 </template>

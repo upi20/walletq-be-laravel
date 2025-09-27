@@ -50,9 +50,9 @@ const isActive = (filterValue: string) => {
   return props.currentPreset === filterValue;
 };
 
-// Get button classes
+// Get button classes - Mobile Optimized
 const getButtonClasses = (filter: any) => {
-  const baseClasses = 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:scale-105';
+  const baseClasses = 'flex items-center gap-2 px-4 py-3 rounded-full text-sm font-medium transition-all duration-200 min-h-[44px]';
   
   if (isActive(filter.value)) {
     return filter.color === 'teal' 
@@ -76,40 +76,57 @@ const getIconClasses = (filter: any) => {
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-2">
+  <!-- Mobile Optimized Quick Filters -->
+  <div class="flex overflow-x-auto pb-2 -mx-4 px-4 gap-3 scrollbar-hide">
     <button
       v-for="filter in quickFilters"
       :key="filter.value"
       @click="handleFilterClick(filter.value)"
       :class="getButtonClasses(filter)"
+      class="flex-shrink-0"
     >
       <component 
         :is="filter.icon" 
         :class="getIconClasses(filter)"
       />
-      <span>{{ filter.label }}</span>
+      <span class="whitespace-nowrap">{{ filter.label }}</span>
     </button>
     
     <!-- Clear/All filter -->
     <button
       @click="handleFilterClick('all')"
       :class="isActive('all') || !currentPreset 
-        ? 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-gray-500 text-white shadow-lg transition-all duration-200 hover:scale-105'
-        : 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105'"
+        ? 'flex items-center gap-2 px-4 py-3 rounded-full text-sm font-medium bg-gray-500 text-white shadow-lg transition-all duration-200 flex-shrink-0'
+        : 'flex items-center gap-2 px-4 py-3 rounded-full text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 flex-shrink-0'"
     >
       <Calendar class="w-4 h-4" />
-      <span>Semua</span>
+      <span class="whitespace-nowrap">Semua</span>
     </button>
   </div>
 </template>
 
 <style scoped>
-/* Additional styles for smooth transitions */
+/* Additional styles for smooth transitions and mobile scrolling */
 button {
   user-select: none;
 }
 
 button:active {
   transform: scale(0.98);
+}
+
+/* Hide scrollbar for mobile */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Add momentum scrolling for iOS */
+.scrollbar-hide {
+  -webkit-overflow-scrolling: touch;
 }
 </style>

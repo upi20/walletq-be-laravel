@@ -82,58 +82,58 @@ const quickStatsData = computed(() => [
 </script>
 
 <template>
-  <div class="space-y-4">
-    <!-- Main Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+  <div class="space-y-3">
+    <!-- Main Summary Cards - Mobile Optimized -->
+    <div class="grid grid-cols-1 gap-3">
       <div 
         v-for="(card, index) in cards" 
         :key="index"
-        class="p-4 rounded-xl border backdrop-blur-sm transition-all duration-200 hover:scale-105"
+        class="p-4 rounded-2xl border backdrop-blur-sm transition-all duration-200"
         :class="[card.bgColor, card.borderColor]"
       >
         <div class="flex items-center justify-between">
-          <div>
-            <p class="text-white/80 text-sm font-medium">{{ card.title }}</p>
-            <p class="text-white text-xl font-bold mt-1">
+          <div class="flex-1 min-w-0">
+            <p class="text-white/80 text-xs font-medium uppercase tracking-wider">{{ card.title }}</p>
+            <p class="text-white text-lg font-bold mt-1 truncate">
               {{ formatCurrencyWithSign(card.amount) }}
             </p>
           </div>
-          <div class="p-2 bg-white/20 rounded-lg">
-            <component :is="card.icon" class="w-6 h-6 text-white" />
+          <div class="p-2 bg-white/20 rounded-lg ml-3 flex-shrink-0">
+            <component :is="card.icon" class="w-5 h-5 text-white" />
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Transaction Count -->
-    <div class="p-4 bg-white/20 dark:bg-white/10 rounded-xl border border-white/20 backdrop-blur-sm">
+    <!-- Transaction Count - Mobile Optimized -->
+    <div class="p-3 bg-white/15 dark:bg-white/10 rounded-xl border border-white/20 backdrop-blur-sm">
       <div class="text-center">
-        <p class="text-white/80 text-sm font-medium">Total Transaksi</p>
-        <p class="text-white text-2xl font-bold">
+        <p class="text-white/80 text-xs font-medium uppercase tracking-wider">Total Transaksi</p>
+        <p class="text-white text-lg font-bold mt-1">
           {{ formatNumber(summary.transaction_count) }}
         </p>
       </div>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-3 gap-3">
+    <!-- Quick Stats - Mobile Optimized -->
+    <div class="grid grid-cols-3 gap-2">
       <div 
         v-for="(stat, index) in quickStatsData" 
         :key="index"
         class="p-3 bg-white/10 dark:bg-white/5 rounded-lg border border-white/20 backdrop-blur-sm"
       >
-        <p class="text-white/80 text-xs font-medium mb-2">{{ stat.label }}</p>
+        <p class="text-white/80 text-xs font-medium mb-2 text-center">{{ stat.label }}</p>
         <div class="space-y-1">
-          <div class="flex items-center justify-between">
+          <div class="flex flex-col items-center">
             <span class="text-white/70 text-xs">Masuk</span>
-            <span class="text-teal-200 text-xs font-semibold">
-              {{ stat.income > 0 ? formatCurrencyWithSign(stat.income).replace('Rp ', '+') : '-' }}
+            <span class="text-teal-200 text-xs font-semibold truncate w-full text-center">
+              {{ stat.income > 0 ? formatCurrencyWithSign(stat.income).replace('Rp ', '+').replace(',', 'rb') : '-' }}
             </span>
           </div>
-          <div class="flex items-center justify-between">
+          <div class="flex flex-col items-center">
             <span class="text-white/70 text-xs">Keluar</span>
-            <span class="text-coral-200 text-xs font-semibold">
-              {{ stat.expense > 0 ? formatCurrencyWithSign(stat.expense).replace('Rp ', '-') : '-' }}
+            <span class="text-coral-200 text-xs font-semibold truncate w-full text-center">
+              {{ stat.expense > 0 ? formatCurrencyWithSign(stat.expense).replace('Rp ', '-').replace(',', 'rb') : '-' }}
             </span>
           </div>
         </div>

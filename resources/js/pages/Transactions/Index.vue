@@ -163,29 +163,31 @@ onMounted(() => {
   <FinancialAppLayout :showHeader="false" :showFab="false" containerClass="px-0">
     <Head :title="pageTitle" />
     
-    <!-- Header Section -->
-    <div class="bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-b-[32px] px-6 pt-6 pb-8 mb-6 shadow-lg dark:shadow-2xl">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h1 class="text-2xl font-semibold text-white">{{ pageTitle }}</h1>
-          <p class="text-teal-100 dark:text-teal-200">{{ transactions.summary.period_label }}</p>
+    <!-- Header Section - Mobile Optimized -->
+    <div class="bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-b-[24px] px-4 pt-4 pb-6 mb-4 shadow-lg dark:shadow-2xl">
+      <!-- Header Top -->
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex-1 min-w-0">
+          <h1 class="text-xl font-semibold text-white truncate">{{ pageTitle }}</h1>
+          <p class="text-sm text-teal-100 dark:text-teal-200 truncate">{{ transactions.summary.period_label }}</p>
         </div>
         
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 ml-3">
           <button
             @click="exportTransactions"
             :disabled="loading"
-            class="p-3 bg-white/20 hover:bg-white/30 rounded-xl text-white transition-colors duration-200"
+            class="p-3 bg-white/20 hover:bg-white/30 rounded-xl text-white transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            title="Export"
           >
             <Download class="w-5 h-5" />
           </button>
           
           <Link
             href="/transactions/create"
-            class="flex items-center gap-2 px-4 py-2 bg-white text-teal-600 rounded-xl font-medium hover:bg-teal-50 transition-colors duration-200"
+            class="flex items-center gap-2 px-3 py-2 bg-white text-teal-600 rounded-xl font-medium hover:bg-teal-50 transition-colors duration-200 min-h-[44px] text-sm"
           >
-            <Plus class="w-5 h-5" />
-            <span>Tambah</span>
+            <Plus class="w-4 h-4" />
+            <span class="hidden xs:inline">Tambah</span>
           </Link>
         </div>
       </div>
@@ -197,39 +199,39 @@ onMounted(() => {
       />
     </div>
 
-    <!-- Main Content -->
-    <div class="px-6">
-      <!-- Quick Filters & Search -->
-      <div class="flex flex-col sm:flex-row gap-4 mb-6">
+    <!-- Main Content - Mobile Optimized -->
+    <div class="px-4">
+      <!-- Quick Filters - Mobile Stack -->
+      <div class="mb-4">
         <QuickFilters 
           :current-preset="currentFilters.date_preset"
           @apply-preset="(preset) => applyFilters({ ...currentFilters, date_preset: preset })"
         />
-        
-        <div class="flex-1 flex gap-3">
-          <!-- Search Input -->
-          <div class="relative flex-1">
-            <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <input
-              v-model="currentFilters.search"
-              @input="applyFilters(currentFilters)"
-              type="text"
-              placeholder="Cari transaksi..."
-              class="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-            />
-          </div>
-          
-          <!-- Filter Toggle -->
-          <button
-            @click="showFilterPanel = !showFilterPanel"
-            class="flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-            :class="{ 'ring-2 ring-teal-500 border-teal-500': hasActiveFilters }"
-          >
-            <Filter class="w-4 h-4" />
-            <span>Filter</span>
-            <div v-if="hasActiveFilters" class="w-2 h-2 bg-teal-500 rounded-full"></div>
-          </button>
+      </div>
+      
+      <!-- Search & Filter Row -->
+      <div class="flex gap-3 mb-4">
+        <!-- Search Input -->
+        <div class="relative flex-1">
+          <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            v-model="currentFilters.search"
+            @input="applyFilters(currentFilters)"
+            type="text"
+            placeholder="Cari transaksi..."
+            class="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+          />
         </div>
+        
+        <!-- Filter Toggle - Mobile -->
+        <button
+          @click="showFilterPanel = !showFilterPanel"
+          class="flex items-center justify-center px-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 min-w-[48px] min-h-[48px]"
+          :class="{ 'ring-2 ring-teal-500 border-teal-500': hasActiveFilters }"
+        >
+          <Filter class="w-5 h-5" />
+          <div v-if="hasActiveFilters" class="absolute -top-1 -right-1 w-3 h-3 bg-teal-500 rounded-full"></div>
+        </button>
       </div>
 
       <!-- Filter Panel -->
@@ -241,11 +243,11 @@ onMounted(() => {
         @apply-filters="applyFilters"
         @clear-filters="clearFilters"
         @close="showFilterPanel = false"
-        class="mb-6"
+        class="mb-4"
       />
 
       <!-- Transaction Table -->
-      <div class="mb-6">
+      <div class="mb-4">
         <TransactionTable
           :transactions="transactions.data"
           :loading="loading"
@@ -257,28 +259,27 @@ onMounted(() => {
         />
       </div>
 
-      <!-- Pagination -->
-      <div v-if="transactions.meta.total > 0" class="flex items-center justify-between">
-        <div class="text-sm text-gray-600 dark:text-gray-400">
-          Menampilkan {{ transactions.meta.from }} - {{ transactions.meta.to }} 
-          dari {{ transactions.meta.total }} transaksi
+      <!-- Pagination - Mobile Optimized -->
+      <div v-if="transactions.meta.total > 0" class="flex flex-col gap-3 mb-6">
+        <div class="text-xs text-gray-600 dark:text-gray-400 text-center">
+          {{ transactions.meta.from }} - {{ transactions.meta.to }} dari {{ transactions.meta.total }} transaksi
         </div>
         
-        <div class="flex items-center gap-2">
+        <div class="flex items-center justify-center gap-2">
           <button
             @click="goToPage(currentPage - 1)"
             :disabled="currentPage <= 1"
-            class="p-2 border border-gray-200 dark:border-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+            class="p-2 border border-gray-200 dark:border-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
             <ChevronLeft class="w-4 h-4" />
           </button>
           
-          <!-- Page Numbers -->
+          <!-- Page Numbers - Limited for mobile -->
           <div class="flex items-center gap-1">
-            <template v-for="page in Math.min(5, totalPages)" :key="page">
+            <template v-for="page in Math.min(3, totalPages)" :key="page">
               <button
                 @click="goToPage(page)"
-                class="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors duration-200"
+                class="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors duration-200 min-w-[44px] min-h-[44px] text-sm"
                 :class="page === currentPage 
                   ? 'bg-teal-500 text-white border-teal-500' 
                   : 'hover:bg-gray-50 dark:hover:bg-gray-700'"
@@ -286,38 +287,50 @@ onMounted(() => {
                 {{ page }}
               </button>
             </template>
+            
+            <!-- Show dots if more pages -->
+            <span v-if="totalPages > 3" class="px-2 text-gray-400">...</span>
+            
+            <!-- Last page if not shown -->
+            <button
+              v-if="totalPages > 3 && currentPage < totalPages"
+              @click="goToPage(totalPages)"
+              class="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors duration-200 min-w-[44px] min-h-[44px] text-sm hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
+              {{ totalPages }}
+            </button>
           </div>
           
           <button
             @click="goToPage(currentPage + 1)"
             :disabled="currentPage >= totalPages"
-            class="p-2 border border-gray-200 dark:border-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+            class="p-2 border border-gray-200 dark:border-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
             <ChevronRight class="w-4 h-4" />
           </button>
         </div>
       </div>
       
-      <!-- Empty State -->
-      <div v-else class="text-center py-12">
-        <div class="text-gray-400 mb-4">
-          <DollarSign class="w-16 h-16 mx-auto mb-4 opacity-50" />
-          <p class="text-lg font-medium">Tidak ada transaksi</p>
-          <p class="text-sm">Belum ada transaksi yang sesuai dengan filter yang dipilih</p>
+      <!-- Empty State - Mobile Optimized -->
+      <div v-else class="text-center py-8 px-4">
+        <div class="text-gray-400 mb-6">
+          <DollarSign class="w-12 h-12 mx-auto mb-3 opacity-50" />
+          <p class="text-base font-medium">Tidak ada transaksi</p>
+          <p class="text-sm text-gray-500 mt-1">Belum ada transaksi yang sesuai dengan filter yang dipilih</p>
         </div>
         
-        <div class="flex justify-center gap-4">
+        <div class="flex flex-col gap-3">
           <button
             v-if="hasActiveFilters"
             @click="clearFilters"
-            class="px-4 py-2 text-teal-600 border border-teal-600 rounded-lg hover:bg-teal-50 transition-colors duration-200"
+            class="w-full py-3 text-teal-600 border border-teal-600 rounded-xl hover:bg-teal-50 transition-colors duration-200 font-medium"
           >
             Hapus Filter
           </button>
           
           <Link
             href="/transactions/create"
-            class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors duration-200"
+            class="w-full py-3 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition-colors duration-200 font-medium text-center"
           >
             Tambah Transaksi Pertama
           </Link>
