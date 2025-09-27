@@ -152,6 +152,15 @@ class AccountController extends Controller
             'account_category_id' => 'required|exists:account_categories,id',
             'initial_balance' => 'nullable|numeric',
             'is_active' => 'boolean',
+        ],[
+            'name.required' => 'Nama rekening wajib diisi.',
+            'name.string' => 'Nama rekening harus berupa teks.',
+            'name.max' => 'Nama rekening maksimal 255 karakter.',
+            'description.string' => 'Deskripsi harus berupa teks.',
+            'account_category_id.required' => 'Kategori rekening wajib dipilih.',
+            'account_category_id.exists' => 'Kategori rekening tidak valid.',
+            'initial_balance.numeric' => 'Saldo awal harus berupa angka.',
+            // 'is_active.boolean' => 'Status aktif harus berupa true atau false.',
         ]);
 
         $validated['initial_balance'] = $validated['initial_balance'] ?? $account->initial_balance;
