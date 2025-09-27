@@ -46,6 +46,10 @@ const showCategoryDropdown = ref(false);
 const accountSearch = ref('');
 const categorySearch = ref('');
 
+// Display values for amount fields
+const displayAmount = ref('');
+const bulkDisplayAmounts = ref<string[]>(['']); // Initialize dengan satu empty string
+
 // Single transaction form
 const singleForm = useForm({
   type: 'expense' as 'income' | 'expense',
@@ -115,6 +119,23 @@ const getBulkCategories = (type: 'income' | 'expense') => {
   return Array.isArray(categories) ? categories : [];
 };
 
+// Error states for visual feedback
+const hasAccountError = computed(() => {
+  return singleForm.errors && singleForm.errors['transactions.0.account_id'];
+});
+
+const hasCategoryError = computed(() => {
+  return singleForm.errors && singleForm.errors['transactions.0.transaction_category_id'];
+});
+
+const hasAmountError = computed(() => {
+  return singleForm.errors && singleForm.errors['transactions.0.amount'];
+});
+
+const hasDateError = computed(() => {
+  return singleForm.errors && singleForm.errors['transactions.0.date'];
+});
+
 // Methods
 const toggleBulkMode = () => {
   bulkMode.value = !bulkMode.value;
@@ -135,21 +156,54 @@ const addBulkTransaction = () => {
     flag: 'normal',
     tag_ids: [],
   });
+  
+  // Initialize display amount
+  bulkDisplayAmounts.value.push('');
 };
 
-// Number formatting methods
-const formatNumberInput = (value: string): string => {
-  // Remove all non-numeric characters except decimal
-  const numeric = value.replace(/[^\d.]/g, '');
-  // Format with thousand separators
-  const parts = numeric.split('.');
-  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  return parts.join(','); // Use comma for decimal
+// Format angka dengan titik sebagai pemisah ribuan
+const formatAmount = (value: string): string => {
+  if (!value) return '';
+  // Hapus semua titik dan karakter non-numeric
+  const cleanValue = value.replace(/[^\d]/g, '');
+  if (!cleanValue) return '';
+  // Format dengan titik pemisah ribuan
+  return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 };
 
-const parseNumberInput = (value: string): string => {
-  // Convert display format back to database format
-  return value.replace(/\./g, '').replace(',', '.');
+// Parse angka kembali ke format database
+const parseAmount = (value: string): number => {
+  if (!value) return 0;
+  const cleanValue = value.replace(/\./g, '');
+  return parseFloat(cleanValue) || 0;
+};
+
+// Handle single form amount input
+const handleSingleAmountInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const inputValue = target.value;
+  
+  // Format untuk display
+  const formatted = formatAmount(inputValue);
+  displayAmount.value = formatted;
+  target.value = formatted;
+  
+  // Set nilai asli ke form
+  singleForm.amount = parseAmount(formatted).toString();
+};
+
+// Handle bulk form amount input
+const handleBulkAmountInput = (event: Event, index: number) => {
+  const target = event.target as HTMLInputElement;
+  const inputValue = target.value;
+  
+  // Format untuk display
+  const formatted = formatAmount(inputValue);
+  bulkDisplayAmounts.value[index] = formatted;
+  target.value = formatted;
+  
+  // Set nilai asli ke form
+  bulkTransactions.value[index].amount = parseAmount(formatted).toString();
 };
 
 // Select dropdown methods
@@ -183,6 +237,7 @@ const getSelectedCategory = computed(() => {
 const removeBulkTransaction = (index: number) => {
   if (bulkTransactions.value.length > 1) {
     bulkTransactions.value.splice(index, 1);
+    bulkDisplayAmounts.value.splice(index, 1);
   }
 };
 
@@ -190,14 +245,25 @@ const duplicateBulkTransaction = (index: number) => {
   const transaction = { ...bulkTransactions.value[index] };
   transaction.tag_ids = [...transaction.tag_ids];
   bulkTransactions.value.splice(index + 1, 0, transaction);
+  
+  // Duplicate display amount
+  const displayAmount = bulkDisplayAmounts.value[index] || '';
+  bulkDisplayAmounts.value.splice(index + 1, 0, displayAmount);
 };
 
 const submitSingle = () => {
+  // Client-side validation
+  const errors = validateSingleForm();
+  if (errors.length > 0) {
+    error(`Mohon lengkapi: ${errors.join(', ')}`);
+    return;
+  }
+
   const data = singleForm.data();
   const formData = {
     transactions: [{
       ...data,
-      amount: parseNumberInput(data.amount),
+      amount: parseAmount(data.amount),
       date: `${data.date} ${data.time}:00` // Combine date and time
     }]
   };
@@ -206,37 +272,40 @@ const submitSingle = () => {
     onSuccess: () => {
       success('Transaksi berhasil ditambahkan');
     },
-    onError: () => {
-      error('Gagal menyimpan transaksi');
+    onError: (errors) => {
+      handleFormErrors(errors);
     }
   });
 };
 
 const submitBulk = () => {
-  // Validate all bulk transactions
-  const validTransactions = bulkTransactions.value.filter(t => 
-    t.account_id && t.transaction_category_id && t.amount && parseFloat(parseNumberInput(t.amount)) > 0
-  );
+  // Validate bulk transactions
+  const validationResults = validateBulkTransactions();
   
-  if (validTransactions.length === 0) {
-    warning('Lengkapi minimal satu transaksi');
+  if (validationResults.errors.length > 0) {
+    error(`Transaksi ${validationResults.invalidIndexes.map(i => i + 1).join(', ')}: ${validationResults.errors[0]}`);
+    return;
+  }
+
+  if (validationResults.validTransactions.length === 0) {
+    warning('Lengkapi minimal satu transaksi yang valid');
     return;
   }
 
   const formData = {
-    transactions: validTransactions.map(t => ({
+    transactions: validationResults.validTransactions.map(t => ({
       ...t,
-      amount: parseNumberInput(t.amount),
+      amount: parseAmount(t.amount),
       date: `${t.date} ${t.time}:00` // Combine date and time
     }))
   };
 
   singleForm.transform(() => formData).post('/transactions', {
     onSuccess: () => {
-      success(`Berhasil menambahkan ${validTransactions.length} transaksi`);
+      success(`Berhasil menambahkan ${validationResults.validTransactions.length} transaksi`);
     },
-    onError: () => {
-      error('Gagal menyimpan transaksi');
+    onError: (errors) => {
+      handleFormErrors(errors);
     }
   });
 };
@@ -257,6 +326,90 @@ const toggleTag = (tagId: number, transactionIndex?: number) => {
     } else {
       singleForm.tag_ids.push(tagId);
     }
+  }
+};
+
+// Validation functions
+const validateSingleForm = (): string[] => {
+  const errors: string[] = [];
+  
+  if (!singleForm.account_id) {
+    errors.push('Akun');
+  }
+  
+  if (!singleForm.transaction_category_id) {
+    errors.push('Kategori');
+  }
+  
+  if (!singleForm.amount || parseAmount(singleForm.amount) <= 0) {
+    errors.push('Jumlah yang valid');
+  }
+  
+  if (!singleForm.date) {
+    errors.push('Tanggal');
+  }
+  
+  if (!singleForm.time) {
+    errors.push('Waktu');
+  }
+  
+  return errors;
+};
+
+const validateBulkTransactions = () => {
+  const validTransactions: typeof bulkTransactions.value = [];
+  const invalidIndexes: number[] = [];
+  const errors: string[] = [];
+  
+  bulkTransactions.value.forEach((transaction, index) => {
+    const transactionErrors: string[] = [];
+    
+    if (!transaction.account_id) transactionErrors.push('akun');
+    if (!transaction.transaction_category_id) transactionErrors.push('kategori');
+    if (!transaction.amount || parseAmount(transaction.amount) <= 0) transactionErrors.push('jumlah');
+    if (!transaction.date) transactionErrors.push('tanggal');
+    if (!transaction.time) transactionErrors.push('waktu');
+    
+    if (transactionErrors.length > 0) {
+      invalidIndexes.push(index);
+      if (errors.length === 0) { // Only show first error type
+        errors.push(`mohon lengkapi ${transactionErrors.join(', ')}`);
+      }
+    } else {
+      validTransactions.push(transaction);
+    }
+  });
+  
+  return { validTransactions, invalidIndexes, errors };
+};
+
+const handleFormErrors = (errors: any) => {
+  console.log('Form errors:', errors);
+  
+  if (errors?.transactions) {
+    // Handle transaction-specific errors
+    const transactionErrors = errors.transactions;
+    const errorMessages: string[] = [];
+    
+    Object.keys(transactionErrors).forEach(key => {
+      const fieldErrors = transactionErrors[key];
+      Object.keys(fieldErrors).forEach(field => {
+        const messages = fieldErrors[field];
+        if (Array.isArray(messages)) {
+          errorMessages.push(...messages);
+        }
+      });
+    });
+    
+    if (errorMessages.length > 0) {
+      error(errorMessages[0]); // Show first error
+    } else {
+      error('Terjadi kesalahan pada form');
+    }
+  } else if (errors?.message) {
+    error(errors.message);
+  } else {
+    error('Gagal menyimpan transaksi. Periksa kembali data yang dimasukkan.');
   }
 };
 
@@ -346,7 +499,12 @@ onUnmounted(() => {
           <div class="relative">
             <button
               @click="showAccountDropdown = !showAccountDropdown"
-              class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-left flex items-center justify-between focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              :class="[
+                'w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-left flex items-center justify-between transition-colors duration-200',
+                hasAccountError 
+                  ? 'border-red-500 dark:border-red-400 focus:ring-2 focus:ring-red-500' 
+                  : 'border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-teal-500 focus:border-transparent'
+              ]"
             >
               <div class="flex items-center gap-2">
                 <CreditCard class="w-4 h-4 text-gray-500" />
@@ -392,7 +550,12 @@ onUnmounted(() => {
           <div class="relative">
             <button
               @click="showCategoryDropdown = !showCategoryDropdown"
-              class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-left flex items-center justify-between focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              :class="[
+                'w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-left flex items-center justify-between transition-colors duration-200',
+                hasCategoryError 
+                  ? 'border-red-500 dark:border-red-400 focus:ring-2 focus:ring-red-500' 
+                  : 'border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-teal-500 focus:border-transparent'
+              ]"
             >
               <div class="flex items-center gap-2">
                 <div 
@@ -442,11 +605,16 @@ onUnmounted(() => {
         <!-- Amount with Floating Label -->
         <div class="mb-4 relative">
           <input
-            v-model="singleForm.amount"
-            @input="singleForm.amount = formatNumberInput(($event.target as HTMLInputElement)?.value || '')"
+            @input="handleSingleAmountInput"
             type="text"
             placeholder=" "
-            class="peer w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder-transparent"
+            :value="displayAmount"
+            :class="[
+              'peer w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-transparent transition-colors duration-200',
+              hasAmountError 
+                ? 'border-red-500 dark:border-red-400 focus:ring-2 focus:ring-red-500' 
+                : 'border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-teal-500 focus:border-transparent'
+            ]"
             required
           />
           <label class="absolute left-4 text-gray-500 transition-all duration-200 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:left-3 peer-focus:text-xs peer-focus:text-teal-500 peer-focus:bg-white dark:peer-focus:bg-gray-800 peer-focus:px-1 -top-2 text-xs bg-white dark:bg-gray-800 px-1">
@@ -462,7 +630,12 @@ onUnmounted(() => {
               v-model="singleForm.date"
               type="date"
               placeholder=" "
-              class="peer w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder-transparent"
+              :class="[
+                'peer w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-transparent transition-colors duration-200',
+                hasDateError 
+                  ? 'border-red-500 dark:border-red-400 focus:ring-2 focus:ring-red-500' 
+                  : 'border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-teal-500 focus:border-transparent'
+              ]"
               required
             />
             <label class="absolute left-4 text-gray-500 transition-all duration-200 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:left-3 peer-focus:text-xs peer-focus:text-teal-500 peer-focus:bg-white dark:peer-focus:bg-gray-800 peer-focus:px-1 -top-2 text-xs bg-white dark:bg-gray-800 px-1">
@@ -593,10 +766,10 @@ onUnmounted(() => {
             <!-- Amount -->
             <div>
               <input
-                v-model="transaction.amount"
-                @input="transaction.amount = formatNumberInput(($event.target as HTMLInputElement)?.value || '')"
+                @input="handleBulkAmountInput($event, index)"
                 type="text"
                 placeholder="Jumlah"
+                :value="bulkDisplayAmounts[index] || ''"
                 class="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500"
               />
             </div>

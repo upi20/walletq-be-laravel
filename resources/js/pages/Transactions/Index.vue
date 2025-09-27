@@ -11,7 +11,8 @@ import {
   DollarSign,
   TrendingUp,
   TrendingDown,
-  X
+  X,
+  Plus
 } from 'lucide-vue-next';
 
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
@@ -564,6 +565,14 @@ onMounted(() => {
       @apply="applyFilters"
       @close="closeFilterModal" 
     />
+
+    <Link
+      href="/transactions/create"
+      title="Buat transaksi"
+      class="fixed bottom-20 right-6 w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
+    >
+      <Plus class="w-6 h-6 text-white" />
+    </Link>
 
   </FinancialAppLayout>
 </template>

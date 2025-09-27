@@ -90,7 +90,7 @@ class TransactionController extends Controller
     {
         $user = $request->user();
         
-        // Simple validation
+        // Simple validation dengan pesan bahasa Indonesia
         $request->validate([
             'transactions' => 'required|array|min:1',
             'transactions.*.type' => 'required|in:income,expense',
@@ -102,6 +102,21 @@ class TransactionController extends Controller
             'transactions.*.flag' => 'nullable|string',
             'transactions.*.tag_ids' => 'nullable|array',
             'transactions.*.tag_ids.*' => 'exists:tags,id',
+        ], [
+            'transactions.required' => 'Data transaksi harus diisi.',
+            'transactions.*.type.required' => 'Tipe transaksi harus dipilih.',
+            'transactions.*.type.in' => 'Tipe transaksi tidak valid.',
+            'transactions.*.account_id.required' => 'Akun harus dipilih.',
+            'transactions.*.account_id.exists' => 'Akun yang dipilih tidak ditemukan.',
+            'transactions.*.transaction_category_id.required' => 'Kategori harus dipilih.',
+            'transactions.*.transaction_category_id.exists' => 'Kategori yang dipilih tidak ditemukan.',
+            'transactions.*.amount.required' => 'Jumlah harus diisi.',
+            'transactions.*.amount.numeric' => 'Jumlah harus berupa angka.',
+            'transactions.*.amount.min' => 'Jumlah minimal adalah 0.01.',
+            'transactions.*.date.required' => 'Tanggal harus diisi.',
+            'transactions.*.date.date' => 'Format tanggal tidak valid.',
+            'transactions.*.note.max' => 'Catatan maksimal 255 karakter.',
+            'transactions.*.tag_ids.*.exists' => 'Tag yang dipilih tidak ditemukan.',
         ]);
 
         try {
