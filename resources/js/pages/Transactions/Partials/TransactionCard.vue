@@ -91,6 +91,7 @@ const dateTimeOnly = (date: string) => {
   return new Date(date).toLocaleTimeString('id-ID', {
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'UTC'
   });
 }
 </script>

@@ -5,6 +5,7 @@ namespace App\Services\Transaction;
 use App\Models\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class TransactionService
@@ -30,7 +31,7 @@ class TransactionService
         $this->applySearchFilter($query, $filters);
 
         return $query->orderBy('date', 'desc')
-            ->orderBy('created_at', 'desc')
+            // ->orderBy('created_at', 'desc')
             ->get();
     }
 
@@ -103,7 +104,7 @@ class TransactionService
     {
         $tagIds = $filters['tag_ids'] ?? null;
         if ($tagIds && is_array($tagIds) && !empty($tagIds)) {
-            $query->whereHas('tags', function($q) use ($tagIds) {
+            $query->whereHas('tags', function ($q) use ($tagIds) {
                 $q->whereIn('tags.id', $tagIds);
             });
         }
@@ -143,14 +144,14 @@ class TransactionService
     {
         $search = $filters['search'] ?? null;
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('note', 'like', "%{$search}%")
-                  ->orWhereHas('account', function($subQ) use ($search) {
-                      $subQ->where('name', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('category', function($subQ) use ($search) {
-                      $subQ->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('account', function ($subQ) use ($search) {
+                        $subQ->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('category', function ($subQ) use ($search) {
+                        $subQ->where('name', 'like', "%{$search}%");
+                    });
             });
         }
     }
@@ -161,7 +162,7 @@ class TransactionService
     public function getFilteredTransactionsGroupedByDate(User $user, array $filters = [])
     {
         $transactions = $this->getFilteredTransactions($user, $filters);
-        $transactionGroupedByDate = $transactions->groupBy(function($transaction) {
+        $transactionGroupedByDate = $transactions->groupBy(function ($transaction) {
             return $transaction->date->format('Y-m-d');
         });
 
@@ -174,13 +175,16 @@ class TransactionService
             $data->label = $now->format('d');
             $data->day = $now->format('l');
             $data->month = $now->format('F Y');
-            $data->date = $date;
+            $data->date = Carbon::parse($date);
 
             // amount
             $data->amount = 0;
             foreach ($transactions as $transaction) {
-                $data->amount += ( $transaction->type === 'income' ? $transaction->amount : -$transaction->amount);
+                $transaction->date = Carbon::parse($transaction->date);
+                $data->amount += ($transaction->type === 'income' ? $transaction->amount : -$transaction->amount);
             }
+            // order transaction by date desc
+            $transactions = collect($transactions)->sortByDesc('date');
 
             $data->transactions = $transactions;
             $result[] = $data;
@@ -194,11 +198,11 @@ class TransactionService
     public function getFilteredSummary(User $user, array $filters = []): array
     {
         $transactions = $this->getFilteredTransactions($user, $filters);
-        
+
         $totalIncome = $transactions->where('type', 'income')->sum('amount');
         $totalExpense = $transactions->where('type', 'expense')->sum('amount');
         $transactionCount = $transactions->count();
-        
+
         return [
             'total_income' => $totalIncome,
             'total_expense' => $totalExpense,
@@ -240,20 +244,20 @@ class TransactionService
         $data['amount'] = preg_replace('/[^0-9]/', '', $data['amount']);
         // Validate and prepare data
         $transactionData = $this->prepareTransactionData($user, $data);
-        
+
         // Create transaction
         $transaction = Transaction::create($transactionData);
-        
+
         // Attach tags if provided
         if (!empty($data['tag_ids'])) {
             $transaction->tags()->attach($data['tag_ids']);
         }
-        
+
         // Update account balance
         if ($transaction->account) {
             $transaction->account->updateBalance($transaction->amount, $transaction->type);
         }
-        
+
         return $transaction->load(['account', 'category', 'tags']);
     }
 
@@ -263,7 +267,7 @@ class TransactionService
     public function bulkCreateTransactions(User $user, array $transactions): array
     {
         $createdTransactions = [];
-        
+
         foreach ($transactions as $transactionData) {
             try {
                 $createdTransactions[] = $this->createTransaction($user, $transactionData);
@@ -272,7 +276,7 @@ class TransactionService
                 Log::error('Failed to create transaction: ' . $e->getMessage(), $transactionData);
             }
         }
-        
+
         return $createdTransactions;
     }
 
@@ -312,5 +316,46 @@ class TransactionService
                 ['value' => Transaction::FLAG_INITIAL_BALANCE, 'label' => 'Saldo Awal'],
             ],
         ];
+    }
+
+    /**
+     * Get transaction by ID for specific user
+     */
+    public function getTransactionById(User $user, int $id): Transaction
+    {
+        return Transaction::with(['account.category', 'category', 'tags'])
+            ->where('user_id', $user->id)
+            ->findOrFail($id);
+    }
+
+    /**
+     * Update transaction
+     */
+    public function updateTransaction(User $user, int $id, array $data): Transaction
+    {
+        $hasUpdateAmount = false;
+        $transaction = $this->getTransactionById($user, $id);
+        // if amount or type is updated, recalculate account balance
+        if ($transaction->amount != $data['amount']) {
+            $hasUpdateAmount = true;
+        }
+
+        // if type is updated, recalculate account balance
+        if ($transaction->type != $data['type']) {
+            $hasUpdateAmount = true;
+        }
+
+        DB::beginTransaction();
+
+        // update transaction
+        $transaction->update($data);
+
+        // recalculate account balance
+        if ($hasUpdateAmount) {
+            $transaction->account->recalculateBalance();
+        }
+
+        DB::commit();
+        return $transaction->load(['account', 'category', 'tags']);
     }
 }

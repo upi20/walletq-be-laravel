@@ -469,16 +469,13 @@ onUnmounted(() => {
         
         <!-- Transaction Type Toggle -->
         <div class="mb-6">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 block">
-            Tipe Transaksi
-          </label>
-          <div class="grid grid-cols-2 gap-3">
+          <div class="flex bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
             <button
               @click="singleForm.type = 'income'"
               :class="singleForm.type === 'income' 
                 ? 'bg-teal-500 text-white shadow-md' 
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'"
-              class="p-3 rounded-xl font-medium transition-all duration-200"
+              class="flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200"
             >
               Pemasukan
             </button>
@@ -487,7 +484,7 @@ onUnmounted(() => {
               :class="singleForm.type === 'expense' 
                 ? 'bg-coral-500 text-white shadow-md' 
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'"
-              class="p-3 rounded-xl font-medium transition-all duration-200"
+              class="flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200"
             >
               Pengeluaran
             </button>

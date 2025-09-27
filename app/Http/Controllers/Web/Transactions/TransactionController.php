@@ -205,4 +205,71 @@ class TransactionController extends Controller
         
         return array_filter(explode(',', $value));
     }
+
+    /**
+     * Show edit transaction form
+     */
+    public function edit(Request $request, $id)
+    {
+        $user = $request->user();
+        
+        try {
+            $transaction = $this->transactionService->getTransactionById($user, $id);
+            $masterData = $this->transactionService->getCreateFormData($user);
+            $parseTransaction = $transaction->toArray();
+            $parseTransaction['amount'] = (int) $parseTransaction['amount'];
+
+            return Inertia::render('Transactions/Edit', [
+                'transaction' => $parseTransaction,
+                'masterData' => $masterData,
+                'pageTitle' => 'Edit Transaksi',
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('transactions.index')
+                ->with('error', 'Transaksi tidak ditemukan');
+        }
+    }
+
+    /**
+     * Update transaction
+     */
+    public function update(Request $request, $id)
+    {
+        $user = $request->user();
+        
+        // Simple validation untuk single transaction
+        $request->validate([
+            'type' => 'required|in:income,expense',
+            'account_id' => 'required|exists:accounts,id',
+            'transaction_category_id' => 'required|exists:transaction_categories,id',
+            'amount' => 'required|numeric|min:0.01',
+            'date' => 'required|date',
+            'note' => 'nullable|string|max:255',
+            'flag' => 'nullable|string',
+            'tag_ids' => 'nullable|array',
+            'tag_ids.*' => 'exists:tags,id',
+        ], [
+            'type.required' => 'Tipe transaksi harus dipilih.',
+            'type.in' => 'Tipe transaksi tidak valid.',
+            'account_id.required' => 'Akun harus dipilih.',
+            'account_id.exists' => 'Akun yang dipilih tidak ditemukan.',
+            'transaction_category_id.required' => 'Kategori harus dipilih.',
+            'transaction_category_id.exists' => 'Kategori yang dipilih tidak ditemukan.',
+            'amount.required' => 'Jumlah harus diisi.',
+            'amount.numeric' => 'Jumlah harus berupa angka.',
+            'amount.min' => 'Jumlah minimal adalah 0.01.',
+            'date.required' => 'Tanggal harus diisi.',
+            'date.date' => 'Format tanggal tidak valid.',
+            'note.max' => 'Catatan maksimal 255 karakter.',
+            'tag_ids.*.exists' => 'Tag yang dipilih tidak ditemukan.',
+        ]);
+
+        try {
+            $transaction = $this->transactionService->updateTransaction($user, $id, $request->all());
+            return redirect()->route('transactions.index')
+                ->with('success', 'Transaksi berhasil diperbarui');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal memperbarui transaksi: ' . $e->getMessage()])->withInput();
+        }
+    }
 }

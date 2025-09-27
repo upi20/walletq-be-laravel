@@ -254,7 +254,7 @@ const handleTransactionAction = (action: string, transactionId: number) => {
       info('Fitur lihat detail akan segera hadir');
       break;
     case 'edit':
-      info('Fitur edit transaksi akan segera hadir');
+      router.get(`/transactions/${transactionId}/edit`);
       break;
     case 'delete':
       warning('Fitur hapus transaksi akan segera hadir');
