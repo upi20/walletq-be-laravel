@@ -127,10 +127,10 @@ const deleteAccount = async (account: Account) => {
   if (confirmed) {
     router.delete(`/settings/accounts/${account.id}`, {
       onStart: () => {
-        info('Menghapus rekening...', {
-          message: 'Sedang memproses permintaan Anda.',
-          duration: 2000
-        });
+        // info('Menghapus rekening...', {
+        //   message: 'Sedang memproses permintaan Anda.',
+        //   duration: 2000
+        // });
       },
       onSuccess: () => {
         success('Rekening berhasil dihapus!', {
@@ -396,7 +396,7 @@ const totalCurrentBalanceSelected = computed(() => {
           
           <div class="relative">
             <button
-              class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center transition-colors mt-2"
+              class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center transition-colors mt-1"
               @click="toggleMenu(account.id)"
             >
               <MoreVertical class="w-4 h-4 text-gray-400" />

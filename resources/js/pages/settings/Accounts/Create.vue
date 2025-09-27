@@ -51,10 +51,10 @@ const submit = async () => {
   
   form.post('/settings/accounts', {
     onStart: () => {
-      info('Menyimpan akun...', {
-        message: 'Sedang memproses data akun baru.',
-        duration: 2000
-      });
+      // info('Menyimpan akun...', {
+      //   message: 'Sedang memproses data akun baru.',
+      //   duration: 2000
+      // });
     },
     onSuccess: () => {
       success('Akun berhasil dibuat!', {
