@@ -138,7 +138,7 @@ bottomNavItems.forEach(item => {
     <!-- Bottom Navigation -->
     <nav 
       v-if="showBottomNav" 
-      class="fixed bottom-0 left-0 right-0 max-w-[640px] mx-auto bg-white dark:bg-gray-900 shadow-sm border-gray-200 dark:border-gray-700 h-16 flex items-center justify-around px-4 transition-colors duration-300 z-50"
+      class="fixed bottom-0 left-0 right-0 max-w-[640px] mx-auto bg-white dark:bg-gray-900 shadow-sm border-gray-200 dark:border-gray-700 h-16 flex items-center justify-around px-4 transition-colors duration-300 z-40"
     >
       <Link 
         v-for="item in bottomNavItems" 

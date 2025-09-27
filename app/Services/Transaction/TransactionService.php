@@ -358,4 +358,77 @@ class TransactionService
         DB::commit();
         return $transaction->load(['account', 'category', 'tags']);
     }
+
+    /**
+     * Delete transaction (only normal transactions)
+     */
+    public function deleteTransaction(User $user, int $id): bool
+    {
+        DB::beginTransaction();
+        $transaction = $this->getTransactionById($user, $id);
+        $account = $user->accounts()->findOrFail($transaction->account_id);
+        $transaction->delete();
+
+        $account->recalculateBalance();
+
+        DB::commit();
+        return true;
+    }
+
+    /**
+     * Bulk delete transactions (only normal transactions)
+     */
+    public function bulkDeleteTransactions(User $user, array $transactionIds): int
+    {
+        $deletedCount = 0;
+        
+        foreach ($transactionIds as $id) {
+            try {
+                if ($this->deleteTransaction($user, $id)) {
+                    $deletedCount++;
+                }
+            } catch (\Exception $e) {
+                // Log error but continue with other transactions
+                Log::error('Failed to delete transaction: ' . $e->getMessage(), ['transaction_id' => $id]);
+            }
+        }
+        
+        return $deletedCount;
+    }
+
+    /**
+     * Check if transaction can be deleted
+     */
+    public function canDeleteTransaction(User $user, int $id): bool
+    {
+        try {
+            $transaction = $this->getTransactionById($user, $id);
+            return $transaction->flag === Transaction::FLAG_NORMAL;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Get deletable transactions (normal transactions only)
+     */
+    public function getDeletableTransactions(User $user, array $filters = [])
+    {
+        $query = Transaction::with(['account.category', 'category', 'tags'])
+            ->where('user_id', $user->id)
+            ->where('flag', Transaction::FLAG_NORMAL); // Only normal transactions
+
+        // Apply same filters as getFilteredTransactions
+        $this->applyDateFilters($query, $filters);
+        $this->applyTypeFilter($query, $filters);
+        $this->applyAccountFilter($query, $filters);
+        $this->applyCategoryFilter($query, $filters);
+        $this->applyTagFilter($query, $filters);
+        $this->applyAmountFilter($query, $filters);
+        $this->applySearchFilter($query, $filters);
+
+        return $query->orderBy('date', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
 }

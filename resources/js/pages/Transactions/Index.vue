@@ -12,7 +12,10 @@ import {
   TrendingUp,
   TrendingDown,
   X,
-  Plus
+  Plus,
+  Trash2,
+  Check,
+  AlertTriangle
 } from 'lucide-vue-next';
 
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
@@ -45,6 +48,11 @@ const loading = ref(false);
 const showSearchModal = ref(false);
 const showFilterModal = ref(false);
 const showMonthPicker = ref(false);
+const showDeleteModal = ref(false);
+const showBulkDeleteModal = ref(false);
+const transactionToDelete = ref<number | null>(null);
+const selectedTransactions = ref<number[]>([]);
+const bulkMode = ref(false);
 
 // Current filters state
 const currentFilters = ref<TransactionFilters>({
@@ -257,7 +265,8 @@ const handleTransactionAction = (action: string, transactionId: number) => {
       router.get(`/transactions/${transactionId}/edit`);
       break;
     case 'delete':
-      warning('Fitur hapus transaksi akan segera hadir');
+      showDeleteModal.value = true;
+      transactionToDelete.value = transactionId;
       break;
   }
 };
@@ -269,6 +278,100 @@ const toggleMonthPicker = () => {
 const selectMonth = (month: string) => {
   applyFilters({ ...currentFilters.value, month, period: 'month' });
   showMonthPicker.value = false;
+};
+
+// Computed for deletable transactions (only normal transactions)
+const deletableTransactions = computed(() => {
+  const allTransactions: any[] = [];
+  props.transactions.data.forEach((group: any) => {
+    group.transactions.forEach((transaction: any) => {
+      if (transaction.flag === 'normal') {
+        allTransactions.push(transaction);
+      }
+    });
+  });
+  return allTransactions;
+});
+
+const canBulkDelete = computed(() => {
+  return selectedTransactions.value.length > 0;
+});
+
+const allSelected = computed(() => {
+  return deletableTransactions.value.length > 0 && 
+         selectedTransactions.value.length === deletableTransactions.value.length;
+});
+
+// Delete methods
+const toggleBulkMode = () => {
+  bulkMode.value = !bulkMode.value;
+  selectedTransactions.value = [];
+};
+
+const toggleSelectAll = () => {
+  if (allSelected.value) {
+    selectedTransactions.value = [];
+  } else {
+    selectedTransactions.value = deletableTransactions.value.map(t => t.id);
+  }
+};
+
+const toggleSelectTransaction = (transactionId: number) => {
+  const index = selectedTransactions.value.indexOf(transactionId);
+  if (index === -1) {
+    selectedTransactions.value.push(transactionId);
+  } else {
+    selectedTransactions.value.splice(index, 1);
+  }
+};
+
+const confirmDelete = () => {
+  if (!transactionToDelete.value) return;
+  
+  router.delete(`/transactions/${transactionToDelete.value}`, {
+    preserveState: true,
+    preserveScroll: true,
+    only: ['transactions'],
+    onSuccess: () => {
+      showDeleteModal.value = false;
+      transactionToDelete.value = null;
+      success('Transaksi berhasil dihapus');
+    },
+    onError: () => {
+      error('Gagal menghapus transaksi');
+    }
+  });
+};
+
+const confirmBulkDelete = () => {
+  if (selectedTransactions.value.length === 0) return;
+  
+  router.delete('/transactions', {
+    data: {
+      transaction_ids: selectedTransactions.value
+    },
+    preserveState: true,
+    preserveScroll: true,
+    only: ['transactions'],
+    onSuccess: () => {
+      showBulkDeleteModal.value = false;
+      selectedTransactions.value = [];
+      bulkMode.value = false;
+      success('Transaksi berhasil dihapus');
+    },
+    onError: () => {
+      error('Gagal menghapus transaksi');
+    }
+  });
+};
+
+const cancelDelete = () => {
+  showDeleteModal.value = false;
+  transactionToDelete.value = null;
+};
+
+const cancelBulkDelete = () => {
+  showBulkDeleteModal.value = false;
 };
 
 // Watch for URL changes
@@ -311,6 +414,14 @@ onMounted(() => {
             title="Filter">
             <Filter class="w-5 h-5" />
             <div v-if="hasActiveFilters" class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full"></div>
+          </button>
+
+          <button
+            @click="toggleBulkMode"
+            :class="bulkMode ? 'bg-white/30 ring-2 ring-white/50' : 'bg-white/20 hover:bg-white/30'"
+            class="p-3 rounded-xl text-white transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            title="Mode Hapus">
+            <Trash2 class="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -466,6 +577,49 @@ onMounted(() => {
       </div>
     </div>
 
+    <!-- Bulk Delete Controls -->
+    <div v-if="bulkMode" class="px-4 mb-4">
+      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <AlertTriangle class="w-5 h-5 text-red-600 dark:text-red-400" />
+            <span class="text-sm font-medium text-red-800 dark:text-red-200">Mode Hapus Aktif</span>
+          </div>
+          <span class="text-xs text-red-600 dark:text-red-400">
+            {{ selectedTransactions.length }} dari {{ deletableTransactions.length }} terpilih
+          </span>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <button
+            @click="toggleSelectAll"
+            class="px-3 py-1 text-xs border border-red-300 dark:border-red-700 rounded-lg hover:bg-red-100 dark:hover:bg-red-800/30 transition-colors text-red-700 dark:text-red-300"
+          >
+            {{ allSelected ? 'Batalkan Semua' : 'Pilih Semua' }}
+          </button>
+          
+          <button
+            @click="showBulkDeleteModal = true"
+            :disabled="!canBulkDelete"
+            class="px-3 py-1 text-xs bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
+          >
+            Hapus Terpilih ({{ selectedTransactions.length }})
+          </button>
+          
+          <button
+            @click="toggleBulkMode"
+            class="px-3 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300"
+          >
+            Batalkan
+          </button>
+        </div>
+        
+        <p class="text-xs text-red-600 dark:text-red-400 mt-2">
+          Hanya transaksi normal yang dapat dihapus
+        </p>
+      </div>
+    </div>
+
     <!-- Main Content: Daily Grouped Transactions -->
     <div class="px-2">
       <div v-for="group in transactions.data" :key="group.date"
@@ -497,9 +651,13 @@ onMounted(() => {
             v-for="transaction in group.transactions"
             :key="transaction.id"
             :transaction="transaction"
+            :bulk-mode="bulkMode"
+            :selected="selectedTransactions.includes(transaction.id)"
+            :can-delete="transaction.flag === 'normal'"
             @action="handleTransactionAction"
             @account-click="onAccountClick"
-            @category-click="onCategoryClick" />
+            @category-click="onCategoryClick"
+            @toggle-select="toggleSelectTransaction" />
         </div>
       </div>
 
@@ -565,6 +723,80 @@ onMounted(() => {
       @apply="applyFilters"
       @close="closeFilterModal" 
     />
+
+    <!-- Delete Confirmation Modal -->
+    <div v-if="showDeleteModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-sm w-full">
+        <div class="p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
+              <AlertTriangle class="w-5 h-5 text-red-600 dark:text-red-400" />
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Hapus Transaksi</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400">Tindakan ini tidak dapat dibatalkan</p>
+            </div>
+          </div>
+          
+          <p class="text-gray-700 dark:text-gray-300 mb-6">
+            Apakah Anda yakin ingin menghapus transaksi ini? 
+            Saldo akun akan disesuaikan secara otomatis.
+          </p>
+          
+          <div class="flex gap-3">
+            <button
+              @click="cancelDelete"
+              class="flex-1 px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Batal
+            </button>
+            <button
+              @click="confirmDelete"
+              class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            >
+              Hapus
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bulk Delete Confirmation Modal -->
+    <div v-if="showBulkDeleteModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-sm w-full">
+        <div class="p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
+              <Trash2 class="w-5 h-5 text-red-600 dark:text-red-400" />
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Hapus Transaksi</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400">Tindakan ini tidak dapat dibatalkan</p>
+            </div>
+          </div>
+          
+          <p class="text-gray-700 dark:text-gray-300 mb-6">
+            Apakah Anda yakin ingin menghapus {{ selectedTransactions.length }} transaksi yang dipilih?
+            Saldo akun akan disesuaikan secara otomatis.
+          </p>
+          
+          <div class="flex gap-3">
+            <button
+              @click="cancelBulkDelete"
+              class="flex-1 px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Batal
+            </button>
+            <button
+              @click="confirmBulkDelete"
+              class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            >
+              Hapus {{ selectedTransactions.length }} Transaksi
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <Link
       href="/transactions/create"

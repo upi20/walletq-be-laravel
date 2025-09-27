@@ -272,4 +272,83 @@ class TransactionController extends Controller
             return back()->withErrors(['error' => 'Gagal memperbarui transaksi: ' . $e->getMessage()])->withInput();
         }
     }
+
+    /**
+     * Delete single transaction
+     */
+    public function destroy(Request $request, $id)
+    {
+        $user = $request->user();
+        
+        try {
+            // Check if transaction can be deleted
+            if (!$this->transactionService->canDeleteTransaction($user, $id)) {
+                return back()->with('error', 'Transaksi ini tidak dapat dihapus. Hanya transaksi normal yang dapat dihapus.');
+            }
+            
+            $this->transactionService->deleteTransaction($user, $id);
+            
+            // Use back() to preserve current state and filters
+            return back()->with('success', 'Transaksi berhasil dihapus');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menghapus transaksi: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Bulk delete transactions
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $user = $request->user();
+        
+        $request->validate([
+            'transaction_ids' => 'required|array|min:1',
+            'transaction_ids.*' => 'required|integer|exists:transactions,id',
+        ], [
+            'transaction_ids.required' => 'Pilih minimal satu transaksi untuk dihapus.',
+            'transaction_ids.array' => 'Data transaksi tidak valid.',
+            'transaction_ids.min' => 'Pilih minimal satu transaksi untuk dihapus.',
+            'transaction_ids.*.exists' => 'Transaksi yang dipilih tidak ditemukan.',
+        ]);
+
+        try {
+            $transactionIds = $request->input('transaction_ids');
+            $deletedCount = $this->transactionService->bulkDeleteTransactions($user, $transactionIds);
+            
+            if ($deletedCount === 0) {
+                return back()->with('warning', 'Tidak ada transaksi yang dapat dihapus. Hanya transaksi normal yang dapat dihapus.');
+            }
+            
+            $message = $deletedCount === 1 
+                ? 'Berhasil menghapus 1 transaksi'
+                : "Berhasil menghapus {$deletedCount} transaksi";
+            
+            // Use back() to preserve current state and filters
+            return back()->with('success', $message);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menghapus transaksi: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get filters for preserving after delete operations
+     */
+    protected function getFiltersForPreservation(Request $request): array
+    {
+        $preserveParams = [
+            'period', 'date_from', 'date_to', 'month', 'year',
+            'type', 'search', 'account_ids', 'category_ids', 
+            'tag_ids', 'flags', 'amount_min', 'amount_max'
+        ];
+        
+        $filters = [];
+        foreach ($preserveParams as $param) {
+            if ($request->has($param) && $request->get($param) !== null && $request->get($param) !== '') {
+                $filters[$param] = $request->get($param);
+            }
+        }
+        
+        return $filters;
+    }
 }

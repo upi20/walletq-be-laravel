@@ -10,13 +10,17 @@ import {
   Tag as TagIcon,
   Eye,
   Edit,
-  Trash2
+  Trash2,
+  Check
 } from 'lucide-vue-next';
 import { Transaction } from '@/types';
 import formatCurrency from '@/composables/formatCurrency';
 
 interface Props {
   transaction: Transaction;
+  bulkMode?: boolean;
+  selected?: boolean;
+  canDelete?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -25,6 +29,7 @@ const emit = defineEmits<{
   action: [action: string, transactionId: number];
   accountClick: [accountId: number];
   categoryClick: [categoryId: number];
+  toggleSelect: [transactionId: number];
 }>();
 
 // State
@@ -87,6 +92,12 @@ const handleAction = (action: string) => {
   showActionMenu.value = false;
 };
 
+const handleToggleSelect = () => {
+  if (props.bulkMode && props.canDelete) {
+    emit('toggleSelect', props.transaction.id);
+  }
+};
+
 const dateTimeOnly = (date: string) => {
   return new Date(date).toLocaleTimeString('id-ID', {
     hour: '2-digit',
@@ -97,8 +108,24 @@ const dateTimeOnly = (date: string) => {
 </script>
 
 <template>
-  <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-200">
+  <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-200" :class="{ 'bg-red-50 dark:bg-red-900/10': bulkMode && !canDelete }">
     <div class="flex items-start gap-3">
+      <!-- Bulk Mode Checkbox -->
+      <div v-if="bulkMode" class="flex-shrink-0 mt-1">
+        <button
+          @click="handleToggleSelect"
+          :disabled="!canDelete"
+          class="w-5 h-5 rounded border-2 transition-all duration-200 flex items-center justify-center"
+          :class="canDelete 
+            ? (selected 
+                ? 'bg-teal-500 border-teal-500 hover:bg-teal-600 hover:border-teal-600' 
+                : 'border-gray-300 dark:border-gray-600 hover:border-teal-500')
+            : 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 cursor-not-allowed opacity-50'"
+        >
+          <Check v-if="selected && canDelete" class="w-3 h-3 text-white" />
+        </button>
+      </div>
+
       <!-- Transaction Icon -->
       <div
         class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
@@ -205,12 +232,12 @@ const dateTimeOnly = (date: string) => {
     <div
       class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl w-full max-w-xs mx-auto">
       <div class="py-2">
-        <button
+        <!-- <button
           @click="handleAction('view')"
           class="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
           <Eye class="w-4 h-4" />
           Lihat Detail
-        </button>
+        </button> -->
 
         <button
           @click="handleAction('edit')"
@@ -223,9 +250,13 @@ const dateTimeOnly = (date: string) => {
 
         <button
           @click="handleAction('delete')"
-          class="flex items-center gap-3 w-full px-4 py-3 text-sm text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200">
+          :disabled="!canDelete"
+          :class="canDelete 
+            ? 'text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'
+            : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'"
+          class="flex items-center gap-3 w-full px-4 py-3 text-sm transition-colors duration-200">
           <Trash2 class="w-4 h-4" />
-          Hapus Transaksi
+          {{ canDelete ? 'Hapus Transaksi' : 'Tidak Dapat Dihapus' }}
         </button>
       </div>
     </div>
