@@ -9,7 +9,8 @@ import {
   Calendar,
   DollarSign,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  X
 } from 'lucide-vue-next';
 
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
@@ -22,36 +23,7 @@ import TransactionSummaryCards from '@/pages/Transactions/Partials/SummaryCards.
 import SearchModal from './Partials/SearchModal.vue';
 import FilterModal from './Partials/FilterModal.vue';
 import TransactionCard from './Partials/TransactionCard.vue';
-import { Account, Tag, Transaction, TransactionCategory } from '@/types';
-
-interface TransactionListResponse {
-  data: Array<{
-    label: string;
-    day: string;
-    month: string;
-    date: string;
-    amount: number;
-    transactions: Transaction[];
-  }>;
-  summary: {
-    total_income: number;
-    total_expense: number;
-    net_amount: number;
-    transaction_count: number;
-    month: string;
-  };
-  master_data: {
-    accounts: Account[];
-    income_categories: TransactionCategory[];
-    expense_categories: TransactionCategory[];
-    tags: Tag[];
-    flag_options: Array<{ value: string; label: string; }>;
-    type_options: Array<{ value: string; label: string; }>;
-  };
-  filters: {
-    month?: string; // YYYY-MM format
-  };
-}
+import { TransactionListResponse, TransactionFilters } from '@/types';
 
 interface Props {
   transactions: TransactionListResponse;
@@ -72,38 +44,48 @@ const loading = ref(false);
 const showSearchModal = ref(false);
 const showFilterModal = ref(false);
 
-// Current month state
-const currentMonth = ref(props.transactions.filters.month || new Date().toISOString().slice(0, 7)); // YYYY-MM format
-const searchQuery = ref('');
-const currentFilters = ref({
-  account_ids: [] as number[],
-  category_ids: [] as number[],
-  type: 'both' as string,
-  flags: [] as string[],
-  tag_ids: [] as number[],
-  amount_min: undefined as number | undefined,
-  amount_max: undefined as number | undefined,
+// Current filters state
+const currentFilters = ref<TransactionFilters>({
+  ...props.transactions.filters
 });
 
 // Computed
-const currentMonthLabel = computed(() => {
-  const date = new Date(currentMonth.value + '-01');
-  return date.toLocaleDateString('id-ID', {
-    month: 'long',
-    year: 'numeric'
-  });
+const currentPeriodLabel = computed(() => {
+  const period = currentFilters.value.period || 'month';
+  
+  if (period === 'today') return 'Hari Ini';
+  if (period === 'week') return 'Minggu Ini';
+  if (period === 'year') return 'Tahun Ini';
+  if (period === 'all') return 'Semua Waktu';
+  
+  if (period === 'month') {
+    const month = currentFilters.value.month || new Date().toISOString().slice(0, 7);
+    const date = new Date(month + '-01');
+    return date.toLocaleDateString('id-ID', {
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+  
+  if (period === 'custom' && currentFilters.value.date_from && currentFilters.value.date_to) {
+    return `${currentFilters.value.date_from} - ${currentFilters.value.date_to}`;
+  }
+  
+  return 'Filter Aktif';
 });
 
 const hasActiveFilters = computed(() => {
+  const filters = currentFilters.value;
   return !!(
-    searchQuery.value ||
-    currentFilters.value.account_ids.length > 0 ||
-    currentFilters.value.category_ids.length > 0 ||
-    currentFilters.value.tag_ids.length > 0 ||
-    currentFilters.value.type !== 'both' ||
-    currentFilters.value.flags.length > 0 ||
-    currentFilters.value.amount_min ||
-    currentFilters.value.amount_max
+    filters.search ||
+    (filters.account_ids && filters.account_ids.length > 0) ||
+    (filters.category_ids && filters.category_ids.length > 0) ||
+    (filters.tag_ids && filters.tag_ids.length > 0) ||
+    (filters.flags && filters.flags.length > 0) ||
+    filters.type !== 'both' ||
+    filters.amount_min ||
+    filters.amount_max ||
+    filters.period !== 'month'
   );
 });
 
@@ -126,40 +108,118 @@ const closeFilterModal = () => {
 };
 
 const previousMonth = () => {
-  const date = new Date(currentMonth.value + '-01');
+  const currentMonth = currentFilters.value.month || new Date().toISOString().slice(0, 7);
+  const date = new Date(currentMonth + '-01');
   date.setMonth(date.getMonth() - 1);
   const newMonth = date.toISOString().slice(0, 7);
-  router.get('/transactions', { month: newMonth });
+  
+  applyFilters({ ...currentFilters.value, month: newMonth, period: 'month' });
 };
 
 const nextMonth = () => {
-  const date = new Date(currentMonth.value + '-01');
+  const currentMonth = currentFilters.value.month || new Date().toISOString().slice(0, 7);
+  const date = new Date(currentMonth + '-01');
   date.setMonth(date.getMonth() + 1);
   const newMonth = date.toISOString().slice(0, 7);
-  router.get('/transactions', { month: newMonth });
+  
+  applyFilters({ ...currentFilters.value, month: newMonth, period: 'month' });
 };
 
 const applySearchFilter = (query: string) => {
-  searchQuery.value = query;
+  applyFilters({ ...currentFilters.value, search: query });
   closeSearchModal();
 };
 
-const applyFilters = (filters: any) => {
-  currentFilters.value = { ...filters };
-  closeFilterModal();
+const applyFilters = (filters: TransactionFilters) => {
+  loading.value = true;
+  
+  // Clean up empty values
+  const cleanFilters = Object.fromEntries(
+    Object.entries(filters).filter(([_, value]) => {
+      if (Array.isArray(value)) return value.length > 0;
+      return value !== null && value !== undefined && value !== '';
+    })
+  );
+
+  router.get('/transactions', cleanFilters, {
+    preserveState: true,
+    preserveScroll: true,
+    onSuccess: () => {
+      loading.value = false;
+    },
+    onError: () => {
+      error('Gagal memuat data transaksi');
+      loading.value = false;
+    }
+  });
 };
 
 const clearAllFilters = () => {
-  searchQuery.value = '';
-  currentFilters.value = {
-    account_ids: [],
-    category_ids: [],
-    type: 'both',
-    flags: [],
-    tag_ids: [],
-    amount_min: undefined,
-    amount_max: undefined,
-  };
+  applyFilters({
+    period: 'month',
+    month: new Date().toISOString().slice(0, 7),
+    type: 'both'
+  });
+};
+
+const quickFilterByPeriod = (period: string) => {
+  applyFilters({ ...currentFilters.value, period });
+};
+
+const dateFormatter = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+};
+
+// Filter removal methods
+const removeFilter = (filterType: string) => {
+  const newFilters = { ...currentFilters.value };
+  
+  if (filterType === 'search') {
+    delete newFilters.search;
+  } else if (filterType === 'type') {
+    newFilters.type = 'both';
+  } else if (filterType === 'amount') {
+    delete newFilters.amount_min;
+    delete newFilters.amount_max;
+  }
+  
+  applyFilters(newFilters);
+};
+
+const removeAccountFilter = (accountId: number) => {
+  const newFilters = { ...currentFilters.value };
+  newFilters.account_ids = (newFilters.account_ids || []).filter(id => id !== accountId);
+  applyFilters(newFilters);
+};
+
+const removeCategoryFilter = (categoryId: number) => {
+  const newFilters = { ...currentFilters.value };
+  newFilters.category_ids = (newFilters.category_ids || []).filter(id => id !== categoryId);
+  applyFilters(newFilters);
+};
+
+// Click actions for TransactionCard
+const onAccountClick = (accountId: number) => {
+  const currentAccountIds = currentFilters.value.account_ids || [];
+  const newAccountIds = currentAccountIds.includes(accountId) 
+    ? currentAccountIds.filter(id => id !== accountId)
+    : [...currentAccountIds, accountId];
+  
+  applyFilters({ ...currentFilters.value, account_ids: newAccountIds });
+};
+
+const onCategoryClick = (categoryId: number) => {
+  const currentCategoryIds = currentFilters.value.category_ids || [];
+  const newCategoryIds = currentCategoryIds.includes(categoryId)
+    ? currentCategoryIds.filter(id => id !== categoryId)
+    : [...currentCategoryIds, categoryId];
+  
+  applyFilters({ ...currentFilters.value, category_ids: newCategoryIds });
 };
 
 const handleTransactionAction = (action: string, transactionId: number) => {
@@ -175,14 +235,6 @@ const handleTransactionAction = (action: string, transactionId: number) => {
       break;
   }
 };
-
-function dateFormatter(date: string) {
-  return new Date(date).toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
-}
 
 // Watch for URL changes
 watch(() => currentFilters.value, (newFilters) => {
@@ -206,7 +258,7 @@ onMounted(() => {
       <div class="flex items-center justify-between mb-4">
         <div class="flex-1 min-w-0">
           <h1 class="text-xl font-semibold text-white truncate">{{ pageTitle }}</h1>
-          <p class="text-sm text-teal-100 dark:text-teal-200 truncate">{{ currentMonthLabel }}</p>
+          <p class="text-sm text-teal-100 dark:text-teal-200 truncate">{{ currentPeriodLabel }}</p>
         </div>
 
         <div class="flex items-center gap-2 ml-3">
@@ -228,8 +280,25 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Month Navigation -->
-      <div class="flex items-center justify-between mb-4 bg-white/10 rounded-xl p-3">
+      <!-- Quick Period Filters -->
+      <div class="mb-4">
+        <div class="flex overflow-x-auto pb-2 -mx-4 px-4 gap-2 scrollbar-hide">
+          <button
+            v-for="period in transactions.master_data.period_options"
+            :key="period.value"
+            @click="quickFilterByPeriod(period.value)"
+            class="flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap min-h-[36px]"
+            :class="currentFilters.period === period.value || (!currentFilters.period && period.value === 'month')
+              ? 'bg-white text-teal-600 shadow-md'
+              : 'bg-white/20 text-white hover:bg-white/30'"
+          >
+            {{ period.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Month Navigation (only show for month period) -->
+      <div v-if="(currentFilters.period || 'month') === 'month'" class="flex items-center justify-between mb-4 bg-white/10 rounded-xl p-3">
         <button
           @click="previousMonth"
           class="p-2 hover:bg-white/20 rounded-lg text-white transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center">
@@ -238,7 +307,7 @@ onMounted(() => {
 
         <div class="flex items-center gap-2 text-white">
           <Calendar class="w-4 h-4" />
-          <span class="font-medium">{{ currentMonthLabel }}</span>
+          <span class="font-medium">{{ currentPeriodLabel }}</span>
         </div>
 
         <button
@@ -280,6 +349,66 @@ onMounted(() => {
       </div>
     </div>
 
+    <!-- Active Filters Chips -->
+    <div v-if="hasActiveFilters" class="px-4 mb-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Filter Aktif:</span>
+        <button
+          @click="clearAllFilters"
+          class="text-xs text-teal-600 hover:text-teal-700 font-medium"
+        >
+          Hapus Semua
+        </button>
+      </div>
+      
+      <div class="flex flex-wrap gap-2">
+        <!-- Search Filter -->
+        <div v-if="currentFilters.search" class="flex items-center gap-1 px-3 py-1 bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200 rounded-full text-sm">
+          <Search class="w-3 h-3" />
+          <span>{{ currentFilters.search }}</span>
+          <button @click="removeFilter('search')" class="ml-1 hover:bg-teal-200 dark:hover:bg-teal-800 rounded-full p-0.5">
+            <X class="w-3 h-3" />
+          </button>
+        </div>
+        
+        <!-- Type Filter -->
+        <div v-if="currentFilters.type && currentFilters.type !== 'both'" class="flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
+          <span>{{ currentFilters.type === 'income' ? 'Pemasukan' : 'Pengeluaran' }}</span>
+          <button @click="removeFilter('type')" class="ml-1 hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5">
+            <X class="w-3 h-3" />
+          </button>
+        </div>
+        
+        <!-- Account Filters -->
+        <div v-for="accountId in (currentFilters.account_ids || [])" :key="`account-${accountId}`" class="flex items-center gap-1 px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm">
+          <span>{{ transactions.master_data.accounts.find(a => a.id === accountId)?.name || `Account ${accountId}` }}</span>
+          <button @click="removeAccountFilter(accountId)" class="ml-1 hover:bg-green-200 dark:hover:bg-green-800 rounded-full p-0.5">
+            <X class="w-3 h-3" />
+          </button>
+        </div>
+        
+        <!-- Category Filters -->
+        <div v-for="categoryId in (currentFilters.category_ids || [])" :key="`category-${categoryId}`" class="flex items-center gap-1 px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-sm">
+          <span>{{ [...transactions.master_data.income_categories, ...transactions.master_data.expense_categories].find(c => c.id === categoryId)?.name || `Category ${categoryId}` }}</span>
+          <button @click="removeCategoryFilter(categoryId)" class="ml-1 hover:bg-purple-200 dark:hover:bg-purple-800 rounded-full p-0.5">
+            <X class="w-3 h-3" />
+          </button>
+        </div>
+        
+        <!-- Amount Range Filter -->
+        <div v-if="currentFilters.amount_min || currentFilters.amount_max" class="flex items-center gap-1 px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded-full text-sm">
+          <DollarSign class="w-3 h-3" />
+          <span>
+            {{ currentFilters.amount_min ? formatCurrency(currentFilters.amount_min, 'decimal') : '0' }} - 
+            {{ currentFilters.amount_max ? formatCurrency(currentFilters.amount_max, 'decimal') : '∞' }}
+          </span>
+          <button @click="removeFilter('amount')" class="ml-1 hover:bg-orange-200 dark:hover:bg-orange-800 rounded-full p-0.5">
+            <X class="w-3 h-3" />
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Main Content: Daily Grouped Transactions -->
     <div class="px-2">
       <div v-for="group in transactions.data" :key="group.date"
@@ -311,7 +440,9 @@ onMounted(() => {
             v-for="transaction in group.transactions"
             :key="transaction.id"
             :transaction="transaction"
-            @action="handleTransactionAction" />
+            @action="handleTransactionAction"
+            @account-click="onAccountClick"
+            @category-click="onCategoryClick" />
         </div>
       </div>
 
@@ -345,8 +476,37 @@ onMounted(() => {
     </div>
 
     <!-- Search Modal -->
-    <SearchModal v-if="showSearchModal" :initial-query="searchQuery" @apply="applySearchFilter"
-      @close="closeSearchModal" />
+    <SearchModal 
+      v-if="showSearchModal" 
+      :initial-query="currentFilters.search || ''"
+      @apply="applySearchFilter"
+      @close="closeSearchModal" 
+    />
+    
+    <!-- Filter Modal -->
+    <FilterModal 
+      v-if="showFilterModal"
+      :filters="currentFilters"
+      :master-data="transactions.master_data"
+      @apply="applyFilters"
+      @close="closeFilterModal" 
+    />
 
   </FinancialAppLayout>
 </template>
+
+<style scoped>
+/* Hide scrollbar for period filters */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -webkit-overflow-scrolling: touch;
+}
+</style>

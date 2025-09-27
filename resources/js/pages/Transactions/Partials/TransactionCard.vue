@@ -23,6 +23,8 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
   action: [action: string, transactionId: number];
+  accountClick: [accountId: number];
+  categoryClick: [categoryId: number];
 }>();
 
 // State
@@ -118,18 +120,26 @@ const handleAction = (action: string) => {
             
             <!-- Account & Category Info -->
             <div class="flex items-center gap-2 mt-1 text-xs text-gray-500 dark:text-gray-400">
-              <CreditCard class="w-3 h-3" />
-              <span>{{ transaction.account?.name || 'Akun Tidak Diketahui' }}</span>
+              <button 
+                @click="emit('accountClick', transaction.account_id!)"
+                class="flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-1 py-0.5 -mx-1 transition-colors duration-200"
+              >
+                <CreditCard class="w-3 h-3" />
+                <span>{{ transaction.account?.name || 'Akun Tidak Diketahui' }}</span>
+              </button>
               
               <span class="text-gray-300 dark:text-gray-600">•</span>
               
-              <div class="flex items-center gap-1">
+              <button 
+                @click="emit('categoryClick', transaction.transaction_category_id!)"
+                class="flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-1 py-0.5 -mx-1 transition-colors duration-200"
+              >
                 <div 
                   class="w-2 h-2 rounded-full"
                   :class="transaction.category?.type === 'income' ? 'bg-teal-500' : 'bg-coral-500'"
                 ></div>
                 <span>{{ transaction.category?.name || 'Kategori Tidak Diketahui' }}</span>
-              </div>
+              </button>
             </div>
 
             <!-- Flag Badge & Tags -->

@@ -12,11 +12,17 @@ import {
 
 interface Props {
   filters: {
-    account_ids: number[];
-    category_ids: number[];
-    type: string;
-    flags: string[];
-    tag_ids: number[];
+    period?: string;
+    date_from?: string;
+    date_to?: string;
+    month?: string;
+    year?: string;
+    type?: string;
+    account_ids?: number[];
+    category_ids?: number[];
+    tag_ids?: number[];
+    flags?: string[];
+    search?: string;
     amount_min?: number;
     amount_max?: number;
   };
@@ -33,6 +39,7 @@ interface Props {
     tags: Array<{ id: number; name: string; }>;
     flag_options: Array<{ value: string; label: string; }>;
     type_options: Array<{ value: string; label: string; }>;
+    period_options: Array<{ value: string; label: string; }>;
   };
 }
 

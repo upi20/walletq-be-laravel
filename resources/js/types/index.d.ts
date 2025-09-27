@@ -204,3 +204,47 @@ export interface ImportTransaction {
 
 export type BreadcrumbItemType = BreadcrumbItem;
 
+// Transaction List Response Types (Enhanced)
+export interface TransactionListResponse {
+  data: Array<{
+    label: string;
+    day: string;
+    month: string;
+    date: string;
+    amount: number;
+    transactions: Transaction[];
+  }>;
+  summary: {
+    total_income: number;
+    total_expense: number;
+    net_amount: number;
+    transaction_count: number;
+  };
+  master_data: {
+    accounts: Account[];
+    income_categories: TransactionCategory[];
+    expense_categories: TransactionCategory[];
+    tags: Tag[];
+    flag_options: Array<{ value: string; label: string; }>;
+    type_options: Array<{ value: string; label: string; }>;
+    period_options: Array<{ value: string; label: string; }>;
+  };
+  filters: TransactionFilters;
+}
+
+export interface TransactionFilters {
+  period?: 'today' | 'week' | 'month' | 'year' | 'all' | 'custom';
+  date_from?: string;
+  date_to?: string;
+  month?: string;
+  year?: string;
+  type?: 'income' | 'expense' | 'both';
+  account_ids?: number[];
+  category_ids?: number[];
+  tag_ids?: number[];
+  flags?: string[];
+  search?: string;
+  amount_min?: number;
+  amount_max?: number;
+}
+
