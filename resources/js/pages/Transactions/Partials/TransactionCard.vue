@@ -129,6 +129,7 @@ const dateTimeOnly = (date: string) => {
               <span class="text-gray-300 dark:text-gray-600">•</span>
 
               <button
+                v-if="transaction.transaction_category_id"
                 @click="emit('categoryClick', transaction.transaction_category_id!)"
                 class="flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-1 py-0.5 -mx-1 transition-colors duration-200">
                 <div
@@ -182,7 +183,7 @@ const dateTimeOnly = (date: string) => {
             </div>
 
             <!-- Action Menu -->
-            <div class="relative">
+            <div v-if="transaction.flag === 'normal'" class="relative">
               <button
                 @click="toggleActionMenu"
                 class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">

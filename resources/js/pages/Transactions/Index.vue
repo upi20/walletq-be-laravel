@@ -6,6 +6,7 @@ import {
   Filter,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Calendar,
   DollarSign,
   TrendingUp,
@@ -42,6 +43,7 @@ const { success, error, warning, info } = useToast();
 const loading = ref(false);
 const showSearchModal = ref(false);
 const showFilterModal = ref(false);
+const showMonthPicker = ref(false);
 
 // Current filters state
 const currentFilters = ref<TransactionFilters>({
@@ -91,6 +93,26 @@ const hasActiveFilters = computed(() => {
     filters.amount_max ||
     filters.period !== 'month'
   );
+});
+
+// Generate month options (last 12 months + next 6 months)
+const monthOptions = computed(() => {
+  const options = [];
+  const now = new Date();
+  
+  // Generate from 12 months ago to 6 months ahead
+  for (let i = -12; i <= 6; i++) {
+    const date = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    const value = date.toISOString().slice(0, 7); // YYYY-MM format
+    const label = date.toLocaleDateString('id-ID', {
+      month: 'long',
+      year: 'numeric'
+    });
+    
+    options.push({ value, label });
+  }
+  
+  return options;
 });
 
 
@@ -239,6 +261,15 @@ const handleTransactionAction = (action: string, transactionId: number) => {
   }
 };
 
+const toggleMonthPicker = () => {
+  showMonthPicker.value = !showMonthPicker.value;
+};
+
+const selectMonth = (month: string) => {
+  applyFilters({ ...currentFilters.value, month, period: 'month' });
+  showMonthPicker.value = false;
+};
+
 // Watch for URL changes
 watch(() => currentFilters.value, (newFilters) => {
   // Update URL parameters when filters change
@@ -308,9 +339,31 @@ onMounted(() => {
           <ChevronLeft class="w-5 h-5" />
         </button>
 
-        <div class="flex items-center gap-2 text-white">
-          <Calendar class="w-4 h-4" />
-          <span class="font-medium">{{ currentPeriodLabel }}</span>
+        <div class="relative">
+          <button 
+            @click="toggleMonthPicker"
+            class="flex items-center gap-2 text-white cursor-pointer hover:bg-white/10 rounded-lg px-2 py-1 transition-colors duration-200"
+          >
+            <Calendar class="w-4 h-4" />
+            <span class="font-medium">{{ currentPeriodLabel }}</span>
+            <ChevronDown class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': showMonthPicker }" />
+          </button>
+
+          <!-- Month Picker Dropdown -->
+          <div 
+            v-if="showMonthPicker"
+            class="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-64 overflow-y-auto"
+          >
+            <button
+              v-for="option in monthOptions"
+              :key="option.value"
+              @click="selectMonth(option.value)"
+              class="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 text-gray-900 dark:text-white"
+              :class="{ 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400': option.value === (currentFilters.month || new Date().toISOString().slice(0, 7)) }"
+            >
+              {{ option.label }}
+            </button>
+          </div>
         </div>
 
         <button
