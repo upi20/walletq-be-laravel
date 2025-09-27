@@ -8,7 +8,7 @@ export default defineConfig({
         laravel({
             input: ['resources/js/app.ts'],
             ssr: 'resources/js/ssr.ts',
-            refresh: true,
+            refresh: false,
         }),
         wayfinder({
             formVariants: true,

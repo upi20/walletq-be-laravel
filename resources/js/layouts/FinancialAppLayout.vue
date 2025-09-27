@@ -14,6 +14,7 @@ import {
 } from 'lucide-vue-next';
 import formatCurrency from '@/composables/formatCurrency';
 import ToastContainer from '@/components/Toast/ToastContainer.vue';
+import ConfirmationContainer from '@/components/Confirmation/ConfirmationContainer.vue';
 
 interface Props {
   showHeader?: boolean;
@@ -135,7 +136,7 @@ bottomNavItems.forEach(item => {
     <!-- Bottom Navigation -->
     <nav 
       v-if="showBottomNav" 
-      class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 h-16 flex items-center justify-around px-4 transition-colors duration-300"
+      class="fixed bottom-0 left-0 right-0 max-w-[640px] mx-auto bg-white dark:bg-gray-900 shadow-sm border-gray-200 dark:border-gray-700 h-16 flex items-center justify-around px-4 transition-colors duration-300"
     >
       <Link 
         v-for="item in bottomNavItems" 
@@ -161,6 +162,9 @@ bottomNavItems.forEach(item => {
 
     <!-- Toast Container -->
     <ToastContainer />
+    
+    <!-- Confirmation Container -->
+    <ConfirmationContainer />
   </div>
 </template>
 

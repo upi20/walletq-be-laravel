@@ -9,6 +9,7 @@ import {
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import { useToast } from '@/composables/useToast';
+import { useConfirmation } from '@/composables/useConfirmation';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 
 // Translation
@@ -16,6 +17,9 @@ const { trans } = useTranslation();
 
 // Toast notifications
 const { success, error, warning, info } = useToast();
+
+// Confirmation dialogs
+const { confirmAction, alert } = useConfirmation();
 
 interface AccountCategory {
   id: number;
@@ -36,7 +40,19 @@ const form = useForm({
   is_active: true,
 });
 
-const submit = () => {
+const submit = async () => {
+  // Confirm important action before submitting
+  if (form.initial_balance > 10000000) { // Jika saldo awal > 10 juta
+    const confirmed = await confirmAction(
+      'Konfirmasi Saldo Besar',
+      `Anda akan membuat akun dengan saldo awal ${formatNumber(form.initial_balance.toString())}. Apakah data ini sudah benar?`
+    );
+    
+    if (!confirmed) {
+      return;
+    }
+  }
+  
   form.post('/settings/accounts', {
     onStart: () => {
       info('Menyimpan akun...', {

@@ -125,6 +125,7 @@ class AccountController extends Controller
 
     public function destroy(Account $account)
     {
+        dd('masuk');
         $this->authorize('delete', $account);
 
         // Check if account has transactions

@@ -20,6 +20,7 @@ import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
 import formatCurrency from '@/composables/formatCurrency';
 import { useTranslation } from '@/composables/useTranslation';
 import { useToast } from '@/composables/useToast';
+import { useConfirmation } from '@/composables/useConfirmation';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 
 interface Account {
@@ -58,6 +59,9 @@ const { trans } = useTranslation();
 
 // Toast notifications
 const { success, error, warning, info } = useToast();
+
+// Confirmation dialogs
+const { confirmDelete, confirmAction, alert } = useConfirmation();
 
 const activeMenu = ref<number | null>(null);
 
@@ -135,8 +139,10 @@ const toggleSort = (field: 'name' | 'current_balance') => {
   search();
 };
 
-const deleteAccount = (account: Account) => {
-  if (confirm(`${trans('accounts.delete_confirmation')} "${account.name}"?`)) {
+const deleteAccount = async (account: Account) => {
+  const confirmed = await confirmDelete(account.name);
+  
+  if (confirmed) {
     router.delete(`/settings/accounts/${account.id}`, {
       onStart: () => {
         info('Menghapus akun...', {
@@ -193,6 +199,34 @@ const showToastExamples = () => {
   }, 3000);
 };
 
+// Example confirmation functions for demonstration
+const showConfirmationExamples = async () => {
+  // Simple delete confirmation
+  const deleteConfirmed = await confirmDelete('Data Penting');
+  if (deleteConfirmed) {
+    success('Item berhasil dihapus!');
+  }
+  
+  // Action confirmation
+  setTimeout(async () => {
+    const actionConfirmed = await confirmAction(
+      'Konfirmasi Tindakan Penting',
+      'Apakah Anda yakin ingin melanjutkan proses ini? Tindakan ini akan mempengaruhi semua data terkait.'
+    );
+    if (actionConfirmed) {
+      info('Proses dilanjutkan', { message: 'Tindakan berhasil dikonfirmasi.' });
+    }
+  }, 1000);
+  
+  // Alert info
+  setTimeout(async () => {
+    await alert(
+      'Informasi Penting',
+      'Sistem akan mengalami pemeliharaan pada hari Minggu pukul 02:00 - 05:00 WIB. Mohon maaf atas ketidaknyamanannya.'
+    );
+  }, 2000);
+};
+
 // hide all toggle menu when clicking outside
 document.addEventListener('click', (event) => {
   const target = event.target as HTMLElement;
@@ -239,14 +273,25 @@ const totalCurrentBalanceSelected = computed(() => {
         
         <div class="flex items-center gap-2">
           <LanguageSwitcher />
-          <!-- Demo Toast Button -->
-          <button
-            @click="showToastExamples"
-            class="px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 shadow-md hover:shadow-lg"
-            title="Demo Toast Notifications"
-          >
-            🔔 Demo
-          </button>
+          <!-- Demo Buttons -->
+          <div class="flex gap-2">
+            <!-- Demo Toast Button -->
+            <!-- <button
+              @click="showToastExamples"
+              class="px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 shadow-md hover:shadow-lg"
+              title="Demo Toast Notifications"
+            >
+              🔔 Toast
+            </button> -->
+            <!-- Demo Confirmation Button -->
+            <!-- <button
+              @click="showConfirmationExamples"
+              class="px-3 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm rounded-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
+              title="Demo Confirmation Dialogs"
+            >
+              ❓ Confirm
+            </button> -->
+          </div>
         </div>
       </div>
       

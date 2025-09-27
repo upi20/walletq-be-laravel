@@ -84,7 +84,7 @@ const settingsItems = computed(() => [
         v-for="item in settingsItems"
         :key="item.href"
         :href="item.href"
-        class="group block p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300"
+        class="group block p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300"
       >
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">

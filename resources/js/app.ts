@@ -7,6 +7,7 @@ import { createApp, h } from 'vue';
 import { initializeTheme } from './composables/useAppearance';
 import languagePlugin from './plugins/language';
 import toastPlugin from './plugins/toast';
+import confirmationPlugin from './plugins/confirmation';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -18,6 +19,7 @@ createInertiaApp({
             .use(plugin)
             .use(languagePlugin)
             .use(toastPlugin)
+            .use(confirmationPlugin)
             .mount(el);
     },
     progress: {
