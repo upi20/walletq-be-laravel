@@ -63,8 +63,13 @@ class Account extends Model
                 }
             });
 
-        $this->current_balance = $balance;
-        $this->save();
+        if($this->current_balance != $balance) {
+            $this->current_balance = $balance;
+            $this->save();
+        }
+
+        // Update user's total balance
+        User::refreshBalance($this->user_id);
 
         return $balance;
     }

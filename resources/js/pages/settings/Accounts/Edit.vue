@@ -11,7 +11,7 @@ import { useTranslation } from '@/composables/useTranslation';
 import { useToast } from '@/composables/useToast';
 import { useConfirmation } from '@/composables/useConfirmation';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
-import { AccountCategory } from '@/types';
+import { Account, AccountCategory } from '@/types';
 
 // Translation
 const { trans } = useTranslation();
@@ -23,17 +23,18 @@ const { success, error, warning, info } = useToast();
 const { confirmAction, alert } = useConfirmation();
 
 interface Props {
+  account: Account;
   categories: AccountCategory[];
 }
 
 const props = defineProps<Props>();
 
 const form = useForm({
-  name: '',
-  note: '',
-  account_category_id: '',
-  initial_balance: 0,
-  // is_active: true,
+  name: props.account.name || '',
+  note: props.account.note || '',
+  account_category_id: props.account.account_category_id || '',
+  initial_balance: props.account.initial_balance || 0,
+  // is_active: props.account.is_active || true,
 });
 
 const submit = async () => {
@@ -49,7 +50,7 @@ const submit = async () => {
     }
   }
   
-  form.post('/settings/accounts', {
+  form.put(`/settings/accounts/${props.account.id}`, {
     onStart: () => {
       info('Menyimpan akun...', {
         message: 'Sedang memproses data akun baru.',
@@ -128,11 +129,11 @@ const handleBalanceInput = (event: Event) => {
           <CreditCard class="w-5 h-5 text-white" />
         </div>
         <h1 class="text-3xl font-bold bg-gradient-to-r from-teal-600 to-coral-600 bg-clip-text text-transparent">
-          {{ trans('settings.items.accounts.title_create') }}
+          Edit Rekening
         </h1>
       </div>
       <p class="text-gray-600 dark:text-gray-300">
-        {{ trans('settings.items.accounts.note_create') }}
+        Edit detail rekening. Pastikan informasi yang Anda masukkan sudah benar.
       </p>
     </div>
 
@@ -243,7 +244,7 @@ const handleBalanceInput = (event: Event) => {
               class="flex-1 flex items-center justify-center px-6 py-3 bg-gradient-to-r from-teal-600 to-coral-600 text-white rounded-xl font-medium hover:from-teal-700 hover:to-coral-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save class="w-5 h-5 mr-2" />
-              {{ form.processing ? trans('settings.items.accounts.btn.save_progress') : trans('settings.items.accounts.btn.save') }}
+              {{ form.processing ? 'Menyimpan...' : 'Update Rekening' }}
             </button>
             
             <Link

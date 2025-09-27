@@ -95,4 +95,19 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public function syncBalance()
+    {
+        // sync each account balance
+        foreach($this->accounts as $account) {
+            $account->recalculateBalance();
+        }
+        // then update user's total balance
+        $totalBalance = $this->accounts()->sum('current_balance');
+        if($this->balance != $totalBalance) {
+            $this->balance = $totalBalance;
+            $this->save();
+        }
+        return $this->balance;
+    }
 }

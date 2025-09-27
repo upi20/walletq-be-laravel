@@ -22,25 +22,8 @@ import { useTranslation } from '@/composables/useTranslation';
 import { useToast } from '@/composables/useToast';
 import { useConfirmation } from '@/composables/useConfirmation';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
+import { Account, AccountCategory } from '@/types';
 
-interface Account {
-  id: number;
-  name: string;
-  description: string | null;
-  initial_balance: number;
-  current_balance: number;
-  is_active: boolean;
-  category: {
-    id: number;
-    name: string;
-  } | null;
-  created_at: string;
-}
-
-interface AccountCategory {
-  id: number;
-  name: string;
-}
 
 interface Props {
   accounts: Account[];
@@ -48,11 +31,10 @@ interface Props {
   filters: {
     search?: string;
   };
+  totalBalance: number;
 }
 
 const props = defineProps<Props>();
-const page = usePage();
-const totalBalance = page.props.auth?.user.balance || 0;
 
 // Translation
 const { trans } = useTranslation();
@@ -306,7 +288,7 @@ const totalCurrentBalanceSelected = computed(() => {
                 Total Saldo
               </h1>
               <h3 class="text-xs">
-                {{ formatCurrency(totalBalance) }} 
+                {{ formatCurrency(props.totalBalance) }} 
                 <template v-if="selectedAccountsIds.length > 0">
                   | Dipilih : {{ formatCurrency(totalCurrentBalanceSelected) }}
                 </template>

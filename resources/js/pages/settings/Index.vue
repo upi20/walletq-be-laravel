@@ -19,7 +19,7 @@ const { trans } = useTranslation();
 const settingsItems = computed(() => [
   {
     title: trans('settings.items.accounts.title'),
-    description: trans('settings.items.accounts.description'),
+    description: trans('settings.items.accounts.note'),
     icon: CreditCard,
     href: '/settings/accounts',
     iconBg: 'bg-teal-100 dark:bg-teal-900',

@@ -68,8 +68,8 @@ export interface TranslationKeys {
       accounts: {
         title: string;
         title_create: string;
-        description: string;
-        description_create: string;
+        note: string;
+        note_create: string;
         back_to_list: string;
         add_account: string;
         edit_account: string;
@@ -83,8 +83,8 @@ export interface TranslationKeys {
         form: {
           name: string;
           name_placeholder: string;
-          description: string;
-          description_placeholder: string;
+          note: string;
+          note_placeholder: string;
           category: string;
           category_first_option: string;
           initial_balance: string;
@@ -188,8 +188,8 @@ export const translations: Record<'id' | 'en', TranslationKeys> = {
         accounts: {
           title: 'Rekening',
           title_create: 'Buat Rekening',
-          description: 'Kelola rekening keuangan Anda',
-          description_create: 'Buat rekening baru untuk mulai melacak keuangan Anda',
+          note: 'Kelola rekening keuangan Anda',
+          note_create: 'Buat rekening baru untuk mulai melacak keuangan Anda',
           back_to_list: 'Kembali ke Daftar',
           add_account: 'Tambah Rekening',
           edit_account: 'Edit Rekening',
@@ -203,8 +203,8 @@ export const translations: Record<'id' | 'en', TranslationKeys> = {
           form: {
             name: 'Nama',
             name_placeholder: 'Masukkan nama rekening',
-            description: 'Deskripsi',
-            description_placeholder: 'Masukkan deskripsi rekening',
+            note: 'Deskripsi',
+            note_placeholder: 'Masukkan deskripsi rekening',
             category: 'Kategori',
             category_first_option: 'Pilih Kategori',
             initial_balance: 'Saldo Awal',
@@ -304,8 +304,8 @@ export const translations: Record<'id' | 'en', TranslationKeys> = {
         accounts: {
           title: 'Accounts',
           title_create: 'Create Account',
-          description: 'Manage your financial accounts',
-          description_create: 'Create a new account to start tracking your finances',
+          note: 'Manage your financial accounts',
+          note_create: 'Create a new account to start tracking your finances',
           back_to_list: 'Back to List',
           add_account: 'Add Account',
           edit_account: 'Edit Account',
@@ -319,8 +319,8 @@ export const translations: Record<'id' | 'en', TranslationKeys> = {
           form: {
             name: 'Name',
             name_placeholder: 'Enter account name',
-            description: 'Description',
-            description_placeholder: 'Enter account description',
+            note: 'Description',
+            note_placeholder: 'Enter account description',
             category: 'Category',
             category_first_option: 'Select Category',
             initial_balance: 'Initial Balance',
