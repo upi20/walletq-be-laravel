@@ -15,12 +15,45 @@ class TransactionService
     {
         $month = $month ?: Carbon::now()->format('Y-m');
         
+        $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+        
         return Transaction::with(['account', 'category', 'tags'])
             ->where('user_id', $user->id)
-            ->whereRaw("DATE_FORMAT(date, '%Y-%m') = ?", [$month])
+            ->whereBetween('date', [$startDate, $endDate])
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
+    }
+
+    public function getMonthlyTransactionsGroupedByDate(User $user, string $month = null)
+    {
+        $transactions = $this->getMonthlyTransactions($user, $month);
+        $transactionGroupedByDate = $transactions->groupBy(function($transaction) {
+            return $transaction->date->format('Y-m-d');
+        });
+
+        // set carbon to indonesia
+        Carbon::setLocale('id');
+        $result = [];
+        foreach ($transactionGroupedByDate as $date => $transactions) {
+            $now = Carbon::parse($date);
+            $data = (object)[];
+            $data->label = $now->format('d');
+            $data->day = $now->format('l');
+            $data->month = $now->format('F Y');
+            $data->date = $date;
+
+            // amount
+            $data->amount = 0;
+            foreach ($transactions as $transaction) {
+                $data->amount += ( $transaction->type === 'income' ? $transaction->amount : -$transaction->amount);
+            }
+
+            $data->transactions = $transactions;
+            $result[] = $data;
+        }
+        return $result;
     }
 
     /**

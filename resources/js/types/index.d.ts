@@ -204,26 +204,3 @@ export interface ImportTransaction {
 
 export type BreadcrumbItemType = BreadcrumbItem;
 
-// Transaction List Response Types (Simplified)
-export interface TransactionListResponse {
-  data: Transaction[];
-  summary: {
-    total_income: number;
-    total_expense: number;
-    net_amount: number;
-    transaction_count: number;
-    month: string;
-  };
-  master_data: {
-    accounts: Account[];
-    income_categories: TransactionCategory[];
-    expense_categories: TransactionCategory[];
-    tags: Tag[];
-    flag_options: Array<{ value: string; label: string; }>;
-    type_options: Array<{ value: string; label: string; }>;
-  };
-  filters: {
-    month?: string;
-  };
-}
-

@@ -20,20 +20,18 @@ class TransactionController extends Controller
     {
         $user = $request->user();
         $month = $request->get('month', now()->format('Y-m'));
-        
+
         // Get monthly transactions
-        $transactions = $this->transactionService->getMonthlyTransactions($user, $month);
-        
+        $transactions = $this->transactionService->getMonthlyTransactionsGroupedByDate($user, $month);
+
         // Get monthly summary
         $summary = $this->transactionService->getMonthlySummary($user, $month);
-        
+
         // Get master data for filters
         $masterData = [
             'accounts' => $this->transactionService->getUserAccounts($user),
-            'income_categories' => $this->transactionService->getUserTransactionCategories($user)
-                ->where('type', 'income'),
-            'expense_categories' => $this->transactionService->getUserTransactionCategories($user)
-                ->where('type', 'expense'),
+            'income_categories' => $this->transactionService->getUserTransactionCategories($user)->where('type', 'income'),
+            'expense_categories' => $this->transactionService->getUserTransactionCategories($user)->where('type', 'expense'),
             'tags' => $this->transactionService->getUserTags($user),
             'flag_options' => [
                 ['value' => 'normal', 'label' => 'Normal'],
@@ -55,7 +53,9 @@ class TransactionController extends Controller
                 'data' => $transactions,
                 'summary' => $summary,
                 'master_data' => $masterData,
-                'filters' => $request->only(['month']),
+                'filters' => [
+                    'month' => $month,
+                ],
             ],
             'pageTitle' => 'Transaksi',
         ]);
