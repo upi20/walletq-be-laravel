@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ref, computed, onBeforeUnmount } from 'vue';
-import { 
-  CreditCard, 
-  Plus, 
-  Search, 
-  Edit, 
-  Eye, 
+import {
+  CreditCard,
+  Plus,
+  Search,
+  Edit,
+  Eye,
   Trash2,
   MoreVertical,
   ArrowLeft,
@@ -99,11 +99,11 @@ const filteredAndSortedAccounts = computed(() => {
 
 // perform a backend request with search param (updates URL)
 const search = () => {
-  router.get('/settings/accounts', { 
+  router.get('/settings/accounts', {
     search: searchQuery.value,
     sortField: sortField.value,
     sortOrder: sortOrder.value,
-  }, { 
+  }, {
     preserveState: true,
     preserveScroll: true,
     only: ['accounts'],
@@ -124,7 +124,7 @@ const toggleSort = (field: 'name' | 'current_balance') => {
 
 const deleteAccount = async (account: Account) => {
   const confirmed = await confirmDelete(account.name);
-  
+
   if (confirmed) {
     router.delete(`/settings/accounts/${account.id}`, {
       onStart: () => {
@@ -156,7 +156,7 @@ const showToastExamples = () => {
     message: 'Data telah disimpan dengan baik.',
     duration: 4000
   });
-  
+
   // Error toast with persistent option
   setTimeout(() => {
     error('Terjadi kesalahan sistem', {
@@ -164,7 +164,7 @@ const showToastExamples = () => {
       persistent: true
     });
   }, 1000);
-  
+
   // Warning toast
   setTimeout(() => {
     warning('Peringatan penting', {
@@ -172,7 +172,7 @@ const showToastExamples = () => {
       duration: 6000
     });
   }, 2000);
-  
+
   // Info toast
   setTimeout(() => {
     info('Informasi sistem', {
@@ -189,7 +189,7 @@ const showConfirmationExamples = async () => {
   if (deleteConfirmed) {
     success('Item berhasil dihapus!');
   }
-  
+
   // Action confirmation
   setTimeout(async () => {
     const actionConfirmed = await confirmAction(
@@ -200,7 +200,7 @@ const showConfirmationExamples = async () => {
       info('Proses dilanjutkan', { message: 'Tindakan berhasil dikonfirmasi.' });
     }
   }, 1000);
-  
+
   // Alert info
   setTimeout(async () => {
     await alert(
@@ -234,7 +234,7 @@ const idHasBeenSelected = (accountId: number) => {
 const totalCurrentBalanceSelected = computed(() => {
   return props.accounts
     .filter(account => selectedAccountsIds.value.includes(account.id))
-    .reduce((sum, account) => Number(sum) + Number(account.current_balance), 0); 
+    .reduce((sum, account) => Number(sum) + Number(account.current_balance), 0);
 });
 
 const refresh = () => {
@@ -249,6 +249,7 @@ const refresh = () => {
 
 <template>
   <FinancialAppLayout :showHeader="false" :showFab="false" containerClass="px-3 pt-6 pb-32">
+
     <Head :title="trans('accounts.title')" />
 
     <!-- Header -->
@@ -256,12 +257,11 @@ const refresh = () => {
       <div class="flex items-center justify-between mb-4">
         <Link
           href="/settings"
-          class="inline-flex items-center text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 transition-colors"
-        >
-          <ArrowLeft class="w-4 h-4 mr-2" />
-          {{ trans('settings.back_to_settings') }}
+          class="inline-flex items-center text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 transition-colors">
+        <ArrowLeft class="w-4 h-4 mr-2" />
+        {{ trans('settings.back_to_settings') }}
         </Link>
-        
+
         <div class="flex items-center gap-2">
           <LanguageSwitcher />
           <!-- Demo Buttons -->
@@ -285,11 +285,12 @@ const refresh = () => {
           </div>
         </div>
       </div>
-      
+
       <div class="flex items-center justify-between gap-4">
         <div>
           <div class="flex items-center gap-3 mb-2">
-            <div class="w-10 h-10 bg-gradient-to-r from-teal-500 to-coral-500 rounded-xl flex items-center justify-center">
+            <div
+              class="w-10 h-10 bg-gradient-to-r from-teal-500 to-coral-500 rounded-xl flex items-center justify-center">
               <CreditCard class="w-5 h-5 text-white" />
             </div>
             <div>
@@ -297,7 +298,7 @@ const refresh = () => {
                 Total Saldo
               </h1>
               <h3 class="text-xs">
-                {{ formatCurrency(props.totalBalance) }} 
+                {{ formatCurrency(props.totalBalance) }}
                 <template v-if="selectedAccountsIds.length > 0">
                   | Dipilih : {{ formatCurrency(totalCurrentBalanceSelected) }}
                 </template>
@@ -307,44 +308,33 @@ const refresh = () => {
 
         </div>
         <!-- refresh button -->
-        <button
-          @click="refresh"
-          class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
-        >
+        <button @click="refresh"
+          class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
           <RefreshCcw class="w-4 h-4" />
         </button>
       </div>
     </div>
 
     <!-- Search -->
-    <div 
-      v-if="showFilterModal"
+    <div v-if="showFilterModal"
       class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-6 mt-5">
       <div class="flex flex-col sm:flex-row gap-4">
         <form class="relative flex-1" @submit.prevent="search">
           <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            v-model="searchQuery"
-            type="search"
-            :placeholder="trans('accounts.search_placeholder')"
+          <input v-model="searchQuery" type="search" :placeholder="trans('accounts.search_placeholder')"
             class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-            @keyup="onKeyupSearch"
-          />
+            @keyup="onKeyupSearch" />
         </form>
         <div class="flex items-center gap-2">
-          <div class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-            <button
-              @click.prevent="toggleSort('name')"
-              class="px-3 py-2 text-sm flex items-center gap-2"
-            >
+          <div
+            class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button @click.prevent="toggleSort('name')" class="px-3 py-2 text-sm flex items-center gap-2">
               {{ trans('common.name') }}
               <ChevronUp v-if="sortField === 'name' && sortOrder === 'asc'" class="w-4 h-4" />
               <ChevronDown v-else-if="sortField === 'name' && sortOrder === 'desc'" class="w-4 h-4" />
             </button>
-            <button
-              @click.prevent="toggleSort('current_balance')"
-              class="px-3 py-2 text-sm flex items-center gap-2 border-l border-gray-200 dark:border-gray-700"
-            >
+            <button @click.prevent="toggleSort('current_balance')"
+              class="px-3 py-2 text-sm flex items-center gap-2 border-l border-gray-200 dark:border-gray-700">
               {{ trans('accounts.balance') }}
               <ChevronUp v-if="sortField === 'current_balance' && sortOrder === 'asc'" class="w-4 h-4" />
               <ChevronDown v-else-if="sortField === 'current_balance' && sortOrder === 'desc'" class="w-4 h-4" />
@@ -367,12 +357,10 @@ const refresh = () => {
       </div>
       <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">{{ trans('accounts.no_accounts') }}</h3>
       <p class="text-gray-600 dark:text-gray-400 mb-6">{{ trans('accounts.no_accounts_subtitle') }}</p>
-      <Link
-        href="/settings/accounts/create"
-        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-600 to-coral-600 text-white rounded-xl font-medium hover:from-teal-700 hover:to-coral-700 transition-all duration-200"
-      >
-        <Plus class="w-5 h-5 mr-2" />
-        {{ trans('accounts.create_account') }}
+      <Link href="/settings/accounts/create"
+        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-600 to-coral-600 text-white rounded-xl font-medium hover:from-teal-700 hover:to-coral-700 transition-all duration-200">
+      <Plus class="w-5 h-5 mr-2" />
+      {{ trans('accounts.create_account') }}
       </Link>
     </div>
 
@@ -382,25 +370,24 @@ const refresh = () => {
     </div>
 
     <div v-else class="grid grid-cols-1 gap-1 mb-20">
-      <div
-        v-for="(account, index) in filteredAndSortedAccounts"
-        :key="account.id"
-        :class="[
-          'group rounded-md p-0 shadow-sm border transition-all duration-300',
-          index % 2 === 0 
-            ? 'bg-white dark:bg-gray-800 border-none hover:shadow-lg hover:shadow-teal-500/10' 
-            : 'bg-teal-50 dark:bg-teal-900/20 border-none hover:shadow-lg hover:shadow-coral-500/10'
-        ]"
-      >
+      <div v-for="(account, index) in filteredAndSortedAccounts" :key="account.id" :class="[
+        'group rounded-md p-0 shadow-sm border transition-all duration-300',
+        index % 2 === 0
+          ? 'bg-white dark:bg-gray-800 border-none hover:shadow-lg hover:shadow-teal-500/10'
+          : 'bg-teal-50 dark:bg-teal-900/20 border-none hover:shadow-lg hover:shadow-coral-500/10'
+      ]">
         <!-- Account Header -->
         <div class="flex items-start justify-between">
           <div class="flex items-center gap-3" @click="handleSelectAccount(account.id)">
-            <div class="ms-2 w-8 h-8 bg-gradient-to-r from-teal-100 to-coral-100 dark:from-teal-900 dark:to-coral-900 rounded-md flex items-center justify-center">
-              <CreditCard v-if="idHasBeenSelected(account.id) == false" class="w-6 h-6 text-teal-600 dark:text-teal-400" />
+            <div
+              class="ms-2 w-8 h-8 bg-gradient-to-r from-teal-100 to-coral-100 dark:from-teal-900 dark:to-coral-900 rounded-md flex items-center justify-center">
+              <CreditCard v-if="idHasBeenSelected(account.id) == false"
+                class="w-6 h-6 text-teal-600 dark:text-teal-400" />
               <Check v-else class="w-6 h-6 text-teal-600 dark:text-teal-400" />
             </div>
             <div>
-              <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+              <h3
+                class="font-semibold text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                 {{ account.name }}
               </h3>
               <div class="flex items-center gap-2 mb-1">
@@ -410,31 +397,24 @@ const refresh = () => {
               </div>
             </div>
           </div>
-          
+
           <div class="relative">
             <button
               class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center transition-colors mt-1"
-              @click="toggleMenu(account.id)"
-            >
+              @click="toggleMenu(account.id)">
               <MoreVertical class="w-4 h-4 text-gray-400" />
             </button>
-            
+
             <!-- Dropdown Menu -->
-            <div
-              v-if="activeMenu === account.id"
-              class="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10"
-            >
-              <Link
-                :href="`/settings/accounts/${account.id}/edit`"
-                class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-              >
-                <Edit class="w-4 h-4 mr-3" />
-                {{ trans('accounts.edit_account') }}
+            <div v-if="activeMenu === account.id"
+              class="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10">
+              <Link :href="`/settings/accounts/${account.id}/edit`"
+                class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+              <Edit class="w-4 h-4 mr-3" />
+              {{ trans('accounts.edit_account') }}
               </Link>
-              <button
-                @click="deleteAccount(account)"
-                class="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
-              >
+              <button @click="deleteAccount(account)"
+                class="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">
                 <Trash2 class="w-4 h-4 mr-3" />
                 {{ trans('accounts.delete_account') }}
               </button>
@@ -444,20 +424,19 @@ const refresh = () => {
       </div>
     </div>
 
-    <!-- Floating Action Button Filter data -->
-    <button
-      @click="toggleFilterModal"
-    class="fixed bottom-20 left-6 w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
-    >
-      <Filter class="w-6 h-6 text-white" />
-    </button>
+    <div class="fixed bottom-20 left-1/2 transform -translate-x-1/2 w-full max-w-[640px] px-4 pointer-events-none z-40">
+      <!-- between -->
+      <div class="flex pointer-events-auto justify-between">
+        <button @click="toggleFilterModal"
+          class="w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95">
+          <Filter class="w-6 h-6 text-white" />
+        </button>
+        <Link href="/settings/accounts/create" :title="trans('accounts.add_account')"
+          class="w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95">
+        <Plus class="w-6 h-6 text-white" />
+        </Link>
+      </div>
+    </div>
 
-    <Link
-      href="/settings/accounts/create"
-      :title="trans('accounts.add_account')"
-      class="fixed bottom-20 right-6 w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
-    >
-      <Plus class="w-6 h-6 text-white" />
-    </Link>
   </FinancialAppLayout>
 </template>

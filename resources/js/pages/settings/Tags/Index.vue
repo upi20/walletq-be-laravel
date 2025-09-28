@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, computed, onBeforeUnmount } from 'vue';
-import { 
-  Hash, 
-  Plus, 
-  Search, 
-  Edit, 
-  Eye, 
+import {
+  Hash,
+  Plus,
+  Search,
+  Edit,
+  Eye,
   Trash2,
   MoreVertical,
   ArrowLeft,
@@ -98,11 +98,11 @@ const filteredAndSortedTags = computed(() => {
 
 // perform a backend request with search param (updates URL)
 const search = () => {
-  router.get('/settings/tags', { 
+  router.get('/settings/tags', {
     search: searchQuery.value,
     sortField: sortField.value,
     sortOrder: sortOrder.value,
-  }, { 
+  }, {
     preserveState: true,
     preserveScroll: true,
     only: ['tags'],
@@ -123,7 +123,7 @@ const toggleSort = (field: 'name') => {
 
 const deleteTag = async (tag: Tag) => {
   const confirmed = await confirmDelete(tag.name);
-  
+
   if (confirmed) {
     router.delete(`/settings/tags/${tag.id}`, {
       onStart: () => {
@@ -173,6 +173,7 @@ const idHasBeenSelected = (tagId: number) => {
 
 <template>
   <FinancialAppLayout :showHeader="false" :showFab="false" containerClass="px-3 pt-6 pb-32">
+
     <Head title="Tag" />
 
     <!-- Header -->
@@ -180,21 +181,21 @@ const idHasBeenSelected = (tagId: number) => {
       <div class="flex items-center justify-between mb-4">
         <Link
           href="/settings"
-          class="inline-flex items-center text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 transition-colors"
-        >
-          <ArrowLeft class="w-4 h-4 mr-2" />
-          Kembali ke Pengaturan
+          class="inline-flex items-center text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 transition-colors">
+        <ArrowLeft class="w-4 h-4 mr-2" />
+        Kembali ke Pengaturan
         </Link>
-        
+
         <div class="flex items-center gap-2">
           <LanguageSwitcher />
         </div>
       </div>
-      
+
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div class="flex items-center gap-3 mb-2">
-            <div class="w-10 h-10 bg-gradient-to-r from-teal-500 to-coral-500 rounded-xl flex items-center justify-center">
+            <div
+              class="w-10 h-10 bg-gradient-to-r from-teal-500 to-coral-500 rounded-xl flex items-center justify-center">
               <Hash class="w-5 h-5 text-white" />
             </div>
             <div>
@@ -211,7 +212,7 @@ const idHasBeenSelected = (tagId: number) => {
     </div>
 
     <!-- Search -->
-    <div 
+    <div
       v-if="showFilterModal"
       class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-6 mt-5">
       <div class="flex flex-col sm:flex-row gap-4">
@@ -222,15 +223,14 @@ const idHasBeenSelected = (tagId: number) => {
             type="search"
             placeholder="Cari tag..."
             class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-            @keyup="onKeyupSearch"
-          />
+            @keyup="onKeyupSearch" />
         </form>
         <div class="flex items-center gap-2">
-          <div class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          <div
+            class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
             <button
               @click.prevent="toggleSort('name')"
-              class="px-3 py-2 text-sm flex items-center gap-2"
-            >
+              class="px-3 py-2 text-sm flex items-center gap-2">
               Nama
               <ChevronUp v-if="sortField === 'name' && sortOrder === 'asc'" class="w-4 h-4" />
               <ChevronDown v-else-if="sortField === 'name' && sortOrder === 'desc'" class="w-4 h-4" />
@@ -249,10 +249,9 @@ const idHasBeenSelected = (tagId: number) => {
       <p class="text-gray-600 dark:text-gray-400 mb-6">Mulai dengan menambahkan tag pertama Anda</p>
       <Link
         href="/settings/tags/create"
-        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-600 to-coral-600 text-white rounded-xl font-medium hover:from-teal-700 hover:to-coral-700 transition-all duration-200"
-      >
-        <Plus class="w-5 h-5 mr-2" />
-        Tambah Tag
+        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-600 to-coral-600 text-white rounded-xl font-medium hover:from-teal-700 hover:to-coral-700 transition-all duration-200">
+      <Plus class="w-5 h-5 mr-2" />
+      Tambah Tag
       </Link>
     </div>
 
@@ -267,54 +266,52 @@ const idHasBeenSelected = (tagId: number) => {
         :key="tag.id"
         :class="[
           'group rounded-xl p-4 shadow-sm border transition-all duration-300',
-          index % 2 === 0 
-            ? 'bg-white dark:bg-gray-800 border-none hover:shadow-lg hover:shadow-teal-500/10' 
+          index % 2 === 0
+            ? 'bg-white dark:bg-gray-800 border-none hover:shadow-lg hover:shadow-teal-500/10'
             : 'bg-teal-50 dark:bg-teal-900/20 border-none hover:shadow-lg hover:shadow-coral-500/10'
-        ]"
-      >
+        ]">
         <!-- Tag Header -->
         <div class="flex items-start justify-between">
           <div class="flex items-center gap-3" @click="handleSelectTag(tag.id)">
-            <div class="w-8 h-8 bg-gradient-to-r from-teal-100 to-coral-100 dark:from-teal-900 dark:to-coral-900 rounded-md flex items-center justify-center">
+            <div
+              class="w-8 h-8 bg-gradient-to-r from-teal-100 to-coral-100 dark:from-teal-900 dark:to-coral-900 rounded-md flex items-center justify-center">
               <Hash v-if="idHasBeenSelected(tag.id) == false" class="w-6 h-6 text-teal-600 dark:text-teal-400" />
               <Check v-else class="w-6 h-6 text-teal-600 dark:text-teal-400" />
             </div>
             <div>
-              <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+              <h3
+                class="font-semibold text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                 {{ tag.name }}
               </h3>
               <div class="flex items-center gap-2 mb-1">
-                <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                <span
+                  class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                   Tag
                 </span>
               </div>
             </div>
           </div>
-          
+
           <div class="relative">
             <button
               class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center transition-colors"
-              @click="toggleMenu(tag.id)"
-            >
+              @click="toggleMenu(tag.id)">
               <MoreVertical class="w-4 h-4 text-gray-400" />
             </button>
-            
+
             <!-- Dropdown Menu -->
             <div
               v-if="activeMenu === tag.id"
-              class="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10"
-            >
+              class="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10">
               <Link
                 :href="`/settings/tags/${tag.id}/edit`"
-                class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-              >
-                <Edit class="w-4 h-4 mr-3" />
-                Edit Tag
+                class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+              <Edit class="w-4 h-4 mr-3" />
+              Edit Tag
               </Link>
               <button
                 @click="deleteTag(tag)"
-                class="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
-              >
+                class="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">
                 <Trash2 class="w-4 h-4 mr-3" />
                 Hapus Tag
               </button>
@@ -324,20 +321,20 @@ const idHasBeenSelected = (tagId: number) => {
       </div>
     </div>
 
-    <!-- Floating Action Button Filter data -->
-    <button
-      @click="toggleFilterModal"
-      class="fixed bottom-20 left-6 w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
-    >
-      <Filter class="w-6 h-6 text-white" />
-    </button>
 
-    <Link
-      href="/settings/tags/create"
-      title="Tambah Tag"
-      class="fixed bottom-20 right-6 w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
-    >
-      <Plus class="w-6 h-6 text-white" />
-    </Link>
+
+    <div class="fixed bottom-20 left-1/2 transform -translate-x-1/2 w-full max-w-[640px] px-4 pointer-events-none z-40">
+      <!-- between -->
+      <div class="flex pointer-events-auto justify-between">
+        <button @click="toggleFilterModal"
+          class="w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95">
+          <Filter class="w-6 h-6 text-white" />
+        </button>
+        <Link href="/settings/tags/create"
+          class="w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95">
+        <Plus class="w-6 h-6 text-white" />
+        </Link>
+      </div>
+    </div>
   </FinancialAppLayout>
 </template>

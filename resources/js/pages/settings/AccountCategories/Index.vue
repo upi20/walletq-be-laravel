@@ -348,20 +348,18 @@ const getTypeBadgeClass = (type?: string | null) => {
       </div>
     </div>
 
-    <!-- Floating Action Button Filter data -->
-    <button
-      @click="toggleFilterModal"
-      class="fixed bottom-20 left-6 w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
-    >
-      <Filter class="w-6 h-6 text-white" />
-    </button>
-
-    <Link
-      href="/settings/account-categories/create"
-      title="Tambah Kategori"
-      class="fixed bottom-20 right-6 w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
-    >
-      <Plus class="w-6 h-6 text-white" />
-    </Link>
+    <div class="fixed bottom-20 left-1/2 transform -translate-x-1/2 w-full max-w-[640px] px-4 pointer-events-none z-40">
+      <!-- between -->
+      <div class="flex pointer-events-auto justify-between">
+        <button @click="toggleFilterModal"
+          class="w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95">
+          <Filter class="w-6 h-6 text-white" />
+        </button>
+        <Link href="/settings/account-categories/create"
+          class="w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95">
+        <Plus class="w-6 h-6 text-white" />
+        </Link>
+      </div>
+    </div>
   </FinancialAppLayout>
 </template>

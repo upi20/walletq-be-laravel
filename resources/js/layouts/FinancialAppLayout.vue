@@ -2,11 +2,11 @@
 import { computed, reactive } from 'vue';
 import { usePage, Link } from '@inertiajs/vue3';
 import { useDarkMode } from '@/composables/useDarkMode';
-import { 
-  Home, 
-  TrendingUp, 
-  PieChart, 
-  Settings, 
+import {
+  Home,
+  TrendingUp,
+  PieChart,
+  Settings,
   Bell,
   Plus,
   Moon,
@@ -63,10 +63,9 @@ bottomNavItems.forEach(item => {
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300 max-w-[640px] mx-auto">
     <!-- Curved Header dengan Gradient -->
-    <header 
-      v-if="showHeader" 
-      class="relative h-70 bg-gradient-to-br from-teal-500 to-teal-600 dark:from-teal-700 dark:to-teal-800 rounded-b-8 px-6 pt-12 pb-6"
-    >
+    <header
+      v-if="showHeader"
+      class="relative h-70 bg-gradient-to-br from-teal-500 to-teal-600 dark:from-teal-700 dark:to-teal-800 rounded-b-8 px-6 pt-12 pb-6">
       <!-- Top Section: Greeting & Actions -->
       <div class="flex justify-between items-start mb-8">
         <div>
@@ -77,18 +76,17 @@ bottomNavItems.forEach(item => {
             {{ user?.name || 'User' }}
           </h1>
         </div>
-        
+
         <!-- Top Actions -->
         <div class="flex items-center space-x-3">
           <!-- Dark Mode Toggle -->
-          <button 
+          <button
             @click="toggleDarkMode"
-            class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors duration-200"
-          >
+            class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors duration-200">
             <Sun v-if="isDarkMode" class="w-5 h-5 text-white" />
             <Moon v-else class="w-5 h-5 text-white" />
           </button>
-          
+
           <!-- Notification Icon -->
           <div class="relative">
             <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -114,17 +112,21 @@ bottomNavItems.forEach(item => {
     </header>
 
     <!-- Floating Tab Navigation -->
-    <nav 
-      v-if="showHeader" 
+    <nav
+      v-if="showHeader"
       class="relative -mt-6 mx-6 mb-8">
-      <div class="bg-white dark:bg-gray-800 rounded-full h-12 shadow-lg flex items-center p-1 transition-colors duration-300">
-        <button class="flex-1 h-10 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 text-white rounded-full text-sm font-semibold transition-all duration-300">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-full h-12 shadow-lg flex items-center p-1 transition-colors duration-300">
+        <button
+          class="flex-1 h-10 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 text-white rounded-full text-sm font-semibold transition-all duration-300">
           Overview
         </button>
-        <button class="flex-1 h-10 text-gray-500 dark:text-gray-400 rounded-full text-sm font-medium transition-all duration-300 hover:text-gray-700 dark:hover:text-gray-300">
+        <button
+          class="flex-1 h-10 text-gray-500 dark:text-gray-400 rounded-full text-sm font-medium transition-all duration-300 hover:text-gray-700 dark:hover:text-gray-300">
           Expenses
         </button>
-        <button class="flex-1 h-10 text-gray-500 dark:text-gray-400 rounded-full text-sm font-medium transition-all duration-300 hover:text-gray-700 dark:hover:text-gray-300">
+        <button
+          class="flex-1 h-10 text-gray-500 dark:text-gray-400 rounded-full text-sm font-medium transition-all duration-300 hover:text-gray-700 dark:hover:text-gray-300">
           Income
         </button>
       </div>
@@ -136,35 +138,37 @@ bottomNavItems.forEach(item => {
     </main>
 
     <!-- Bottom Navigation -->
-    <nav 
-      v-if="showBottomNav" 
-      class="fixed bottom-0 left-0 right-0 max-w-[640px] mx-auto bg-white dark:bg-gray-900 shadow-sm border-gray-200 dark:border-gray-700 h-16 flex items-center justify-around px-4 transition-colors duration-300 z-40"
-    >
-      <Link 
-        v-for="item in bottomNavItems" 
+    <nav
+      v-if="showBottomNav"
+      class="fixed bottom-0 left-0 right-0 max-w-[640px] mx-auto bg-white dark:bg-gray-900 shadow-sm border-gray-200 dark:border-gray-700 h-16 flex items-center justify-around px-4 transition-colors duration-300 z-40">
+      <Link
+        v-for="item in bottomNavItems"
         :key="item.route"
         :href="`/${item.route}`"
         class="flex flex-col items-center justify-center w-12 h-12 transition-colors duration-200"
         :class="item.active ? 'text-teal-600 dark:text-teal-400' : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400'"
         :title="item.label"
-        :tooltip="item.label"
-      >
-        <component :is="item.icon" class="w-6 h-6" />
-        <!-- <span class="text-xs mt-1">{{ item.label }}</span> -->
+        :tooltip="item.label">
+      <component :is="item.icon" class="w-6 h-6" />
+      <!-- <span class="text-xs mt-1">{{ item.label }}</span> -->
       </Link>
     </nav>
 
     <!-- Floating Action Button -->
-    <button 
+    <div
       v-if="showFab"
-      class="fixed bottom-20 right-6 w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
-    >
-      <Plus class="w-6 h-6 text-white" />
-    </button>
+      class="fixed bottom-20 left-1/2 transform -translate-x-1/2 w-full max-w-[640px] px-4 pointer-events-none z-40">
+      <div class="flex justify-end pointer-events-auto">
+        <button
+          class="w-14 h-14 bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95">
+          <Plus class="w-6 h-6 text-white" />
+        </button>
+      </div>
+    </div>
 
     <!-- Toast Container -->
     <ToastContainer />
-    
+
     <!-- Confirmation Container -->
     <ConfirmationContainer />
   </div>
@@ -178,6 +182,7 @@ bottomNavItems.forEach(item => {
 }
 
 .h-70 {
-  height: 17.5rem; /* 280px */
+  height: 17.5rem;
+  /* 280px */
 }
 </style>

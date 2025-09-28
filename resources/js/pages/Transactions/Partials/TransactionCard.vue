@@ -108,7 +108,8 @@ const dateTimeOnly = (date: string) => {
 </script>
 
 <template>
-  <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-200" :class="{ 'bg-red-50 dark:bg-red-900/10': bulkMode && !canDelete }">
+  <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-200"
+    :class="{ 'bg-red-50 dark:bg-red-900/10': bulkMode && !canDelete }">
     <div class="flex items-start gap-3">
       <!-- Bulk Mode Checkbox -->
       <div v-if="bulkMode" class="flex-shrink-0 mt-1">
@@ -116,12 +117,11 @@ const dateTimeOnly = (date: string) => {
           @click="handleToggleSelect"
           :disabled="!canDelete"
           class="w-5 h-5 rounded border-2 transition-all duration-200 flex items-center justify-center"
-          :class="canDelete 
-            ? (selected 
-                ? 'bg-teal-500 border-teal-500 hover:bg-teal-600 hover:border-teal-600' 
-                : 'border-gray-300 dark:border-gray-600 hover:border-teal-500')
-            : 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 cursor-not-allowed opacity-50'"
-        >
+          :class="canDelete
+            ? (selected
+              ? 'bg-teal-500 border-teal-500 hover:bg-teal-600 hover:border-teal-600'
+              : 'border-gray-300 dark:border-gray-600 hover:border-teal-500')
+            : 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 cursor-not-allowed opacity-50'">
           <Check v-if="selected && canDelete" class="w-3 h-3 text-white" />
         </button>
       </div>
@@ -146,28 +146,40 @@ const dateTimeOnly = (date: string) => {
             </h4>
 
             <!-- Account & Category Info -->
-            <div class="flex items-center gap-2 mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
               <button
                 @click="emit('accountClick', transaction.account_id!)"
-                class="flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-1 py-0.5 -mx-1 transition-colors duration-200">
-                <CreditCard class="w-3 h-3" />
-                <span>{{ transaction.account?.name || 'Akun Tidak Diketahui' }}</span>
+                class="inline-block hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors duration-200 text-nowrap pe-2">
+                <div class="flex items-center gap-1">
+                  <CreditCard class="w-3 h-3" />
+                  <span>{{ transaction.account?.name || 'Akun Tidak Diketahui' }}</span>
+                </div>
               </button>
-
-              <span class="text-gray-300 dark:text-gray-600">•</span>
 
               <button
                 v-if="transaction.transaction_category_id"
                 @click="emit('categoryClick', transaction.transaction_category_id!)"
-                class="flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded px-1 py-0.5 -mx-1 transition-colors duration-200">
-                <div
-                  class="w-2 h-2 rounded-full"
-                  :class="transaction.category?.type === 'income' ? 'bg-teal-500' : 'bg-coral-500'"></div>
-                <span>{{ transaction.category?.name || 'Kategori Tidak Diketahui' }}</span>
+                class="inline-block hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors duration-200 text-nowrap pe-2">
+                <div class="flex items-center gap-1">
+                  <div
+                    class="w-3 h-3 rounded-full"
+                    :class="transaction.category?.type === 'income' ? 'bg-teal-500' : 'bg-coral-500'"></div>
+                  <span>{{ transaction.category?.name || 'Kategori Tidak Diketahui' }}</span>
+                </div>
               </button>
 
               <!-- time -->
-              {{ dateTimeOnly(transaction.date) }}
+              <div class="inline-block pe-2">
+                <div class="text-nowrap flex items-center">
+                  <!-- clock icon -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-3 h-3 mr-1" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {{ dateTimeOnly(transaction.date) }}
+                </div>
+              </div>
             </div>
 
             <!-- Flag Badge & Tags -->
@@ -251,7 +263,7 @@ const dateTimeOnly = (date: string) => {
         <button
           @click="handleAction('delete')"
           :disabled="!canDelete"
-          :class="canDelete 
+          :class="canDelete
             ? 'text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'
             : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'"
           class="flex items-center gap-3 w-full px-4 py-3 text-sm transition-colors duration-200">

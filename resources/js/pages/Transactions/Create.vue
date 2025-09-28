@@ -604,6 +604,7 @@ onUnmounted(() => {
           <input
             @input="handleSingleAmountInput"
             type="text"
+            inputmode="numeric"
             placeholder=" "
             :value="displayAmount"
             :class="[
@@ -765,6 +766,7 @@ onUnmounted(() => {
               <input
                 @input="handleBulkAmountInput($event, index)"
                 type="text"
+                inputmode="numeric"
                 placeholder="Jumlah"
                 :value="bulkDisplayAmounts[index] || ''"
                 class="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500"
