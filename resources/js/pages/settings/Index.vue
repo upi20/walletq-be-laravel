@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { 
-  CreditCard, 
-  FolderOpen, 
-  ArrowRightLeft, 
-  Tag, 
+import { Head, Link, router } from '@inertiajs/vue3';
+import {
+  CreditCard,
+  FolderOpen,
+  ArrowRightLeft,
+  Tag,
   Info,
-  ChevronRight 
+  ChevronRight,
+  LogOut
 } from 'lucide-vue-next';
 import FinancialAppLayout from '@/layouts/FinancialAppLayout.vue';
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import { useTranslation } from '@/composables/useTranslation';
+import { logout } from '@/routes';
 import { reactive, computed } from 'vue';
 
 // Translation
@@ -59,10 +61,15 @@ const settingsItems = computed(() => [
   },
 ]);
 
+const handleLogout = () => {
+  router.flushAll();
+};
+
 </script>
 
 <template>
   <FinancialAppLayout :showHeader="false" :showFab="false" containerClass="px-3 pt-6 pb-32">
+
     <Head :title="trans('settings.index.title')" />
 
     <!-- Header -->
@@ -84,26 +91,24 @@ const settingsItems = computed(() => [
         v-for="item in settingsItems"
         :key="item.href"
         :href="item.href"
-        class="group block p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300"
-      >
+        class="group block p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
             <!-- Icon -->
-            <div 
+            <div
               :class="[
                 'w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105',
                 item.iconBg
-              ]"
-            >
-              <component 
-                :is="item.icon" 
-                :class="['w-6 h-6', item.iconColor]" 
-              />
+              ]">
+              <component
+                :is="item.icon"
+                :class="['w-6 h-6', item.iconColor]" />
             </div>
 
             <!-- Content -->
             <div>
-              <h3 class="font-medium text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+              <h3
+                class="font-medium text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                 {{ item.title }}
               </h3>
               <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -114,6 +119,39 @@ const settingsItems = computed(() => [
 
           <!-- Arrow -->
           <ChevronRight class="w-5 h-5 text-gray-400 group-hover:text-teal-500 transition-colors" />
+        </div>
+      </Link>
+    </div>
+
+    <!-- Logout Section -->
+    <div class="mt-8">
+      <Link
+        :href="logout().url"
+        method="post"
+        as="button"
+        @click="handleLogout"
+        class="group w-full p-4 bg-gradient-to-r from-coral-500 to-coral-600 dark:from-coral-600 dark:to-coral-700 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border border-transparent dark:border-white/10">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <!-- Icon -->
+            <div
+              class="w-12 h-12 rounded-xl bg-white/20 dark:bg-white/10 flex items-center justify-center transition-transform group-hover:scale-105">
+              <LogOut class="w-6 h-6 text-white" />
+            </div>
+
+            <!-- Content -->
+            <div class="text-left">
+              <h3 class="font-medium text-white">
+                {{ trans('settings.logout.title') }}
+              </h3>
+              <p class="text-sm text-white/80 mt-1">
+                {{ trans('settings.logout.description') }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Arrow -->
+          <ChevronRight class="w-5 h-5 text-white/80 group-hover:text-white transition-colors" />
         </div>
       </Link>
     </div>

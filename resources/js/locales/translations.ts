@@ -113,6 +113,10 @@ export interface TranslationKeys {
         description: string;
       };
     };
+    logout: {
+      title: string;
+      description: string;
+    };
   };
 
   // Messages
@@ -233,6 +237,10 @@ export const translations: Record<'id' | 'en', TranslationKeys> = {
           description: 'Informasi aplikasi dan detail sistem',
         },
       },
+      logout: {
+        title: 'Keluar',
+        description: 'Keluar dari akun Anda',
+      },
     },
     messages: {
       success: 'Berhasil',
@@ -348,6 +356,10 @@ export const translations: Record<'id' | 'en', TranslationKeys> = {
           title: 'About',
           description: 'Application information and system details',
         },
+      },
+      logout: {
+        title: 'Logout',
+        description: 'Sign out from your account',
       },
     },
     messages: {
