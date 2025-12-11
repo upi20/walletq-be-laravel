@@ -23,6 +23,11 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::delete('/{transaction}', [TransactionController::class, 'destroy'])->name('destroy');
         Route::delete('/', [TransactionController::class, 'bulkDestroy'])->name('bulk-destroy');
     });
+
+    // Reports Routes - NEW FEATURE (added 2025-12-11)
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Web\Reports\ReportController::class, 'index'])->name('index');
+    });
 });
 
 require __DIR__.'/settings.php';

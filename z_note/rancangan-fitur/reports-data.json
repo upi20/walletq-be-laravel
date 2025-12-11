@@ -1,0 +1,152 @@
+{
+  "filters": {
+    "month": "2025-03",
+    "period": "month",
+    "type": "both"
+  },
+  "summary": {
+    "total_income": 23281277,
+    "total_expense": 9756171,
+    "net_amount": 13525106,
+    "transaction_count": 67
+  },
+  "income_by_category": [
+    {
+      "category_id": 36,
+      "category_name": "Gaji Maxximum",
+      "total_amount": 20060000,
+      "transaction_count": 3,
+      "percentage": 88.05
+    },
+    {
+      "category_id": 23,
+      "category_name": "Terima Saldo",
+      "total_amount": 2721277,
+      "transaction_count": 9,
+      "percentage": 11.95
+    }
+  ],
+  "expense_by_category": [
+    {
+      "category_id": 22,
+      "category_name": "Kirim Saldo",
+      "total_amount": 3916231,
+      "transaction_count": 12,
+      "percentage": 45.22
+    },
+    {
+      "category_id": 21,
+      "category_name": "Elektronik",
+      "total_amount": 1500000,
+      "transaction_count": 1,
+      "percentage": 17.32
+    },
+    {
+      "category_id": 15,
+      "category_name": "Kost",
+      "total_amount": 750000,
+      "transaction_count": 1,
+      "percentage": 8.66
+    },
+    {
+      "category_id": 13,
+      "category_name": "Belanja",
+      "total_amount": 564773,
+      "transaction_count": 6,
+      "percentage": 6.52
+    },
+    {
+      "category_id": 44,
+      "category_name": "Transfer Amplop",
+      "total_amount": 550000,
+      "transaction_count": 2,
+      "percentage": 6.35
+    },
+    {
+      "category_id": 25,
+      "category_name": "Makan",
+      "total_amount": 534836,
+      "transaction_count": 11,
+      "percentage": 6.18
+    },
+    {
+      "category_id": 19,
+      "category_name": "Transportasi",
+      "total_amount": 450000,
+      "transaction_count": 9,
+      "percentage": 5.2
+    },
+    {
+      "category_id": 38,
+      "category_name": "Jajan",
+      "total_amount": 135000,
+      "transaction_count": 3,
+      "percentage": 1.56
+    },
+    {
+      "category_id": 16,
+      "category_name": "Tambah Pinjaman",
+      "total_amount": 100000,
+      "transaction_count": 1,
+      "percentage": 1.15
+    },
+    {
+      "category_id": 45,
+      "category_name": "Balance",
+      "total_amount": 68831,
+      "transaction_count": 1,
+      "percentage": 0.79
+    },
+    {
+      "category_id": 26,
+      "category_name": "Utang",
+      "total_amount": 56500,
+      "transaction_count": 1,
+      "percentage": 0.65
+    },
+    {
+      "category_id": 20,
+      "category_name": "Laundry",
+      "total_amount": 45000,
+      "transaction_count": 2,
+      "percentage": 0.52
+    },
+    {
+      "category_id": 46,
+      "category_name": "Lampu",
+      "total_amount": 35000,
+      "transaction_count": 1,
+      "percentage": 0.4
+    },
+    {
+      "category_id": 18,
+      "category_name": "Minuman",
+      "total_amount": 20000,
+      "transaction_count": 1,
+      "percentage": 0.23
+    },
+    {
+      "category_id": 30,
+      "category_name": "Kesehatan",
+      "total_amount": 20000,
+      "transaction_count": 1,
+      "percentage": 0.23
+    },
+    {
+      "category_id": 40,
+      "category_name": "Motor",
+      "total_amount": 15000,
+      "transaction_count": 1,
+      "percentage": 0.17
+    }
+  ],
+  "notes": {
+    "data_source": "Actual data from database using TransactionService",
+    "user_id": 2,
+    "date_range": "2025-03-01 to 2025-03-31",
+    "income_categories_with_data": 2,
+    "expense_categories_with_data": 16,
+    "largest_income_category": "Gaji Maxximum (88.05%)",
+    "largest_expense_category": "Kirim Saldo (45.22%)"
+  }
+}
